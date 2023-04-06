@@ -1,10 +1,15 @@
 {
   "name": "klaim",
-  "version": "0.1.0",
-  "description": "Klaim is a package that simplifies, automates, and organizes HTTP requests using axios. With Klaim, you can easily make HTTP requests and handle their responses in a more organized and streamlined way. Save time and boost your productivity with Klaim.",
-  "main": "main",
-  "repository": "https://github.com/antharuu/klaim",
-  "author": "Antharuu <antho.eclips@gmail.com>",
-  "license": "MIT",
-  "private": false
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0"
+  }
 }
