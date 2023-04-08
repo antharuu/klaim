@@ -1,47 +1,50 @@
-import Core from "./core";
-import {KlaimAPI} from "./types";
+import Core from './core'
+import { type KlaimAPI } from './types'
 
 export default class Api extends Core {
-    private static _apis: Record<string, KlaimAPI> = {}
+  private static _apis: Record<string, KlaimAPI> = {}
 
-    static get(id: string) {
-        return Api._apis[id]
+  static get (id: string): KlaimAPI {
+    if (!(id in Api._apis)) {
+      throw new Error(`Api not found: ${id}`)
     }
 
-    static create(id: string, api: Omit<KlaimAPI, 'id'> | string) {
-        if (typeof api === 'string') {
-            api = {baseUrl: api}
-        }
+    return Api._apis[id]
+  }
 
-        api = Api.cleanQueryParameters(api)
-        api = Api.cleanBaseUrl(api)
-
-        Api._apis[id] = {
-            id,
-            ...api
-        }
+  static create (id: string, api: Omit<KlaimAPI, 'id'> | string): void {
+    if (typeof api === 'string') {
+      api = { baseUrl: api }
     }
 
-    private static cleanBaseUrl(api: Omit<KlaimAPI, 'id'>): Omit<KlaimAPI, 'id'> {
-        // Remove trailing slash
-        if (api.baseUrl.endsWith('/')) {
-            api.baseUrl = api.baseUrl.slice(0, -1)
-        }
+    api = Api.cleanQueryParameters(api)
+    api = Api.cleanBaseUrl(api)
 
-        // Remove double slashes (except for http:// or https://)
-        api.baseUrl = api.baseUrl.replace(/([^:]\/)\/+/g, '$1')
+    Api._apis[id] = {
+      id,
+      ...api
+    }
+  }
 
-        return api
+  private static cleanBaseUrl (api: Omit<KlaimAPI, 'id'>): Omit<KlaimAPI, 'id'> {
+    // Remove trailing slash
+    if (api.baseUrl.endsWith('/')) {
+      api.baseUrl = api.baseUrl.slice(0, -1)
     }
 
-    private static cleanQueryParameters(api: Omit<KlaimAPI, "id">) {
-        const url = new URL(api.baseUrl)
+    // Remove double slashes (except for http:// or https://)
+    api.baseUrl = api.baseUrl.replace(/([^:]\/)\/+/g, '$1')
 
-        api.baseUrl = url.origin + url.pathname
+    return api
+  }
 
-        api.queryParameters = Core.parseObjectNums(Object.fromEntries((url.searchParams as any).entries()))
+  private static cleanQueryParameters (api: Omit<KlaimAPI, 'id'>): Omit<KlaimAPI, 'id'> {
+    const url = new URL(api.baseUrl)
 
-        return api
-    }
+    api.baseUrl = url.origin + url.pathname
 
+    api.queryParameters = Core.parseObjectNums(Object.fromEntries((url.searchParams as any).entries()))
+
+    return api
+  }
 }

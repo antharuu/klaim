@@ -1,4 +1,4 @@
-import klaim from "./klaim/klaim";
+import klaim from './klaim/klaim'
 
 klaim.create.api('test', 'https://jsonplaceholder.typicode.com')
 

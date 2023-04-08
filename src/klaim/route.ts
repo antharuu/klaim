@@ -1,77 +1,72 @@
-import Core from "./core";
+import Core from './core'
 import {
-    KlaimAPI,
-    KlaimApiParam,
-    KlaimFunction,
-    KlaimFunctionReturn,
-    KlaimMethod,
-    KlaimMethodEnum,
-    KlaimRoute
-} from "./types";
-import Api from "./api";
+  type KlaimAPI,
+  type KlaimApiParam,
+  type KlaimFunction,
+  type KlaimFunctionReturn,
+  type KlaimMethod,
+  KlaimMethodEnum,
+  type KlaimRoute
+} from './types'
+import Api from './api'
 
 export default class Route extends Core {
-    private static _routes: Record<string, KlaimRoute> = {}
+  private static _routes: Record<string, KlaimRoute> = {}
 
-    static get(id: string) {
-        return Route._routes[id] || null;
+  static get (id: string): KlaimRoute {
+    if (!(id in Route._routes)) {
+      throw new Error(`Route not found: ${id}`)
     }
 
-    static create(id: string, method: KlaimMethod | string, path: string): KlaimRoute {
-        Route._routes[id] = {
-            id,
-            method: Route.getMethod(method),
-            path,
-            call: Route.getCallFunction(id),
-            api: null,
-            on: (apiName: string) => Route.addApiToRoute(Route._routes[id], apiName)
-        }
+    return Route._routes[id]
+  }
 
-        return Route._routes[id]
+  static create (id: string, method: KlaimMethod | string, path: string): KlaimRoute {
+    Route._routes[id] = {
+      id,
+      method: Route.getMethod(method),
+      path,
+      call: Route.getCallFunction(id),
+      api: null,
+      on: (apiName: string) => Route.addApiToRoute(Route._routes[id], apiName)
     }
 
-    static addApiToRoute(route: KlaimRoute, api: KlaimApiParam): KlaimRoute {
-        if (typeof api === 'string') {
-            api = Api.get(api);
-        }
+    return Route._routes[id]
+  }
 
-        if (!api) {
-            throw new Error(`Api not found: ${api}`);
-        }
-
-        if (!('id' in api) || !('baseUrl' in api)) {
-            throw new Error(`Invalid Api: ${api}`);
-        }
-
-        route.api = api as KlaimAPI;
-
-        return route;
+  static addApiToRoute (route: KlaimRoute, api: KlaimApiParam): KlaimRoute {
+    if (typeof api === 'string') {
+      api = Api.get(api)
     }
 
-    static getCallFunction(id: string): KlaimFunction {
-        return (_params: any = null) => {
-            console.log(`Call: ${id}`);
+    route.api = api as KlaimAPI
 
-            const route = Route.get(id);
-            if (!route) {
-                throw new Error(`Route not found: ${id}`);
-            }
+    return route
+  }
 
-            console.table({route});
+  static getCallFunction (id: string): KlaimFunction {
+    return async (_params: any = null) => {
+      console.log(`Call: ${id}`)
 
-            return new Promise((resolve) => { resolve({params: true}) } );
-        };
+      const route = Route.get(id)
+
+      console.table({ route })
+
+      return await new Promise((resolve) => {
+        resolve({ params: true })
+      })
+    }
+  }
+
+  static async call (id: string): KlaimFunctionReturn {
+    return await Route.getCallFunction(id)()
+  }
+
+  private static getMethod (method: KlaimMethod | string): KlaimMethod {
+    if (!(method.toUpperCase() in KlaimMethodEnum)) {
+      throw new Error(`Invalid KlaimMethod: ${method}`)
     }
 
-    static call(id: string): KlaimFunctionReturn {
-        return Route.getCallFunction(id)();
-    }
-
-    private static getMethod(method: KlaimMethod | string): KlaimMethod {
-        if (!(method.toUpperCase() in KlaimMethodEnum)) {
-            throw new Error(`Invalid KlaimMethod: ${method}`);
-        }
-
-        return method.toUpperCase() as KlaimMethod;
-    }
+    return method.toUpperCase() as KlaimMethod
+  }
 }
