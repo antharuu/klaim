@@ -1,7 +1,7 @@
 import Core from "./core";
 import {KlaimAPI} from "./types";
 
-export class Api extends Core {
+export default class Api extends Core {
     private static _apis: Record<string, KlaimAPI> = {}
 
     static get(id: string) {

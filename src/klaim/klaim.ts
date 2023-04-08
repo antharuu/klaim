@@ -1,5 +1,5 @@
-import {Api} from "./api";
-import {Route} from "./route";
+import Api from "./api";
+import Route from "./route";
 
 export default {
     create: {

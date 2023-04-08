@@ -8,9 +8,9 @@ import {
     KlaimMethodEnum,
     KlaimRoute
 } from "./types";
-import {Api} from "./api";
+import Api from "./api";
 
-export class Route extends Core {
+export default class Route extends Core {
     private static _routes: Record<string, KlaimRoute> = {}
 
     static get(id: string) {
