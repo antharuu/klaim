@@ -2,7 +2,7 @@ import Core from './core'
 import {
   type KlaimAPI,
   type KlaimApiParam,
-  type KlaimCallParams,
+  type KlaimCallParams, type KlaimCallParamsType,
   type KlaimFunction,
   type KlaimFunctionReturn,
   type KlaimMethod,
@@ -14,13 +14,13 @@ import Api from './api'
 export default class Route extends Core {
   private static _routes: Record<string, KlaimRoute> = {}
 
-  private static readonly validators = [
-    Route.checkTypeStr,
-    Route.checkTypeNum,
-    Route.checkTypeAlpha,
-    Route.checkTypeAlphaNum,
-    Route.checkTypeWord
-  ]
+  private static readonly regexTypesMap: Record<KlaimCallParamsType, RegExp> = {
+    str: /^[^\d\s]+$/,
+    num: /^-?\d+\.?\d*$/,
+    alpha: /^[a-zA-Z]+$/,
+    alphaNum: /^[a-zA-Z0-9]+$/,
+    word: /^[a-zA-Z0-9_-]+$/
+  }
 
   static get (id: string): KlaimRoute {
     if (!(id in Route._routes)) {
@@ -91,7 +91,7 @@ export default class Route extends Core {
 
       const [name, type] = param.split(':')
 
-      params.push({ name, type: type as KlaimUrlParams['type'] ?? null })
+      params.push({ name, type: type as KlaimCallParamsType ?? null })
     }
 
     return params
@@ -142,67 +142,24 @@ export default class Route extends Core {
   private static isInvalidParam (param: KlaimUrlParams, params: KlaimCallParams): boolean {
     const value = params[param.name]
     if (param.type !== null) {
-      return Route.validators.some(
-        validator => {
-          validator(param, value)
-          return false
-        }
-      )
+      this.checkType(param.type, value, param.name)
     }
     return false
   }
 
   private static checkParamsType (requiredParams: KlaimUrlParams[], params: KlaimCallParams): void {
-    const hasInvalidParam = requiredParams.some(param => this.isInvalidParam(param, params))
-
-    if (hasInvalidParam) {
-      throw new Error('Invalid param type')
-    }
+    requiredParams.some(param => this.isInvalidParam(param, params))
   }
 
-  private static checkTypeStr (param: KlaimUrlParams, givenParam: any): void {
-    if (param.type === 'str') {
-      if (typeof givenParam !== 'string') {
-        throw new Error(`Invalid param type: ${param.name} must be a string, ${typeof givenParam} given`)
+  private static checkType (type: KlaimCallParamsType, givenParam: any, name: string): void {
+    Object.keys(Route.regexTypesMap).forEach((regexType: string) => {
+      if (type.toLowerCase() === regexType.toLowerCase()) {
+        const regex = Route.regexTypesMap[regexType as KlaimCallParamsType]
+
+        if (!regex.test(givenParam)) {
+          throw new Error(`Invalid type: ${type} for param: ${name}, given: ${(givenParam as string)}`)
+        }
       }
-    }
-  }
-
-  private static checkTypeNum (param: KlaimUrlParams, givenParam: any): void {
-    if (param.type === 'num') {
-      if (typeof givenParam !== 'number') {
-        throw new Error(`Invalid param type: ${param.name} must be a number, ${typeof givenParam} given`)
-      }
-    }
-  }
-
-  private static checkTypeAlpha (param: KlaimUrlParams, givenParam: any): void {
-    if (param.type === 'alpha') {
-      Route.checkTypeStr(param, givenParam)
-
-      if (!/^[a-zA-Z]+$/.test(givenParam)) {
-        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters, ${(givenParam as string)} given`)
-      }
-    }
-  }
-
-  private static checkTypeAlphaNum (param: KlaimUrlParams, givenParam: any): void {
-    if (param.type === 'alphanum') {
-      Route.checkTypeStr(param, givenParam)
-
-      if (!/^[a-zA-Z0-9]+$/.test(givenParam)) {
-        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters and numbers, ${(givenParam as string)} given`)
-      }
-    }
-  }
-
-  private static checkTypeWord (param: KlaimUrlParams, givenParam: any): void {
-    if (param.type === 'word') {
-      Route.checkTypeStr(param, givenParam)
-
-      if (!/^[a-zA-Z0-9_-]+$/.test(givenParam)) {
-        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters, numbers, underscores and dashes, ${(givenParam as string)} given`)
-      }
-    }
+    })
   }
 }

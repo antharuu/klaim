@@ -13,11 +13,11 @@ export type KlaimFunctionReturn = Promise<{ params: any }>
 export type KlaimFunction = (params?: any) => KlaimFunctionReturn
 
 export type KlaimCallParams = Record<string, any>
-export type KlaimCallParamsType = 'num' | 'str' | 'alpha' | 'alphanum' | 'word' | null
+export type KlaimCallParamsType = 'num' | 'str' | 'alpha' | 'alphaNum' | 'word'
 
 export interface KlaimUrlParams {
   name: string
-  type: KlaimCallParamsType
+  type: KlaimCallParamsType | null
 }
 
 export interface KlaimRoute {

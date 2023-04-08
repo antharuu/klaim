@@ -8,7 +8,7 @@ const randomId = (): number => Math.round(Math.random() * 200)
 
 const r1 = klaim.create.route('route1', 'get', '/todos/[id:word]').on('test')
 const r1b = await r1.call({
-  id: 'bonjour-le-monde'
+  id: 'bonjour-le-mon de'
 })
 console.log(r1b)
 
