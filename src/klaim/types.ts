@@ -17,6 +17,8 @@ export type KlaimRoute = {
     path: string,
     method: KlaimMethod,
     call: KlaimFunction,
+    api: KlaimAPI | null,
+    on(apiName: string): KlaimRoute;
 }
 
 export type KlaimAPI = {

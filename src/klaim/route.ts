@@ -1,11 +1,20 @@
 import Core from "./core";
-import {KlaimFunction, KlaimFunctionReturn, KlaimMethod, KlaimMethodEnum, KlaimRoute} from "./types";
+import {
+    KlaimAPI,
+    KlaimApiParam,
+    KlaimFunction,
+    KlaimFunctionReturn,
+    KlaimMethod,
+    KlaimMethodEnum,
+    KlaimRoute
+} from "./types";
+import {Api} from "./api";
 
 export class Route extends Core {
     private static _routes: Record<string, KlaimRoute> = {}
 
     static get(id: string) {
-        return Route._routes[id]
+        return Route._routes[id] || null;
     }
 
     static create(id: string, method: KlaimMethod | string, path: string): KlaimRoute {
@@ -13,18 +22,45 @@ export class Route extends Core {
             id,
             method: Route.getMethod(method),
             path,
-            call: Route.getCallFunction(id)
+            call: Route.getCallFunction(id),
+            api: null,
+            on: (apiName: string) => Route.addApiToRoute(Route._routes[id], apiName)
         }
 
         return Route._routes[id]
     }
 
+    static addApiToRoute(route: KlaimRoute, api: KlaimApiParam): KlaimRoute {
+        if (typeof api === 'string') {
+            api = Api.get(api);
+        }
+
+        if (!api) {
+            throw new Error(`Api not found: ${api}`);
+        }
+
+        // check if api is not partial
+        if (!('id' in api) || !('baseUrl' in api)) {
+            throw new Error(`Invalid Api: ${api}`);
+        }
+
+        route.api = api as KlaimAPI;
+
+        return route;
+    }
+
     static getCallFunction(id: string): KlaimFunction {
         return (params: any = null) => {
             console.log(`Call: ${id}`);
-            return Promise.resolve({
-                params
-            });
+
+            const route = Route.get(id);
+            if (!route) {
+                throw new Error(`Route not found: ${id}`);
+            }
+
+            console.log(route, params);
+
+            return new Promise((resolve) => { resolve({params: true}) } );
         };
     }
 
