@@ -20,24 +20,26 @@ Here's an example of using Klaim:
 import klaim from "klaim";
 
 // Create an API instance
-klaim.create.api("test", "http://localhost:8180/api/v2/");
+klaim.create.api('test', 'https://jsonplaceholder.typicode.com')
 
 // Get an API instance
-klaim.get.api("test");
+klaim.get.api('test')
+
+const randomId = () => Math.round(Math.random() * 200)
 
 // Create a route
-const r1 = klaim.create.route("route1", "post", "/test");
+const r1 = klaim.create.route('route1', 'get', '/todos/[id:num]').on('test')
 
 // Call a route
-const r1b = await r1.call();
-console.log(r1b);
+const r1b = await r1.call({id: randomId()})
+console.log(r1b)
 
 // Get and call a route
-const r2 = await klaim.get.route("route1").call();
+const r2 = await klaim.get.route('route1').call({id: randomId()})
 console.log(r2);
 
 // Call a route by name
-const r3 = await klaim.call("route1");
+const r3 = await klaim.call('route1', {id: randomId()})
 console.log(r3); 
 ```
 
