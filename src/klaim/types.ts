@@ -13,7 +13,7 @@ export type KlaimFunctionReturn = Promise<{ params: any }>
 export type KlaimFunction = (params?: any) => KlaimFunctionReturn
 
 export type KlaimCallParams = Record<string, any>
-export type KlaimCallParamsType = 'num' | 'str' | null
+export type KlaimCallParamsType = 'num' | 'str' | 'alpha' | 'alphanum' | 'word' | null
 
 export interface KlaimUrlParams {
   name: string

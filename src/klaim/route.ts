@@ -14,6 +14,14 @@ import Api from './api'
 export default class Route extends Core {
   private static _routes: Record<string, KlaimRoute> = {}
 
+  private static readonly validators = [
+    Route.checkTypeStr,
+    Route.checkTypeNum,
+    Route.checkTypeAlpha,
+    Route.checkTypeAlphaNum,
+    Route.checkTypeWord
+  ]
+
   static get (id: string): KlaimRoute {
     if (!(id in Route._routes)) {
       throw new Error(`Route not found: ${id}`)
@@ -132,12 +140,15 @@ export default class Route extends Core {
   }
 
   private static isInvalidParam (param: KlaimUrlParams, params: KlaimCallParams): boolean {
-    // Check if "type" is defined & if "num" is a number & if "str" is a string
+    const value = params[param.name]
     if (param.type !== null) {
-      Route.checkTypeStr(param, params[param.name])
-      Route.checkTypeNum(param, params[param.name])
+      return Route.validators.some(
+        validator => {
+          validator(param, value)
+          return false
+        }
+      )
     }
-
     return false
   }
 
@@ -161,6 +172,36 @@ export default class Route extends Core {
     if (param.type === 'num') {
       if (typeof givenParam !== 'number') {
         throw new Error(`Invalid param type: ${param.name} must be a number, ${typeof givenParam} given`)
+      }
+    }
+  }
+
+  private static checkTypeAlpha (param: KlaimUrlParams, givenParam: any): void {
+    if (param.type === 'alpha') {
+      Route.checkTypeStr(param, givenParam)
+
+      if (!/^[a-zA-Z]+$/.test(givenParam)) {
+        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters, ${(givenParam as string)} given`)
+      }
+    }
+  }
+
+  private static checkTypeAlphaNum (param: KlaimUrlParams, givenParam: any): void {
+    if (param.type === 'alphanum') {
+      Route.checkTypeStr(param, givenParam)
+
+      if (!/^[a-zA-Z0-9]+$/.test(givenParam)) {
+        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters and numbers, ${(givenParam as string)} given`)
+      }
+    }
+  }
+
+  private static checkTypeWord (param: KlaimUrlParams, givenParam: any): void {
+    if (param.type === 'word') {
+      Route.checkTypeStr(param, givenParam)
+
+      if (!/^[a-zA-Z0-9_-]+$/.test(givenParam)) {
+        throw new Error(`Invalid param type: ${param.name} must be a string containing only letters, numbers, underscores and dashes, ${(givenParam as string)} given`)
       }
     }
   }

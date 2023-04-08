@@ -6,9 +6,9 @@ klaim.get.api('test')
 
 const randomId = (): number => Math.round(Math.random() * 200)
 
-const r1 = klaim.create.route('route1', 'get', '/todos/[id:num]').on('test')
+const r1 = klaim.create.route('route1', 'get', '/todos/[id:word]').on('test')
 const r1b = await r1.call({
-  id: randomId()
+  id: 'bonjour-le-monde'
 })
 console.log(r1b)
 
