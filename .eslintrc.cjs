@@ -22,5 +22,9 @@ module.exports = {
   },
   rules: {
     'curly': ['error', 'multi-line'],
+    'max-lines-per-function': ['error', { max: 12, skipBlankLines: true, skipComments: true}],
+    'max-statements-per-line': ['error', { max: 1 }],
+    'max-depth': ['error', 2],
+    'complexity': ["error", 2]
   }
 }
