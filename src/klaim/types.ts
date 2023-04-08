@@ -12,19 +12,22 @@ export type KlaimMethod = keyof typeof KlaimMethodEnum
 export type KlaimFunctionReturn = Promise<{ params: any }>
 export type KlaimFunction = (params?: any) => KlaimFunctionReturn
 
+export type KlaimCallParams = Record<string, any>
+
 export interface KlaimRoute {
-  id: string
-  path: string
-  method: KlaimMethod
-  call: KlaimFunction
   api: KlaimAPI | null
-  params?: BaseObjType
+  call: KlaimFunction
+  id: string
+  method: KlaimMethod
+  urlParams?: string[]
   on: (apiName: string) => KlaimRoute
+  params?: BaseObjType
+  path: string
 }
 
 export interface KlaimAPI {
-  id: string
   baseUrl: string
+  id: string
   queryParameters?: BaseObjType
 }
 
