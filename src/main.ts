@@ -4,7 +4,7 @@ klaim.create.api('test', 'https://jsonplaceholder.typicode.com')
 
 klaim.get.api('test')
 
-const r1 = klaim.create.route('route1', 'get', '/todos/1').on('test')
+const r1 = klaim.create.route('route1', 'get', '/todos/[id]').on('test')
 const r1b = await r1.call()
 console.log(r1b)
 

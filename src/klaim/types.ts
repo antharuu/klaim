@@ -18,6 +18,7 @@ export type KlaimRoute = {
     method: KlaimMethod,
     call: KlaimFunction,
     api: KlaimAPI | null,
+    params?: BaseObjType,
     on(apiName: string): KlaimRoute;
 }
 

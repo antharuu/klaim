@@ -39,7 +39,6 @@ export default class Route extends Core {
             throw new Error(`Api not found: ${api}`);
         }
 
-        // check if api is not partial
         if (!('id' in api) || !('baseUrl' in api)) {
             throw new Error(`Invalid Api: ${api}`);
         }
@@ -50,7 +49,7 @@ export default class Route extends Core {
     }
 
     static getCallFunction(id: string): KlaimFunction {
-        return (params: any = null) => {
+        return (_params: any = null) => {
             console.log(`Call: ${id}`);
 
             const route = Route.get(id);
@@ -58,7 +57,7 @@ export default class Route extends Core {
                 throw new Error(`Route not found: ${id}`);
             }
 
-            console.log(route, params);
+            console.table({route});
 
             return new Promise((resolve) => { resolve({params: true}) } );
         };
