@@ -15,6 +15,9 @@ export default tseslint.config(
         },
         files: ["src/**/*.ts"],
         rules: {
+            // ----------------------------------------
+            // ---------------------- Simple Import Sort
+            // ----------------------------------------
             "simple-import-sort/exports": "error",
             "simple-import-sort/imports": [
                 "error",
@@ -23,13 +26,6 @@ export default tseslint.config(
                         ["^\u0000"],
                         ["^@?\\w"],
                         ["^/"],
-                        ["/stores/"],
-                        ["/utils/"],
-                        ["/routes/"],
-                        ["/types/"],
-                        ["/pages-parts/"],
-                        ["/layouts/"],
-                        ["/components/"],
                         ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
                         [
                             "^\\./(?=.*/)(?!/?$)",
@@ -40,6 +36,16 @@ export default tseslint.config(
                     ]
                 }
             ],
+            // ----------------------------------------
+            // ---------------------- TypeScript
+            // ----------------------------------------
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/ban-ts-comment": "off",
+            "@typescript-eslint/no-dynamic-delete": "off",
+            "@typescript-eslint/no-namespace": "off",
+            "@typescript-eslint/ban-types": "error",
+            "@typescript-eslint/explicit-function-return-type": "error",
+            "@typescript-eslint/consistent-indexed-object-style": "error",
         }
     }
 );

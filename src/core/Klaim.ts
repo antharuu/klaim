@@ -1,21 +1,13 @@
 import {Api} from "./Api";
 import {Route, RouteMethod} from "./Route";
 
-export interface IArgs {
-    [key: string]: unknown;
-}
+export type IArgs = Record<string, unknown>;
 
-export interface IBody {
-    [key: string]: unknown;
-}
+export type IBody = Record<string, unknown>;
 
-export interface IRouteReference {
-    [key: string]: <T>(args?: IArgs, body?: IBody) => Promise<T>
-}
+export type IRouteReference = Record<string, <T>(args?: IArgs, body?: IBody) => Promise<T>>;
 
-export interface IApiReference {
-    [key: string]: IRouteReference;
-}
+export type IApiReference = Record<string, IRouteReference>;
 
 export const Klaim: IApiReference = {};
 
@@ -26,7 +18,7 @@ export async function callApi<T>(api: Api, route: Route, args: IArgs = {}, body:
 
     console.log(`URL: ${url}`);
 
-    const config: { [key: string]: unknown; } = {}
+    const config: Record<string, unknown> = {}
 
     if (body && route.method !== RouteMethod.GET) {
         config.body = JSON.stringify(body);

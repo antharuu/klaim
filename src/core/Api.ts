@@ -26,7 +26,7 @@ export class Api implements IApi {
         this.headers = headers || {};
     }
 
-    public static create(name: string, url: string, callback: IApiCallback, headers: IHeaders = {}) {
+    public static create(name: string, url: string, callback: IApiCallback, headers: IHeaders = {}): Api {
         const newName = toCamelCase(name);
         if (newName !== name) {
             console.warn(`API name "${name}" has been camelCased to "${newName}"`);

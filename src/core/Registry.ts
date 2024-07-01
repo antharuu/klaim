@@ -1,7 +1,7 @@
 import {Api} from "./Api";
 import {callApi, IArgs, IBody, Klaim} from "./Klaim";
 import {Route} from "./Route";
- 
+
 export class Registry {
     private static _instance: Registry;
 
@@ -18,7 +18,7 @@ export class Registry {
         return Registry._instance;
     }
 
-    public registerApi(api: Api) {
+    public registerApi(api: Api): void {
         this._apis.set(api.name, api);
         Klaim[api.name] = {};
     }
@@ -31,11 +31,11 @@ export class Registry {
         this._currentApi = api;
     }
 
-    public clearCurrent() {
+    public clearCurrent(): void {
         this._currentApi = null;
     }
 
-    public registerRoute(route: Route) {
+    public registerRoute(route: Route): void {
         if (!this._currentApi) {
             throw new Error(`No current API set, use Route only inside Api.create callback`);
         }
@@ -58,7 +58,7 @@ export class Registry {
         return apiObj.routes.get(name) as Route;
     }
 
-    private addToKlaimRoute(apiName: string, route: Route) {
+    private addToKlaimRoute(apiName: string, route: Route): void {
         Klaim[apiName][route.name] = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
             const api = Registry.i._apis.get(apiName);
             if (!api) {

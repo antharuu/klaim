@@ -73,7 +73,7 @@ export class Route implements IRoute {
         return this.createRoute(name, url, headers, RouteMethod.OPTIONS);
     }
 
-    private detectArguments() {
+    private detectArguments(): void {
         const matches = this.url.match(/\[([^\]]+)]/g);
         if (matches) {
             matches.forEach((match) => {
