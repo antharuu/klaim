@@ -1,10 +1,12 @@
 {
     "$schema": "https://unpkg.com/release-it/schema/release-it.json",
     "github": {
-        "release": true
+        "release": true,
+        "tokenRef": "GITHUB_TOKEN"
     },
     "npm": {
-        "publish": true
+        "publish": true,
+        "tokenRef": "NPM_TOKEN"
     },
     "git": {
         "requiredBranch": "main",
