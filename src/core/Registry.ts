@@ -1,29 +1,30 @@
-import {Api} from "./Api";
-import {callApi, IArgs, IBody, Klaim} from "./Klaim";
-import {Route} from "./Route";
+import { Api } from "./Api";
+import { callApi, IArgs, IBody, Klaim } from "./Klaim";
+import { Route } from "./Route";
 
 export class Registry {
     private static _instance: Registry;
 
     private _apis: Map<string, Api> = new Map<string, Api>();
+
     private _currentApi: Api | null = null;
 
-    private constructor() {
+    private constructor () {
     }
 
-    public static get i(): Registry {
+    public static get i (): Registry {
         if (!Registry._instance) {
             Registry._instance = new Registry();
         }
         return Registry._instance;
     }
 
-    public registerApi(api: Api): void {
+    public registerApi (api: Api): void {
         this._apis.set(api.name, api);
         Klaim[api.name] = {};
     }
 
-    public setCurrent(name: string): void {
+    public setCurrent (name: string): void {
         const api = this._apis.get(name);
         if (!api) {
             throw new Error(`API ${name} not found`);
@@ -31,11 +32,11 @@ export class Registry {
         this._currentApi = api;
     }
 
-    public clearCurrent(): void {
+    public clearCurrent (): void {
         this._currentApi = null;
     }
 
-    public registerRoute(route: Route): void {
+    public registerRoute (route: Route): void {
         if (!this._currentApi) {
             throw new Error(`No current API set, use Route only inside Api.create callback`);
         }
@@ -46,11 +47,11 @@ export class Registry {
         this.addToKlaimRoute(route.api, route);
     }
 
-    public getApi(name: string): Api | undefined {
+    public getApi (name: string): Api | undefined {
         return this._apis.get(name);
     }
 
-    public getRoute(api: string, name: string): Route | undefined {
+    public getRoute (api: string, name: string): Route | undefined {
         const apiObj = this._apis.get(api);
         if (!apiObj) {
             throw new Error(`API ${api} not found`);
@@ -58,7 +59,7 @@ export class Registry {
         return apiObj.routes.get(name) as Route;
     }
 
-    private addToKlaimRoute(apiName: string, route: Route): void {
+    private addToKlaimRoute (apiName: string, route: Route): void {
         Klaim[apiName][route.name] = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
             const api = Registry.i._apis.get(apiName);
             if (!api) {
@@ -68,4 +69,3 @@ export class Registry {
         };
     }
 }
-
