@@ -1,12 +1,14 @@
-import { defineConfig } from 'vite';
-import { configDefaults } from 'vitest/config';
+import {defineConfig} from 'vite';
+import {configDefaults} from 'vitest/config';
+import * as path from 'path'; // Utilisation de l'importation compatible
 
 export default defineConfig({
     build: {
         lib: {
-            entry: 'src/index.ts',
+            entry: path.resolve(__dirname, 'src/index.ts'),
             name: 'klaim',
-            fileName: format => `klaim.${format}.js`
+            fileName: format => `klaim.${format}.js`,
+            formats: ['es', 'cjs']
         },
         rollupOptions: {
             external: [],
