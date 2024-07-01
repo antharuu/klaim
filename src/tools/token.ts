@@ -2,7 +2,6 @@
  * Generate a new token
  *
  * @param {number} length The length of the token
- *
  * @returns {string} The generated token
  */
 export default function (length?: number): string {

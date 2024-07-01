@@ -11,6 +11,15 @@ export type IApiReference = Record<string, IRouteReference>;
 
 export const Klaim: IApiReference = {};
 
+/**
+ * Calls an API route
+ *
+ * @param api - The API to call
+ * @param route - The route to call
+ * @param args - The arguments to pass to the route
+ * @param body - The body to pass to the route
+ * @returns The response
+ */
 export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body: IBody = {}): Promise<T> {
     const url = applyArgs(`${api.url}/${route.url}`, route, args);
 
@@ -34,6 +43,14 @@ export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body
     return data as T;
 }
 
+/**
+ * Applies the arguments to the URL
+ *
+ * @param url - The URL to apply the arguments to
+ * @param route - The route to apply the arguments to
+ * @param args - The arguments to apply
+ * @returns The new URL
+ */
 function applyArgs (url: string, route: Route, args: IArgs): string {
     let newUrl = url;
     route.arguments.forEach(arg => {

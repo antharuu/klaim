@@ -1,3 +1,10 @@
+/**
+ * Slugify a text
+ *
+ * @param text - The text to slugify
+ * @param splitCharacter - The character to use to split the text
+ * @returns The slugified text
+ */
 export default function (text: string, splitCharacter: string = "_"): string {
     return text
         .toString()

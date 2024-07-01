@@ -14,6 +14,9 @@ interface IApi {
 export type IApiCallback = () => void;
 export type IHeaders = Record<string, string>;
 
+/**
+ * Represents an API
+ */
 export class Api implements IApi {
     public name: string;
 
@@ -23,12 +26,28 @@ export class Api implements IApi {
 
     public routes: Map<string, Route> = new Map<string, Route>();
 
+    /**
+     * Constructor
+     *
+     * @param name - The name of the API
+     * @param url - The base URL of the API
+     * @param headers - The headers to be sent with each request
+     */
     private constructor (name: string, url: string, headers: IHeaders) {
         this.name = name;
         this.url = cleanUrl(url);
         this.headers = headers || {};
     }
 
+    /**
+     * Creates a new API
+     *
+     * @param name - The name of the API
+     * @param url - The base URL of the API
+     * @param callback - The callback to define the routes
+     * @param headers - The headers to be sent with each request
+     * @returns The new API
+     */
     public static create (name: string, url: string, callback: IApiCallback, headers: IHeaders = {}): Api {
         const newName = toCamelCase(name);
         if (newName !== name) {
