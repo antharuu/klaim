@@ -1,51 +1,62 @@
-import {IRoute} from "./Route";
-import {IApi} from "./Api";
+import {Route, RouteMethod} from "./Route";
+import {Api} from "./Api";
+
+export interface IArgs {
+    [key: string]: any;
+}
+
+export interface IBody {
+    [key: string]: any;
+}
 
 export interface IRouteReference {
-    [key: string]: <T>(...args: any[]) => Promise<T>;
+    [key: string]: <T>(args?: IArgs, body?: IBody) => Promise<T>
 }
 
 export interface IApiReference {
     [key: string]: IRouteReference;
 }
 
-export const Klaim: IApiReference = {}
+export const Klaim: IApiReference = {};
 
-export async function callApi<T>(api: IApi, route: IRoute, ...args: any[]): Promise<T> {
+export async function callApi<T>(api: Api, route: Route, args: IArgs = {}, body: IBody = {}): Promise<T> {
     console.log(`Calling ${api.name}.${route.name}`);
 
     const url = applyArgs(`${api.url}/${route.url}`, route, args);
 
     console.log(`URL: ${url}`);
 
-    // Fetch the data
-    const response = await fetch(url, {
-        method: route.method,
-        headers: {
-            ...api.headers,
-            ...route.headers,
-        }
-    });
+    const config: { [key: string]: any; } = {}
 
-    // Parse the JSON
+    if (body && route.method !== RouteMethod.GET) {
+        config.body = JSON.stringify(body);
+    }
+
+    config.headers = {
+        'Content-Type': 'application/json',
+        ...api.headers,
+        ...route.headers
+    };
+
+    config.method = route.method;
+
+    const response = await fetch(url, config);
+
+
     const data = await response.json();
-
-    // Return the data
-    return data;
+    return data as T;
 }
 
-function applyArgs(url: string, route: IRoute, args: any[]) {
-    // Check if the number of arguments is correct
-    if (args.length !== route.arguments.size) {
-        throw new Error(`Invalid number of arguments for route ${route.name}`);
-    }
+function applyArgs(url: string, route: Route, args: IArgs): string {
+    let newUrl = url;
+    route.arguments.forEach((arg) => {
+        const value = args[arg];
+        if (value === undefined) {
+            throw new Error(`Argument ${arg} is missing`);
+        }
 
-    // Replace the arguments in the URL
-    let i = 0;
-    for (const arg of route.arguments) {
-        url = url.replace(`[${arg}]`, args[i]);
-        i++;
-    }
+        newUrl = newUrl.replace(`[${arg}]`, args[arg]);
+    });
 
-    return url;
+    return newUrl;
 }

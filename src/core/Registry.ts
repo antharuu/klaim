@@ -1,15 +1,14 @@
-import {IApi} from "./Api";
-import {IRoute} from "./Route";
-import {callApi, Klaim} from "./Klaim";
+import {Api} from "./Api";
+import {Route} from "./Route";
+import {callApi, IArgs, IBody, Klaim} from "./Klaim";
 
 export class Registry {
     private static _instance: Registry;
 
-    private _apis: Map<string, IApi> = new Map<string, IApi>();
-    private _currentApi: IApi | null = null
+    private _apis: Map<string, Api> = new Map<string, Api>();
+    private _currentApi: Api | null = null;
 
     private constructor() {
-        // Private constructor to prevent instantiation
     }
 
     public static get i(): Registry {
@@ -19,9 +18,8 @@ export class Registry {
         return Registry._instance;
     }
 
-    public registerApi(api: IApi) {
+    public registerApi(api: Api) {
         this._apis.set(api.name, api);
-
         Klaim[api.name] = {};
     }
 
@@ -30,7 +28,6 @@ export class Registry {
         if (!api) {
             throw new Error(`API ${name} not found`);
         }
-
         this._currentApi = api;
     }
 
@@ -38,7 +35,7 @@ export class Registry {
         this._currentApi = null;
     }
 
-    registerRoute<T>(route: IRoute) {
+    public registerRoute(route: Route) {
         if (!this._currentApi) {
             throw new Error(`No current API set, use Route only inside Api.create callback`);
         }
@@ -46,17 +43,29 @@ export class Registry {
         route.api = this._currentApi.name;
         this._currentApi.routes.set(route.name, route);
 
-        this.addToKlaimRoute<T>(route.api, route);
+        this.addToKlaimRoute(route.api, route);
     }
 
-    private addToKlaimRoute<T>(apiName: string, route: IRoute) {
-        Klaim[apiName][route.name] = async (...args: any[]): Promise<T> => {
+    public getApi(name: string): Api | undefined {
+        return this._apis.get(name);
+    }
+
+    public getRoute(api: string, name: string): Route | undefined {
+        const apiObj = this._apis.get(api);
+        if (!apiObj) {
+            throw new Error(`API ${api} not found`);
+        }
+        return apiObj.routes.get(name) as Route;
+    }
+
+    private addToKlaimRoute(apiName: string, route: Route) {
+        Klaim[apiName][route.name] = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
             const api = Registry.i._apis.get(apiName);
             if (!api) {
                 throw new Error(`API ${route.api} not found`);
             }
-
-            return callApi<T>(api, route, ...args);
+            return callApi(api, route, args, body);
         };
     }
 }
+
