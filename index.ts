@@ -1,5 +1,1 @@
-// src/index.ts
-
-export function getHello (): string {
-    return 'Hello, world! ???';
-}
+export * from './src';

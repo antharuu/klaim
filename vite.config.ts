@@ -1,6 +1,6 @@
 import {defineConfig} from 'vite';
 import {configDefaults} from 'vitest/config';
-import * as path from 'path'; // Utilisation de l'importation compatible
+import * as path from 'path';
 
 export default defineConfig({
     build: {
