@@ -9,32 +9,27 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@v2
-
             -   name: Setup Bun
                 uses: oven-sh/setup-bun@v1
                 with:
                     bun-version: "latest"
-
             -   name: Install Dependencies
                 run: bun install
-
             -   name: Lint & Check
                 run: bun run lint
-
             -   name: Build
                 run: bun run build
-
             -   name: Initialize Git
                 run: |
                     git config --global user.email "antho.eclips@gmail.com"
                     git config --global user.name "Anthony Bellancourt"
-
             -   name: Configure NPM
-                run: |
-                    echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
+                run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+                env:
+                    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             -   name: Release
                 run: bun run release --ci
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
