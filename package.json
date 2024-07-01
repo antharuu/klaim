@@ -28,7 +28,8 @@
         "build": "vite build",
         "dev": "vite build --watch",
         "test": "vitest",
-        "lint": "eslint src --fix",
+        "lint": "eslint src",
+        "lint:fix": "eslint src --fix",
         "release": "dotenv release-it --"
     },
     "devDependencies": {
