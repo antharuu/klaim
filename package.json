@@ -19,6 +19,7 @@
     "@types/node": "^20.14.9",
     "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^9.6.0",
+    "eslint-plugin-jsdoc": "^48.5.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "jsdom": "^24.1.0",
     "typescript-eslint": "^7.15.0",
