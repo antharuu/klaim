@@ -4,3 +4,4 @@ export default function(url: string) : string {
         // remove slashes at the beginning and end of the string
         .replace(/^\/|\/$/g, '')
 }
+

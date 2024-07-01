@@ -1,7 +1,8 @@
-import { Registry } from "./Registry";
-import { Route } from "./Route";
 import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
+
+import {Registry} from "./Registry";
+import {Route} from "./Route";
 
 interface IApi {
     name: string;

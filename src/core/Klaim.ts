@@ -1,12 +1,12 @@
-import {Route, RouteMethod} from "./Route";
 import {Api} from "./Api";
+import {Route, RouteMethod} from "./Route";
 
 export interface IArgs {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface IBody {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface IRouteReference {
@@ -26,7 +26,7 @@ export async function callApi<T>(api: Api, route: Route, args: IArgs = {}, body:
 
     console.log(`URL: ${url}`);
 
-    const config: { [key: string]: any; } = {}
+    const config: { [key: string]: unknown; } = {}
 
     if (body && route.method !== RouteMethod.GET) {
         config.body = JSON.stringify(body);
@@ -55,7 +55,7 @@ function applyArgs(url: string, route: Route, args: IArgs): string {
             throw new Error(`Argument ${arg} is missing`);
         }
 
-        newUrl = newUrl.replace(`[${arg}]`, args[arg]);
+        newUrl = newUrl.replace(`[${arg}]`, <string>args[arg]);
     });
 
     return newUrl;

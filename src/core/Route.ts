@@ -1,7 +1,8 @@
-import { Api, IHeaders } from "./Api";
-import { Registry } from "./Registry";
 import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
+
+import {Api, IHeaders} from "./Api";
+import {Registry} from "./Registry";
 
 export enum RouteMethod {
     GET = "GET",

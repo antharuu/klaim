@@ -1,7 +1,7 @@
 import {Api} from "./Api";
-import {Route} from "./Route";
 import {callApi, IArgs, IBody, Klaim} from "./Klaim";
-
+import {Route} from "./Route";
+ 
 export class Registry {
     private static _instance: Registry;
 
