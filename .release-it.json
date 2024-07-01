@@ -8,6 +8,7 @@
     },
     "git": {
         "requiredBranch": "main",
+        "requireCleanWorkingDir": false,
         "commitMessage": "chore: release v%s"
     },
     "hooks": {
