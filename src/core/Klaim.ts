@@ -12,11 +12,7 @@ export type IApiReference = Record<string, IRouteReference>;
 export const Klaim: IApiReference = {};
 
 export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body: IBody = {}): Promise<T> {
-    console.log(`Calling ${api.name}.${route.name}`);
-
     const url = applyArgs(`${api.url}/${route.url}`, route, args);
-
-    console.log(`URL: ${url}`);
 
     const config: Record<string, unknown> = {};
 

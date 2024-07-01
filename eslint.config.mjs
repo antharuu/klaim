@@ -123,6 +123,34 @@ export default tseslint.config(
             "@stylistic/type-generic-spacing": ["error"],
             "@stylistic/type-named-tuple-spacing": ["error"],
 
+            // ----------------------------------------
+            // ---------------------- General
+            // ----------------------------------------
+
+            "no-void": "off",
+            "no-undef": "off",
+            "indent": ["error", 4],
+            "no-console": [
+                "error",
+                {
+                    allow: [
+                        "warn",
+                        "error",
+                        "info",
+                        "table"
+                    ]
+                }
+            ],
+            "camelcase": [
+                "error",
+                {
+                    "properties": "never", "ignoreDestructuring": true, "allow": ["^_[a-z]+_[a-z]+$"]
+                }
+            ],
+            "dot-notation": "off",
+            "no-underscore-dangle": "off",
+            "func-style": ["error", "declaration"]
+
         }
     }
 );
