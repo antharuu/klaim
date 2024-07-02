@@ -25,6 +25,7 @@ module.exports = {
             'bun run build'
         ],
         'after:bump': [
+            `make update-version-deno`,
             `npx jsr publish --token ${process.env.JSR_TOKEN} --allow-dirty`,
             `npm config set //registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`,
             `npm publish`,
