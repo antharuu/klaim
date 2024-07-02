@@ -20,7 +20,7 @@
     },
     "homepage": "https://github.com/antharuu/klaim#readme",
     "type": "module",
-    "version": "1.2.18",
+    "version": "1.2.19",
     "main": "dist/klaim.cjs.js",
     "module": "dist/klaim.es.js",
     "types": "dist/index.d.ts",
@@ -30,7 +30,7 @@
         "test": "vitest",
         "lint": "eslint src",
         "lint:fix": "eslint src **/*.ts --fix",
-        "release": "dotenv release-it -- patch --config release-it.config.cjs --ci",
+        "release": "dotenv release-it -- patch --config release-it.config.cjs",
         "release:minor": "dotenv release-it -- minor --config release-it.config.cjs --ci",
         "release:major": "dotenv release-it -- major --config release-it.config.cjs --ci"
     },
