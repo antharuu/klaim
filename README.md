@@ -34,7 +34,7 @@ bun add klaim
 Here’s a basic example to get you started:
 
 ```typescript
-import {Api, Klaim, Registry, Route} from 'klaim';
+import {Api, Klaim, Registry, Route, Hook} from 'klaim';
 
 // Your simple Todo type
 type Todo = {
@@ -77,6 +77,12 @@ const todo = await Klaim.hello.getTodo<Todo>({id: 1})
 
 // Make a request to the "addTodo" route
 const newTodo = await Klaim.hello.addTodo<Todo>({}, {title: "New Todo", completed: false, userId: 1})
+
+// You can subscribe to hooks from everywhere
+// Every time hello.getFirstTodo is called, the hook will be triggered
+Hook.subscribe("hello.getFirstTodo", ({url}) => {
+    console.log(`Requesting ${url}`);
+});
 ```
 
 ## 🤝 Contributing

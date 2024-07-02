@@ -1,4 +1,5 @@
 import { Api } from "./Api";
+import { Hook } from "./Hook";
 import { Registry } from "./Registry";
 import { ICallbackAfter, ICallbackBefore, Route, RouteMethod } from "./Route";
 
@@ -58,6 +59,8 @@ export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body
     } = applyAfter({ route, api, response, data: await response.json() });
     Registry.updateApi(afterApi);
     Registry.updateRoute(afterRoute);
+
+    Hook.run(`${api.name}.${route.name}`);
 
     return afterData as T;
 }
