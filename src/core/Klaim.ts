@@ -1,5 +1,6 @@
 import { Api } from "./Api";
-import { Route, RouteMethod } from "./Route";
+import { Registry } from "./Registry";
+import { ICallbackAfter, ICallbackBefore, Route, RouteMethod } from "./Route";
 
 export type IArgs = Record<string, unknown>;
 
@@ -21,9 +22,9 @@ export const Klaim: IApiReference = {};
  * @returns The response
  */
 export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body: IBody = {}): Promise<T> {
-    const url = applyArgs(`${api.url}/${route.url}`, route, args);
+    let url = applyArgs(`${api.url}/${route.url}`, route, args);
 
-    const config: Record<string, unknown> = {};
+    let config: Record<string, unknown> = {};
 
     if (body && route.method !== RouteMethod.GET) {
         config.body = JSON.stringify(body);
@@ -37,10 +38,28 @@ export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body
 
     config.method = route.method;
 
+    const {
+        beforeRoute,
+        beforeApi,
+        beforeUrl,
+        beforeConfig
+    } = applyBefore({ route, api, url, config });
+    url = beforeUrl;
+    config = beforeConfig;
+    api = Registry.updateApi(beforeApi);
+    route = Registry.updateRoute(beforeRoute);
+
     const response = await fetch(url, config);
 
-    const data = await response.json();
-    return data as T;
+    const {
+        afterRoute,
+        afterApi,
+        afterData
+    } = applyAfter({ route, api, response, data: await response.json() });
+    Registry.updateApi(afterApi);
+    Registry.updateRoute(afterRoute);
+
+    return afterData as T;
 }
 
 /**
@@ -63,4 +82,54 @@ function applyArgs (url: string, route: Route, args: IArgs): string {
     });
 
     return newUrl;
+}
+
+/**
+ * Applies the before callback
+ *
+ * @param callbackArgs - The arguments to pass to the callback
+ * @param callbackArgs.route - The route
+ * @param callbackArgs.api - The API
+ * @param callbackArgs.url - The URL
+ * @param callbackArgs.config - The config
+ * @returns The new args
+ */
+function applyBefore ({ route, api, url, config }: ICallbackBefore): {
+    beforeRoute: Route;
+    beforeApi: Api;
+    beforeUrl: string;
+    beforeConfig: Record<string, unknown>;
+} {
+    const beforeRes = route.callbacks.before?.({ route, api, url, config });
+    return {
+        beforeRoute: beforeRes?.route || route,
+        beforeApi: beforeRes?.api || api,
+        beforeUrl: beforeRes?.url || url,
+        beforeConfig: beforeRes?.config || config
+    };
+}
+
+/**
+ * Applies the after callback
+ *
+ * @param callbackArgs - The arguments to pass to the callback
+ * @param callbackArgs.route - The route
+ * @param callbackArgs.api - The API
+ * @param callbackArgs.response - The response
+ * @param callbackArgs.data - The data
+ * @returns The new data
+ */
+function applyAfter ({ route, api, response, data }: ICallbackAfter): {
+    afterRoute: Route;
+    afterApi: Api;
+    afterResponse: Response;
+    afterData: any;
+} {
+    const afterRes = route.callbacks.after?.({ route, api, response, data });
+    return {
+        afterRoute: afterRes?.route || route,
+        afterApi: afterRes?.api || api,
+        afterResponse: afterRes?.response || response,
+        afterData: afterRes?.data || data
+    };
 }

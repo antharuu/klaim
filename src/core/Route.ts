@@ -2,6 +2,7 @@ import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
 
 import { Api, IHeaders } from "./Api";
+import { IArgs } from "./Klaim";
 import { Registry } from "./Registry";
 
 export enum RouteMethod {
@@ -13,6 +14,25 @@ export enum RouteMethod {
     OPTIONS = "OPTIONS"
 }
 
+export interface ICallbackBefore {
+    route: Route;
+    api: Api;
+    url: string;
+    config: Record<string, unknown>;
+}
+
+export interface ICallbackAfter {
+    route: Route;
+    api: Api;
+    response: Response;
+    data: any;
+}
+
+interface IRouteCallbacks {
+    before: ((args: ICallbackBefore) => (Partial<ICallbackBefore> | void)) | null;
+    after: ((args: ICallbackAfter) => (Partial<ICallbackAfter> | void)) | null;
+}
+
 interface IRoute {
     api: Api["name"];
     name: string;
@@ -20,6 +40,10 @@ interface IRoute {
     method: RouteMethod;
     headers: IHeaders;
     arguments: Set<string>;
+    callbacks: IRouteCallbacks;
+
+    before: (callback: (args: ICallbackBefore) => (Partial<ICallbackBefore> | void)) => Route;
+    after: (callback: (args: ICallbackAfter) => (Partial<ICallbackAfter> | void)) => Route;
 }
 
 /**
@@ -37,6 +61,17 @@ export class Route implements IRoute {
     public headers: IHeaders;
 
     public arguments: Set<string> = new Set<string>();
+
+    public callbacks: IRouteCallbacks = {
+        /**
+         * Called before the request is sent
+         */
+        before: null,
+        /**
+         * Called after the request is sent and before the data is returned
+         */
+        after: null
+    };
 
     /**
      * Constructor
@@ -144,6 +179,28 @@ export class Route implements IRoute {
      */
     public static options (name: string, url: string, headers: IHeaders): Route {
         return this.createRoute(name, url, headers, RouteMethod.OPTIONS);
+    }
+
+    /**
+     * Sets the before callback
+     *
+     * @param callback - The callback
+     * @returns The route
+     */
+    public before (callback: (args: ICallbackBefore) => (Partial<ICallbackBefore> | void)): this {
+        this.callbacks.before = callback;
+        return this;
+    }
+
+    /**
+     * Sets the after callback
+     *
+     * @param callback - The callback
+     * @returns The route
+     */
+    public after (callback: (args: ICallbackAfter) => (Partial<ICallbackAfter> | void)): this {
+        this.callbacks.after = callback;
+        return this;
     }
 
     /**
