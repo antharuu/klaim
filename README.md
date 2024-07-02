@@ -49,6 +49,17 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 
     // You can also define routes in post, (put, delete, etc)
     Route.post<Todo>("addTodo", "todos");
+
+    // With before middleware
+    Route.get<Todo>("getRandomTodo", "todos")
+        .before(({url}) => {
+            const random = Math.floor(Math.random() * 10) + 1;
+            return ({url: `${url}/${random}`});
+        });
+
+    // With after middleware
+    Route.get<Todo>("getFirstTodo", "todos")
+        .after(({data: [first]}) => ({data: first}));
 });
 
 // --- Usage
