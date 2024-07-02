@@ -28,7 +28,9 @@ module.exports = {
         'after:bump': [
             `npx jsr publish --token ${process.env.JSR_TOKEN} --allow-dirty`,
             `npm config set //registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`,
-            `npm publish`
+            `npm publish`,
+            `git config --global user.email "antho.eclips@gmail.com"`,
+            `git config --global user.name "Anthony Bellancourt"`,
         ]
     }
 };
