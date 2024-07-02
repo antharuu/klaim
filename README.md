@@ -39,9 +39,8 @@ deno add @antharuu/klaim
 Here’s a basic example to get you started:
 
 ```typescript
-import {Api, Klaim, Registry, Route, Hook} from 'klaim';
-// OR
-import {Api, Klaim, Registry, Route, Hook} from "@antharuu/klaim";
+import {Api, Klaim, Route, Hook} from 'klaim';
+// For deno: import {Api, Klaim, Route, Hook} from "@antharuu/klaim";
 
 // Your simple Todo type
 type Todo = {
