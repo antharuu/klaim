@@ -102,6 +102,39 @@ export class Registry {
     }
 
     /**
+     * Updates an API
+     *
+     * @param api - The API to update
+     * @returns The updated API
+     */
+    public static updateApi (api: Api): Api {
+        if (!Registry.i._apis.has(api.name)) {
+            Registry.i.registerApi(api);
+        }
+
+        Registry.i._apis.set(api.name, api);
+
+        return api;
+    }
+
+    /**
+     * Updates a route
+     *
+     * @param route - The route to update
+     * @returns The updated route
+     */
+    public static updateRoute (route: Route): Route {
+        const api = Registry.i._apis.get(route.api);
+        if (!api) {
+            throw new Error(`API ${route.api} not found`);
+        }
+
+        api.routes.set(route.name, route);
+
+        return route;
+    }
+
+    /**
      * Adds a route to Klaim object
      *
      * @param apiName - The name of the API
