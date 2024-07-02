@@ -16,7 +16,11 @@
     "hooks": {
         "before:init": [
             "git pull",
-            "npm run lint"
+            "bun run lint",
+            "bun run build"
+        ],
+        "after:bump": [
+            "npx jsr publish --token ${JSR_TOKEN}"
         ]
     }
 }
