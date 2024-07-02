@@ -6,6 +6,9 @@ on:
 jobs:
     release:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
         steps:
             -   name: Checkout
                 uses: actions/checkout@v2
@@ -27,7 +30,9 @@ jobs:
                 run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
                 env:
                     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-            -   name: Release
+            -   name: Publish on JSR
+                run: npx jsr publish
+            -   name: Release on NPM
                 run: bun run release --ci
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
