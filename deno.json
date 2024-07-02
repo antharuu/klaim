@@ -1,0 +1,38 @@
+{
+    "name": "@antharuu/klaim",
+    "version": "1.2.1",
+    "description": "Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user experience.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/antharuu/klaim.git"
+    },
+    "keywords": [
+        "typescript",
+        "api",
+        "request",
+        "user experience",
+        "optimization",
+        "lightweight"
+    ],
+    "author": "antharuu",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/antharuu/klaim/issues"
+    },
+    "homepage": "https://github.com/antharuu/klaim#readme",
+    "main": "dist/klaim.cjs.js",
+    "module": "dist/klaim.es.js",
+    "types": "dist/index.d.ts",
+    "exports": "./mod.ts",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "test": "vitest",
+        "lint": "eslint src",
+        "lint:fix": "eslint src **/*.ts --fix",
+        "release": "dotenv release-it --"
+    },
+    "peerDependencies": {
+        "typescript": "^5.5.3"
+    }
+}
