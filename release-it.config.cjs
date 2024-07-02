@@ -22,7 +22,7 @@ module.exports = {
             'bun run build'
         ],
         'after:bump': [
-            `npx jsr publish --token ${process.env.JSR_TOKEN}`
+            `npx jsr publish --token ${process.env.JSR_TOKEN} --allow-dirty`
         ]
     }
 };
