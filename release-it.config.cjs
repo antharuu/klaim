@@ -16,7 +16,8 @@ module.exports = {
         tag: true,
         push: true,
         commit: true,
-        publish: true
+        publish: true,
+        release: false
     },
     hooks: {
         'before:init': [
