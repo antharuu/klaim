@@ -3,6 +3,11 @@
 Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user
 experience.
 
+## Links
+
+- [NPM](https://www.npmjs.com/package/klaim)
+- [GitHub](https://github.com/antharuu/klaim)
+
 ## 🚀 Features
 
 - **Efficient API Management**: Easily manage multiple APIs with streamlined integration and interaction capabilities.
