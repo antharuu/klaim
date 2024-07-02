@@ -4,7 +4,6 @@ require('./load-env.cjs');
 module.exports = {
     github: {
         release: true,
-        tokenRef: 'GITHUB_TOKEN'
     },
     npm: {
         publish: false,
