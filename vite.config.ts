@@ -7,8 +7,11 @@ export default defineConfig({
         lib: {
             entry: path.resolve(__dirname, 'src/index.ts'),
             name: 'klaim',
-            fileName: format => `klaim.${format}.js`,
-            formats: ['es', 'cjs']
+            fileName: format => {
+                if (format === 'cjs') return `klaim.${format}`;
+                return `klaim.${format}.js`;
+            },
+            formats: ['es', 'cjs', 'umd']
         },
         rollupOptions: {
             external: [],
