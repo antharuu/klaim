@@ -7,7 +7,7 @@ module.exports = {
         tokenRef: 'GITHUB_TOKEN'
     },
     npm: {
-        publish: true,
+        publish: false,
     },
     git: {
         requiredBranch: 'main',
@@ -21,7 +21,9 @@ module.exports = {
             'bun run build'
         ],
         'after:bump': [
-            `npx jsr publish --token ${process.env.JSR_TOKEN} --allow-dirty`
+            // `npx jsr publish --token ${process.env.JSR_TOKEN} --allow-dirty`
+            `npm config set //registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}`,
+            `npm publish`
         ]
     }
 };
