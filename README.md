@@ -14,6 +14,7 @@ experience.
 - **Request Recording**: Seamlessly track requests for debugging and monitoring.
 - **User Experience Optimization**: Focused on performance and usability for a smooth user experience.
 - **Lightweight**: Minimal footprint for fast load times and minimal performance impact.
+- **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 
 ## 📥 Installation
