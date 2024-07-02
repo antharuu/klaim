@@ -6,6 +6,7 @@ experience.
 ## Links
 
 - [NPM](https://www.npmjs.com/package/klaim)
+- [JSR](https://jsr.io/@antharuu/klaim)
 - [GitHub](https://github.com/antharuu/klaim)
 
 ## 🚀 Features
@@ -28,6 +29,9 @@ npm install klaim
 
 // Using bun
 bun add klaim
+
+// Using deno
+deno add @antharuu/klaim
 ```
 
 ## 🛠 Usage
@@ -36,6 +40,8 @@ Here’s a basic example to get you started:
 
 ```typescript
 import {Api, Klaim, Registry, Route, Hook} from 'klaim';
+// OR
+import {Api, Klaim, Registry, Route, Hook} from "@antharuu/klaim";
 
 // Your simple Todo type
 type Todo = {
