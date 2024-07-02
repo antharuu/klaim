@@ -30,9 +30,9 @@
         "test": "vitest",
         "lint": "eslint src",
         "lint:fix": "eslint src **/*.ts --fix",
-        "release": "release-it patch --config release-it.config.cjs",
-        "release:minor": "release-it minor --config release-it.config.cjs",
-        "release:major": "release-it major --config release-it.config.cjs"
+        "release": "dotenv release-it patch --config release-it.config.cjs --",
+        "release:minor": "dotenv release-it minor --config release-it.config.cjs --",
+        "release:major": "dotenv release-it major --config release-it.config.cjs --"
     },
     "devDependencies": {
         "@eslint/js": "^9.6.0",

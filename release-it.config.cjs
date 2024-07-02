@@ -8,7 +8,6 @@ module.exports = {
     },
     npm: {
         publish: true,
-        tokenRef: 'NPM_TOKEN'
     },
     git: {
         requiredBranch: 'main',
