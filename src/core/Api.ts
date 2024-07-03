@@ -9,6 +9,9 @@ interface IApi {
     url: string;
     headers: IHeaders;
     routes: Map<string, Route>;
+    cache: false | number;
+
+    withCache: (duration?: number) => this;
 }
 
 export type IApiCallback = () => void;
@@ -25,6 +28,8 @@ export class Api implements IApi {
     public headers: IHeaders;
 
     public routes: Map<string, Route> = new Map<string, Route>();
+
+    public cache: false | number = false;
 
     /**
      * Constructor
@@ -64,5 +69,16 @@ export class Api implements IApi {
         callback();
         Registry.i.clearCurrent();
         return api;
+    }
+
+    /**
+     * Enables caching for the API
+     *
+     * @param duration - The duration to cache the response for seconds (default: 20)
+     * @returns The API
+     */
+    public withCache (duration = 20): this {
+        this.cache = duration;
+        return this;
     }
 }

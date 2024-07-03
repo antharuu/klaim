@@ -28,8 +28,8 @@ export interface ICallbackAfter {
 }
 
 interface IRouteCallbacks {
-    before: ((args: ICallbackBefore) => (Partial<ICallbackBefore> | void)) | null;
-    after: ((args: ICallbackAfter) => (Partial<ICallbackAfter> | void)) | null;
+    before: ((args: ICallbackBefore) => Partial<ICallbackBefore> | void) | null;
+    after: ((args: ICallbackAfter) => Partial<ICallbackAfter> | void) | null;
 }
 
 interface IRoute {
@@ -40,9 +40,16 @@ interface IRoute {
     headers: IHeaders;
     arguments: Set<string>;
     callbacks: IRouteCallbacks;
+    cache: false | number;
 
-    before: (callback: (args: ICallbackBefore) => (Partial<ICallbackBefore> | void)) => Route;
-    after: (callback: (args: ICallbackAfter) => (Partial<ICallbackAfter> | void)) => Route;
+    before: (
+        callback: (args: ICallbackBefore) => Partial<ICallbackBefore> | void,
+    ) => Route;
+    after: (
+        callback: (args: ICallbackAfter) => Partial<ICallbackAfter> | void,
+    ) => Route;
+
+    withCache: (duration?: number) => this;
 }
 
 /**
@@ -80,7 +87,12 @@ export class Route implements IRoute {
      * @param headers - The headers to be sent with the request
      * @param method - The HTTP method of the route
      */
-    private constructor (name: string, url: string, headers: IHeaders, method: RouteMethod = RouteMethod.GET) {
+    private constructor (
+        name: string,
+        url: string,
+        headers: IHeaders,
+        method: RouteMethod = RouteMethod.GET
+    ) {
         this.name = toCamelCase(name);
         if (this.name !== name) {
             console.warn(`Route name "${name}" has been camelCased to "${this.name}"`);
@@ -102,7 +114,12 @@ export class Route implements IRoute {
      * @param method - The HTTP method of the route
      * @returns The new route
      */
-    private static createRoute (name: string, url: string, headers: IHeaders, method: RouteMethod): Route {
+    private static createRoute (
+        name: string,
+        url: string,
+        headers: IHeaders,
+        method: RouteMethod
+    ): Route {
         const route = new Route(name, url, headers, method);
         Registry.i.registerRoute(route as Route);
         return route;
@@ -116,7 +133,11 @@ export class Route implements IRoute {
      * @param headers - The headers to be sent with the request
      * @returns The new route
      */
-    public static get (name: string, url: string, headers: IHeaders = {}): Route {
+    public static get (
+        name: string,
+        url: string,
+        headers: IHeaders = {}
+    ): Route {
         return this.createRoute(name, url, headers, RouteMethod.GET);
     }
 
@@ -186,7 +207,7 @@ export class Route implements IRoute {
      * @param callback - The callback
      * @returns The route
      */
-    public before (callback: (args: ICallbackBefore) => (Partial<ICallbackBefore> | void)): this {
+    public before (callback: (args: ICallbackBefore) => Partial<ICallbackBefore> | void): this {
         this.callbacks.before = callback;
         return this;
     }
@@ -197,7 +218,7 @@ export class Route implements IRoute {
      * @param callback - The callback
      * @returns The route
      */
-    public after (callback: (args: ICallbackAfter) => (Partial<ICallbackAfter> | void)): this {
+    public after (callback: (args: ICallbackAfter) => Partial<ICallbackAfter> | void): this {
         this.callbacks.after = callback;
         return this;
     }
@@ -213,5 +234,16 @@ export class Route implements IRoute {
                 this.arguments.add(key);
             });
         }
+    }
+
+    /**
+     * Enables caching for the Route
+     *
+     * @param duration - The duration to cache the response for seconds (default: 20)
+     * @returns The Route
+     */
+    public withCache (duration = 20): this {
+        this.cache = duration;
+        return this;
     }
 }
