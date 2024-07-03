@@ -2,16 +2,27 @@ import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
 
 import { Registry } from "./Registry";
-import { Route } from "./Route";
+import { IRouteCallbackCall, Route } from "./Route";
+
+interface IApiCallbackCall {}
 
 interface IApi {
     name: string;
     url: string;
     headers: IHeaders;
     routes: Map<string, Route>;
+    callbacks: {
+        call: ((args: IApiCallbackCall) => void) | null;
+    };
     cache: false | number;
+    retry: false | number;
+
+    onCall: (
+        callback: (args: IRouteCallbackCall) => void,
+    ) => Route;
 
     withCache: (duration?: number) => this;
+    withRetry: (maxRetries?: number) => this;
 }
 
 export type IApiCallback = () => void;
@@ -29,7 +40,13 @@ export class Api implements IApi {
 
     public routes: Map<string, Route> = new Map<string, Route>();
 
+    public callbacks = {
+        call: null
+    };
+
     public cache: false | number = false;
+
+    public retry: false | number = false;
 
     /**
      * Constructor
@@ -72,6 +89,17 @@ export class Api implements IApi {
     }
 
     /**
+     * Sets the onCall callback
+     *
+     * @param callback - The callback
+     * @returns The API
+     */
+    public onCall (callback: (args: IApiCallbackCall) => void): this {
+        this.callbacks.call = callback;
+        return this;
+    }
+
+    /**
      * Enables caching for the API
      *
      * @param duration - The duration to cache the response for seconds (default: 20)
@@ -79,6 +107,17 @@ export class Api implements IApi {
      */
     public withCache (duration = 20): this {
         this.cache = duration;
+        return this;
+    }
+
+    /**
+     * Enables retrying for the API
+     *
+     * @param maxRetries - The maximum number of retries (default: 0)
+     * @returns The API
+     */
+    public withRetry (maxRetries = 2): this {
+        this.retry = maxRetries;
         return this;
     }
 }

@@ -60,15 +60,7 @@ export async function callApi<T> (
     api = Registry.updateApi(beforeApi);
     route = Registry.updateRoute(beforeRoute);
 
-    const withCache = api.cache || route.cache;
-
-    let response;
-    if (withCache) {
-        response = await fetchWithCache(url, config, api.cache);
-    } else {
-        const rawResponse = await fetch(url, config);
-        response = await rawResponse.json();
-    }
+    const response = await fetchWithRetry(api, route, url, config);
 
     const {
         afterRoute,
@@ -81,6 +73,69 @@ export async function callApi<T> (
     Hook.run(`${api.name}.${route.name}`);
 
     return afterData as T;
+}
+
+/**
+ * Fetches data from the API
+ *
+ * @param withCache - Whether to use the cache
+ * @param url - The URL to fetch
+ * @param config - The fetch config
+ * @param api - The API
+ * @returns The response
+ */
+async function fetchData (withCache, url, config: any, api: any): Promise<any> {
+    if (withCache) {
+        return await fetchWithCache(url, config, api.cache);
+    } else {
+        const rawResponse = await fetch(url, config);
+        return await rawResponse.json();
+    }
+}
+
+/**
+ * Fetches data with retries
+ *
+ * @param api - The API
+ * @param route - The route
+ * @param url - The URL to fetch
+ * @param config - The fetch config
+ * @returns The response
+ */
+async function fetchWithRetry (
+    api: Api,
+    route: Route,
+    url,
+    config: any
+): Promise<any> {
+    const withCache = api.cache || route.cache;
+    const maxRetries = (route.retry || api.retry) || 0;
+
+    let response;
+    let attempt = 0;
+    let success = false;
+    const callCallback = route.callbacks?.call !== null
+        ? route.callbacks?.call
+        : api.callbacks?.call;
+
+    while (attempt <= maxRetries && !success) {
+        if (callCallback) {
+            callCallback();
+        }
+
+        try {
+            response = await fetchData(withCache, url, config, api);
+            success = true;
+        } catch (error) {
+            attempt++;
+            if (attempt > maxRetries) {
+                error.message
+                    = `Failed to fetch ${url} after ${maxRetries} attempts`;
+                throw error;
+            }
+        }
+    }
+    return response;
 }
 
 /**
