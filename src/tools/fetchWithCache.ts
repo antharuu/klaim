@@ -1,5 +1,3 @@
-import { RequestInit, Response } from "node/globals";
-
 import { Cache } from "../core/Cache.ts";
 
 import hashStr from "./hashStr.ts";
