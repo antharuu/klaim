@@ -3,7 +3,7 @@ require('./load-env.cjs');
 
 module.exports = {
     github: {
-        release: false,
+        release: true,
     },
     npm: {
         publish: false,
