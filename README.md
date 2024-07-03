@@ -15,6 +15,7 @@ experience.
     - [Request Handling](#request-handling)
     - [Middleware Usage](#middleware-usage)
     - [Hook Subscription](#hook-subscription)
+    - [Caching Requests](#caching-requests)
 - [Links](#-links)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -27,6 +28,7 @@ experience.
 - **Lightweight**: Minimal footprint for fast load times and minimal performance impact.
 - **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
+- **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 
 ## 📥 Installation
@@ -138,6 +140,43 @@ import {Hook} from 'klaim';
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
     console.log(`Requesting ${url}`);
 });
+```
+
+### Caching Requests
+
+Enable caching on requests to reduce network load and improve performance. By default, the cache duration is 20 seconds,
+but you can specify a custom duration in seconds.
+
+#### Caching Individual Routes
+
+You can enable caching on individual routes:
+
+```typescript
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Get a list of todos with default cache duration (20 seconds)
+    Route.get<Todo[]>("listTodos", "todos").withCache();
+
+    // Get a specific todo by id with custom cache duration (300 seconds)
+    Route.get<Todo>("getTodo", "todos/[id]").withCache(300);
+
+    // Add a new todo (no cache)
+    Route.post<Todo>("addTodo", "todos");
+});
+```
+
+Now, when making requests, the caching feature will be applied.
+
+#### Caching the Entire API
+
+You can also enable caching for all routes defined within an API:
+
+```typescript
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Define routes for the API
+    Route.get<Todo[]>("listTodos", "todos");
+    Route.get<Todo>("getTodo", "todos/[id]");
+    Route.post<Todo>("addTodo", "todos");
+}).withCache(); // Enable default cache duration (20 seconds) for all routes
 ```
 
 ## 🔗 Links

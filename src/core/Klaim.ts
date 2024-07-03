@@ -1,3 +1,5 @@
+import fetchWithCache from "../tools/fetchWithCache.ts";
+
 import { Api } from "./Api";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
@@ -7,7 +9,10 @@ export type IArgs = Record<string, unknown>;
 
 export type IBody = Record<string, unknown>;
 
-export type IRouteReference = Record<string, <T>(args?: IArgs, body?: IBody) => Promise<T>>;
+export type IRouteReference = Record<
+    string,
+    <T>(args?: IArgs, body?: IBody) => Promise<T>
+>;
 
 export type IApiReference = Record<string, IRouteReference>;
 
@@ -22,7 +27,12 @@ export const Klaim: IApiReference = {};
  * @param body - The body to pass to the route
  * @returns The response
  */
-export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body: IBody = {}): Promise<T> {
+export async function callApi<T> (
+    api: Api,
+    route: Route,
+    args: IArgs = {},
+    body: IBody = {}
+): Promise<T> {
     let url = applyArgs(`${api.url}/${route.url}`, route, args);
 
     let config: Record<string, unknown> = {};
@@ -50,13 +60,21 @@ export async function callApi<T> (api: Api, route: Route, args: IArgs = {}, body
     api = Registry.updateApi(beforeApi);
     route = Registry.updateRoute(beforeRoute);
 
-    const response = await fetch(url, config);
+    const withCache = api.cache || route.cache;
+
+    let response;
+    if (withCache) {
+        response = await fetchWithCache(url, config, api.cache);
+    } else {
+        const rawResponse = await fetch(url, config);
+        response = await rawResponse.json();
+    }
 
     const {
         afterRoute,
         afterApi,
         afterData
-    } = applyAfter({ route, api, response, data: await response.json() });
+    } = applyAfter({ route, api, response, data: response });
     Registry.updateApi(afterApi);
     Registry.updateRoute(afterRoute);
 
@@ -81,7 +99,7 @@ function applyArgs (url: string, route: Route, args: IArgs): string {
             throw new Error(`Argument ${arg} is missing`);
         }
 
-        newUrl = newUrl.replace(`[${arg}]`, <string>args[arg]);
+        newUrl = newUrl.replace(`[${arg}]`, <string> args[arg]);
     });
 
     return newUrl;
