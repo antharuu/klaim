@@ -3,11 +3,18 @@
 Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user
 experience.
 
-## Links
+## 📚 Table of Contents
 
-- [NPM](https://www.npmjs.com/package/klaim)
-- [JSR](https://jsr.io/@antharuu/klaim)
-- [GitHub](https://github.com/antharuu/klaim)
+- [Features](#-features)
+- [Installation](#-installation)
+- [Usage](#-usage)
+    - [Basic API Configuration](#basic-api-configuration)
+    - [Route Definition](#route-definition)
+    - [Request Handling](#request-handling)
+    - [Hook Subscription](#hook-subscription)
+- [Links](#-links)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🚀 Features
 
@@ -36,11 +43,11 @@ deno add @antharuu/klaim
 
 ## 🛠 Usage
 
-Here’s a basic example to get you started:
+### Basic API Configuration
 
 ```typescript
 import {Api, Klaim, Route, Hook} from 'klaim';
-// For deno: import {Api, Klaim, Route, Hook} from "@antharuu/klaim";
+// For deno: import { Api, Klaim, Route, Hook } from "@antharuu/klaim";
 
 // Your simple Todo type
 type Todo = {
@@ -50,47 +57,72 @@ type Todo = {
     completed: boolean;
 }
 
-// --- Basic API configuration
 // Create a new API with the name "hello" and the base URL "https://jsonplaceholder.typicode.com/"
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-    // Define routes for the API
-    Route.get<Todo[]>("listTodos", "todos");
+Api.create("hello", "https://jsonplaceholder.typicode.com/");
+```
 
-    // You can also define routes with parameters
-    Route.get<Todo>("getTodo", "todos/[id]");
+### Route Definition
 
-    // You can also define routes in post, (put, delete, etc)
-    Route.post<Todo>("addTodo", "todos");
+Define routes for the API:
 
-    // With before middleware
-    Route.get<Todo>("getRandomTodo", "todos")
-        .before(({url}) => {
-            const random = Math.floor(Math.random() * 10) + 1;
-            return ({url: `${url}/${random}`});
-        });
+```typescript
+// Define a route to get a list of todos
+Route.get<Todo[]>("listTodos", "todos");
 
-    // With after middleware
-    Route.get<Todo>("getFirstTodo", "todos")
-        .after(({data: [first]}) => ({data: first}));
-});
+// Define a route to get a todo by id
+Route.get<Todo>("getTodo", "todos/[id]");
 
-// --- Usage
+// Define a route to add a new todo
+Route.post<Todo>("addTodo", "todos");
+
+// Define a route with before middleware
+Route.get<Todo>("getRandomTodo", "todos")
+    .before(({url}) => {
+        const random = Math.floor(Math.random() * 10) + 1;
+        return ({url: `${url}/${random}`});
+    });
+
+// Define a route with after middleware
+Route.get<Todo>("getFirstTodo", "todos")
+    .after(({data: [first]}) => ({data: first}));
+```
+
+### Request Handling
+
+Make requests using the defined routes:
+
+```typescript
 // Make a request to the "listTodos" route
-const listOfTodos = await Klaim.hello.todo<Todo>({id: 1})
+const listOfTodos = await Klaim.hello.todo<Todo>({id: 1});
 
 // Make a request to the "getTodo" route with the parameter "id"
-const todo = await Klaim.hello.getTodo<Todo>({id: 1})
+const todo = await Klaim.hello.getTodo<Todo>({id: 1});
 
 // Make a request to the "addTodo" route
-const newTodo = await Klaim.hello.addTodo<Todo>({}, {title: "New Todo", completed: false, userId: 1})
+const newTodo = await Klaim.hello.addTodo<Todo>({}, {title: "New Todo", completed: false, userId: 1});
+```
 
-// You can subscribe to hooks from everywhere
-// Every time hello.getFirstTodo is called, the hook will be triggered
+### Hook Subscription
+
+Subscribe to hooks to monitor specific events:
+
+```typescript
+// Subscribe to the "hello.getFirstTodo" hook
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
     console.log(`Requesting ${url}`);
 });
 ```
 
+## 🔗 Links
+
+- [NPM](https://www.npmjs.com/package/klaim)
+- [JSR](https://jsr.io/@antharuu/klaim)
+- [GitHub](https://github.com/antharuu/klaim)
+
 ## 🤝 Contributing
 
-Contributions are welcome!
+Contributions are welcome! Please see the [Contributing Guide](CONTRIBUTING.md) for more details.
+
+## 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
