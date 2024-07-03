@@ -27,9 +27,13 @@ export interface ICallbackAfter {
     data: any;
 }
 
+export interface IRouteCallbackCall {
+}
+
 interface IRouteCallbacks {
     before: ((args: ICallbackBefore) => Partial<ICallbackBefore> | void) | null;
     after: ((args: ICallbackAfter) => Partial<ICallbackAfter> | void) | null;
+    call: ((args: IRouteCallbackCall) => void) | null;
 }
 
 interface IRoute {
@@ -41,6 +45,7 @@ interface IRoute {
     arguments: Set<string>;
     callbacks: IRouteCallbacks;
     cache: false | number;
+    retry: false | number;
 
     before: (
         callback: (args: ICallbackBefore) => Partial<ICallbackBefore> | void,
@@ -48,8 +53,12 @@ interface IRoute {
     after: (
         callback: (args: ICallbackAfter) => Partial<ICallbackAfter> | void,
     ) => Route;
+    onCall: (
+        callback: (args: IRouteCallbackCall) => void,
+    ) => Route;
 
     withCache: (duration?: number) => this;
+    withRetry: (maxRetries?: number) => this;
 }
 
 /**
@@ -76,8 +85,16 @@ export class Route implements IRoute {
         /**
          * Called after the request is sent and before the data is returned
          */
-        after: null
+        after: null,
+        /**
+         * Called when the route is called (call also includes retries)
+         */
+        call: null
     };
+
+    public cache: false | number = false;
+
+    public retry: false | number = false;
 
     /**
      * Constructor
@@ -224,13 +241,24 @@ export class Route implements IRoute {
     }
 
     /**
+     * Sets the onCall callback
+     *
+     * @param callback - The callback
+     * @returns The route
+     */
+    public onCall (callback: (args: IRouteCallbackCall) => void): this {
+        this.callbacks.call = callback;
+        return this;
+    }
+
+    /**
      * Detects the arguments in the URL
      */
     private detectArguments (): void {
         const matches = this.url.match(/\[([^\]]+)]/g);
         if (matches) {
             matches.forEach(match => {
-                const key = match.replace(/\[|]/g, "");
+                const key = match.replace("[", "").replace("]", "");
                 this.arguments.add(key);
             });
         }
@@ -244,6 +272,17 @@ export class Route implements IRoute {
      */
     public withCache (duration = 20): this {
         this.cache = duration;
+        return this;
+    }
+
+    /**
+     * Enables retry for the Route
+     *
+     * @param maxRetries - The maximum number of retries (default: 3)
+     * @returns The Route
+     */
+    public withRetry (maxRetries = 2): this {
+        this.retry = maxRetries;
         return this;
     }
 }

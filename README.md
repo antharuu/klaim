@@ -16,6 +16,7 @@ experience.
     - [Middleware Usage](#middleware-usage)
     - [Hook Subscription](#hook-subscription)
     - [Caching Requests](#caching-requests)
+    - [Retry Mechanism](#retry-mechanism)
 - [Links](#-links)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -29,6 +30,7 @@ experience.
 - **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
+- **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 
 ## 📥 Installation
@@ -178,6 +180,43 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
     Route.post<Todo>("addTodo", "todos");
 }).withCache(); // Enable default cache duration (20 seconds) for all routes
 ```
+
+### Retry Mechanism
+
+Automatically retry failed requests to enhance reliability. You can specify the number of retry attempts for individual
+routes or for the entire API.
+
+#### Retry on Individual Routes
+
+Enable retry on individual routes:
+
+```typescript
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Get a list of todos with retry mechanism (default: 2)
+    Route.get<Todo[]>("listTodos", "todos").withRetry();
+
+    // Get a specific todo by id with retry mechanism (specified to 5)
+    Route.get<Todo>("getTodo", "todos/[id]").withRetry(5);
+
+    // Add a new todo (no retry)
+    Route.post<Todo>("addTodo", "todos");
+});
+```
+
+#### Retry the Entire API
+
+Enable retry for all routes defined within an API:
+
+```typescript
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Define routes for the API
+    Route.get<Todo[]>("listTodos", "todos");
+    Route.get<Todo>("getTodo", "todos/[id]");
+    Route.post<Todo>("addTodo", "todos");
+}).withRetry();
+```
+
+Now, when a request fails, it will be retried the specified number of times before ultimately failing.
 
 ## 🔗 Links
 
