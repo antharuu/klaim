@@ -20,7 +20,7 @@
     },
     "homepage": "https://github.com/antharuu/klaim#readme",
     "type": "module",
-    "version": "1.2.31",
+    "version": "1.2.32",
     "main": "dist/klaim.cjs.js",
     "module": "dist/klaim.es.js",
     "types": "dist/index.d.ts",
