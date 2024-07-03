@@ -11,6 +11,7 @@ experience.
     - [Basic API Configuration](#basic-api-configuration)
     - [Route Definition](#route-definition)
     - [Request Handling](#request-handling)
+    - [Middleware Usage](#middleware-usage)
     - [Hook Subscription](#hook-subscription)
 - [Links](#-links)
 - [Contributing](#-contributing)
@@ -45,9 +46,11 @@ deno add @antharuu/klaim
 
 ### Basic API Configuration
 
+First, set up the API configuration. Define the API and its base URL.
+
 ```typescript
-import {Api, Klaim, Route, Hook} from 'klaim';
-// For deno: import { Api, Klaim, Route, Hook } from "@antharuu/klaim";
+import {Api, Route} from 'klaim';
+// For deno: import { Api, Route } from "@antharuu/klaim";
 
 // Your simple Todo type
 type Todo = {
@@ -55,45 +58,44 @@ type Todo = {
     id: number;
     title: string;
     completed: boolean;
-}
+};
 
 // Create a new API with the name "hello" and the base URL "https://jsonplaceholder.typicode.com/"
-Api.create("hello", "https://jsonplaceholder.typicode.com/");
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Define routes for the API
+    Route.get<Todo[]>("listTodos", "todos");
+    Route.get<Todo>("getTodo", "todos/[id]");
+    Route.post<Todo>("addTodo", "todos");
+});
 ```
 
 ### Route Definition
 
-Define routes for the API:
+Define various routes within the API callback:
 
 ```typescript
-// Define a route to get a list of todos
-Route.get<Todo[]>("listTodos", "todos");
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Get a list of todos
+    Route.get<Todo[]>("listTodos", "todos");
 
-// Define a route to get a todo by id
-Route.get<Todo>("getTodo", "todos/[id]");
+    // Get a specific todo by id
+    Route.get<Todo>("getTodo", "todos/[id]");
 
-// Define a route to add a new todo
-Route.post<Todo>("addTodo", "todos");
-
-// Define a route with before middleware
-Route.get<Todo>("getRandomTodo", "todos")
-    .before(({url}) => {
-        const random = Math.floor(Math.random() * 10) + 1;
-        return ({url: `${url}/${random}`});
-    });
-
-// Define a route with after middleware
-Route.get<Todo>("getFirstTodo", "todos")
-    .after(({data: [first]}) => ({data: first}));
+    // Add a new todo
+    Route.post<Todo>("addTodo", "todos");
+});
 ```
 
 ### Request Handling
 
-Make requests using the defined routes:
+Handle requests using the defined routes:
 
 ```typescript
+import {Klaim} from 'klaim';
+// For deno: import { Klaim } from "@antharuu/klaim";
+
 // Make a request to the "listTodos" route
-const listOfTodos = await Klaim.hello.todo<Todo>({id: 1});
+const listOfTodos = await Klaim.hello.listTodos<Todo[]>();
 
 // Make a request to the "getTodo" route with the parameter "id"
 const todo = await Klaim.hello.getTodo<Todo>({id: 1});
@@ -102,11 +104,34 @@ const todo = await Klaim.hello.getTodo<Todo>({id: 1});
 const newTodo = await Klaim.hello.addTodo<Todo>({}, {title: "New Todo", completed: false, userId: 1});
 ```
 
+### Middleware Usage
+
+Add middleware to modify requests and responses. Use `before` middleware to alter requests before they are sent
+and `after` middleware to process responses:
+
+```typescript
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // With before middleware
+    Route.get<Todo>("getRandomTodo", "todos")
+        .before(({url}) => {
+            const random = Math.floor(Math.random() * 10) + 1;
+            return {url: `${url}/${random}`};
+        });
+
+    // With after middleware
+    Route.get<Todo>("getFirstTodo", "todos")
+        .after(({data: [first]}) => ({data: first}));
+});
+```
+
 ### Hook Subscription
 
 Subscribe to hooks to monitor specific events:
 
 ```typescript
+import {Hook} from 'klaim';
+// For deno: import { Hook } from "@antharuu/klaim";
+
 // Subscribe to the "hello.getFirstTodo" hook
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
     console.log(`Requesting ${url}`);
