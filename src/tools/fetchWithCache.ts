@@ -10,6 +10,7 @@ import hashStr from "./hashStr.ts";
  * @param input - The input
  * @param init - The init
  * @param ttl - The time to live
+ * @returns The response
  */
 export default async function (
     input: string | URL | globalThis.Request,
