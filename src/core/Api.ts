@@ -33,10 +33,10 @@ export class Api implements IApi {
      * @param url - The base URL of the API
      * @param headers - The headers to be sent with each request
      */
-    private constructor (name: string, url: string, headers: IHeaders) {
+    private constructor (name: string, url: string, headers: IHeaders = {}) {
         this.name = name;
         this.url = cleanUrl(url);
-        this.headers = headers || {};
+        this.headers = headers;
     }
 
     /**
@@ -48,7 +48,12 @@ export class Api implements IApi {
      * @param headers - The headers to be sent with each request
      * @returns The new API
      */
-    public static create (name: string, url: string, callback: IApiCallback, headers: IHeaders = {}): Api {
+    public static create (
+        name: string,
+        url: string,
+        callback: IApiCallback,
+        headers: IHeaders = {}
+    ): Api {
         const newName = toCamelCase(name);
         if (newName !== name) {
             console.warn(`API name "${name}" has been camelCased to "${newName}"`);
