@@ -1,5 +1,7 @@
 # Klaim 📦
 
+[![JSR Score](https://jsr.io/badges/@antharuu/klaim/score)](https://jsr.io/@antharuu/klaim)
+
 Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user
 experience.
 
