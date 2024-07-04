@@ -1,6 +1,6 @@
-import { Cache } from "../core/Cache.ts";
+import { Cache } from "../core/Cache";
 
-import hashStr from "./hashStr.ts";
+import hashStr from "./hashStr";
 
 /**
  * Fetch with cache

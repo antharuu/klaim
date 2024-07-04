@@ -1,7 +1,5 @@
-import cleanUrl from "../tools/cleanUrl";
-import toCamelCase from "../tools/toCamelCase";
-
-import { Api, IHeaders } from "./Api";
+import { Api } from "./Api";
+import { Element, IHeaders } from "./Element";
 import { Registry } from "./Registry";
 
 export enum RouteMethod {
@@ -13,88 +11,17 @@ export enum RouteMethod {
     OPTIONS = "OPTIONS"
 }
 
-export interface ICallbackBefore {
-    route: Route;
-    api: Api;
-    url: string;
-    config: Record<string, unknown>;
-}
-
-export interface ICallbackAfter {
-    route: Route;
-    api: Api;
-    response: Response;
-    data: any;
-}
-
-export interface IRouteCallbackCall {
-}
-
-interface IRouteCallbacks {
-    before: ((args: ICallbackBefore) => Partial<ICallbackBefore> | void) | null;
-    after: ((args: ICallbackAfter) => Partial<ICallbackAfter> | void) | null;
-    call: ((args: IRouteCallbackCall) => void) | null;
-}
-
-interface IRoute {
-    api: Api["name"];
-    name: string;
-    url: string;
-    method: RouteMethod;
-    headers: IHeaders;
-    arguments: Set<string>;
-    callbacks: IRouteCallbacks;
-    cache: false | number;
-    retry: false | number;
-
-    before: (
-        callback: (args: ICallbackBefore) => Partial<ICallbackBefore> | void,
-    ) => Route;
-    after: (
-        callback: (args: ICallbackAfter) => Partial<ICallbackAfter> | void,
-    ) => Route;
-    onCall: (
-        callback: (args: IRouteCallbackCall) => void,
-    ) => Route;
-
-    withCache: (duration?: number) => this;
-    withRetry: (maxRetries?: number) => this;
-}
-
 /**
  * Represents a route
  */
-export class Route implements IRoute {
+export class Route extends Element {
     public api: Api["name"] = "undefined";
-
-    public name: string;
-
-    public url: string;
 
     public method: RouteMethod;
 
-    public headers: IHeaders;
-
     public arguments: Set<string> = new Set<string>();
 
-    public callbacks: IRouteCallbacks = {
-        /**
-         * Called before the request is sent
-         */
-        before: null,
-        /**
-         * Called after the request is sent and before the data is returned
-         */
-        after: null,
-        /**
-         * Called when the route is called (call also includes retries)
-         */
-        call: null
-    };
-
-    public cache: false | number = false;
-
-    public retry: false | number = false;
+    public schema: any;
 
     /**
      * Constructor
@@ -110,13 +37,7 @@ export class Route implements IRoute {
         headers: IHeaders,
         method: RouteMethod = RouteMethod.GET
     ) {
-        this.name = toCamelCase(name);
-        if (this.name !== name) {
-            console.warn(`Route name "${name}" has been camelCased to "${this.name}"`);
-        }
-
-        this.url = cleanUrl(url);
-        this.headers = headers || {};
+        super(name, url, headers);
         this.method = method;
 
         this.detectArguments();
@@ -219,39 +140,6 @@ export class Route implements IRoute {
     }
 
     /**
-     * Sets the before callback
-     *
-     * @param callback - The callback
-     * @returns The route
-     */
-    public before (callback: (args: ICallbackBefore) => Partial<ICallbackBefore> | void): this {
-        this.callbacks.before = callback;
-        return this;
-    }
-
-    /**
-     * Sets the after callback
-     *
-     * @param callback - The callback
-     * @returns The route
-     */
-    public after (callback: (args: ICallbackAfter) => Partial<ICallbackAfter> | void): this {
-        this.callbacks.after = callback;
-        return this;
-    }
-
-    /**
-     * Sets the onCall callback
-     *
-     * @param callback - The callback
-     * @returns The route
-     */
-    public onCall (callback: (args: IRouteCallbackCall) => void): this {
-        this.callbacks.call = callback;
-        return this;
-    }
-
-    /**
      * Detects the arguments in the URL
      */
     private detectArguments (): void {
@@ -265,24 +153,13 @@ export class Route implements IRoute {
     }
 
     /**
-     * Enables caching for the Route
+     * Schema validation (Yup)
      *
-     * @param duration - The duration to cache the response for seconds (default: 20)
-     * @returns The Route
+     * @param schema - The schema to validate
+     * @returns The route
      */
-    public withCache (duration = 20): this {
-        this.cache = duration;
-        return this;
-    }
-
-    /**
-     * Enables retry for the Route
-     *
-     * @param maxRetries - The maximum number of retries (default: 3)
-     * @returns The Route
-     */
-    public withRetry (maxRetries = 2): this {
-        this.retry = maxRetries;
+    public validate (schema: any): Route {
+        this.schema = schema;
         return this;
     }
 }

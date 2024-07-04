@@ -1,10 +1,3 @@
-# Klaim 📦
-
-[![JSR Score](https://jsr.io/badges/@antharuu/klaim/score)](https://jsr.io/@antharuu/klaim)
-
-Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user
-experience.
-
 ## 📚 Table of Contents
 
 - [Features](#-features)
@@ -17,6 +10,7 @@ experience.
     - [Hook Subscription](#hook-subscription)
     - [Caching Requests](#caching-requests)
     - [Retry Mechanism](#retry-mechanism)
+    - [Response Validation](#response-validation)
 - [Links](#-links)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -32,6 +26,7 @@ experience.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
+- **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 
 ## 📥 Installation
 
@@ -217,6 +212,40 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 ```
 
 Now, when a request fails, it will be retried the specified number of times before ultimately failing.
+
+### Response Validation
+
+You can use [Yup](https://www.npmjs.com/package/yup) to validate the response schema for increased reliability and consistency. You can specify a schema for
+individual routes to ensure the response data conforms to the expected structure.
+
+⚠️ **Note**: This feature requires the `yup` package to be installed.
+
+#### Adding Validation to Individual Routes
+
+Enable validation on individual routes:
+
+```typescript
+import * as yup from 'yup';
+
+// Define the schema using Yup
+const todoSchema = yup.object().shape({
+    userId: yup.number().required(),
+    id: yup.number().min(1).max(10).required(),
+    title: yup.string().required(),
+    completed: yup.boolean().required()
+});
+
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Get a specific todo by id with validation
+    Route.get<Todo>("getTodo", "todos/[id]").validate(todoSchema);
+});
+
+// This request will fail because the id is out of range
+const todoFail = await Klaim.hello.getTodo<Todo>({id: 15});
+
+// This request will succeed
+const todo = await Klaim.hello.getTodo<Todo>({id: 1});
+```
 
 ## 🔗 Links
 

@@ -1,9 +1,10 @@
-import fetchWithCache from "../tools/fetchWithCache.ts";
+import fetchWithCache from "../tools/fetchWithCache";
 
 import { Api } from "./Api";
+import { ICallbackAfterArgs, ICallbackBeforeArgs } from "./Element";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
-import { ICallbackAfter, ICallbackBefore, Route, RouteMethod } from "./Route";
+import { Route, RouteMethod } from "./Route";
 
 export type IArgs = Record<string, unknown>;
 
@@ -60,7 +61,11 @@ export async function callApi<T> (
     api = Registry.updateApi(beforeApi);
     route = Registry.updateRoute(beforeRoute);
 
-    const response = await fetchWithRetry(api, route, url, config);
+    let response = await fetchWithRetry(api, route, url, config);
+
+    if (route.schema && "validate" in route.schema) {
+        response = await route.schema.validate(response);
+    }
 
     const {
         afterRoute,
@@ -84,7 +89,12 @@ export async function callApi<T> (
  * @param api - The API
  * @returns The response
  */
-async function fetchData (withCache, url, config: any, api: any): Promise<any> {
+async function fetchData (
+    withCache: boolean,
+    url: string,
+    config: any,
+    api: any
+): Promise<any> {
     if (withCache) {
         return await fetchWithCache(url, config, api.cache);
     } else {
@@ -105,7 +115,7 @@ async function fetchData (withCache, url, config: any, api: any): Promise<any> {
 async function fetchWithRetry (
     api: Api,
     route: Route,
-    url,
+    url: string,
     config: any
 ): Promise<any> {
     const withCache = api.cache || route.cache;
@@ -120,13 +130,13 @@ async function fetchWithRetry (
 
     while (attempt <= maxRetries && !success) {
         if (callCallback) {
-            callCallback();
+            callCallback({});
         }
 
         try {
-            response = await fetchData(withCache, url, config, api);
+            response = await fetchData(!!withCache, url, config, api);
             success = true;
-        } catch (error) {
+        } catch (error: any) {
             attempt++;
             if (attempt > maxRetries) {
                 error.message
@@ -135,6 +145,7 @@ async function fetchWithRetry (
             }
         }
     }
+
     return response;
 }
 
@@ -170,7 +181,7 @@ function applyArgs (url: string, route: Route, args: IArgs): string {
  * @param callbackArgs.config - The config
  * @returns The new args
  */
-function applyBefore ({ route, api, url, config }: ICallbackBefore): {
+function applyBefore ({ route, api, url, config }: ICallbackBeforeArgs): {
     beforeRoute: Route;
     beforeApi: Api;
     beforeUrl: string;
@@ -195,7 +206,7 @@ function applyBefore ({ route, api, url, config }: ICallbackBefore): {
  * @param callbackArgs.data - The data
  * @returns The new data
  */
-function applyAfter ({ route, api, response, data }: ICallbackAfter): {
+function applyAfter ({ route, api, response, data }: ICallbackAfterArgs): {
     afterRoute: Route;
     afterApi: Api;
     afterResponse: Response;

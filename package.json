@@ -1,41 +1,13 @@
 {
     "name": "klaim",
-    "description": "Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user experience.",
+    "version": "1.6.0",
+    "author": "antharuu",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/antharuu/klaim.git"
     },
-    "keywords": [
-        "typescript",
-        "api",
-        "request",
-        "user experience",
-        "optimization",
-        "lightweight"
-    ],
-    "author": "antharuu",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/antharuu/klaim/issues"
-    },
-    "homepage": "https://github.com/antharuu/klaim#readme",
-    "type": "module",
-    "version": "1.5.0",
     "main": "dist/klaim.cjs.js",
     "module": "dist/klaim.es.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite build --watch",
-        "test": "vitest",
-        "test:ui": "vitest --ui --coverage.enabled=true",
-        "test:cover": "vitest --coverage",
-        "lint": "eslint src",
-        "lint:fix": "eslint src **/*.ts --fix",
-        "release": "dotenv release-it -- patch --config release-it.config.cjs --ci",
-        "release:minor": "dotenv release-it -- minor --config release-it.config.cjs --ci",
-        "release:major": "dotenv release-it -- major --config release-it.config.cjs --ci"
-    },
     "devDependencies": {
         "@eslint/js": "^9.6.0",
         "@stylistic/eslint-plugin": "^2.3.0",
@@ -52,9 +24,35 @@
         "release-it": "^17.4.1",
         "typescript-eslint": "^7.15.0",
         "vite": "^5.3.3",
-        "vitest": "^1.6.0"
+        "vitest": "^1.6.0",
+        "yup": "^1.4.0"
     },
-    "peerDependencies": {
-        "typescript": "^5.5.3"
-    }
+    "bugs": {
+        "url": "https://github.com/antharuu/klaim/issues"
+    },
+    "description": "Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user experience.",
+    "homepage": "https://github.com/antharuu/klaim#readme",
+    "keywords": [
+        "typescript",
+        "api",
+        "request",
+        "user experience",
+        "optimization",
+        "lightweight"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "test": "vitest",
+        "test:ui": "vitest --ui --coverage.enabled=true",
+        "test:cover": "vitest --coverage",
+        "lint": "eslint src",
+        "lint:fix": "eslint src **/*.ts --fix",
+        "release": "dotenv release-it -- patch --config release-it.config.cjs --ci",
+        "release:minor": "dotenv release-it -- minor --config release-it.config.cjs --ci",
+        "release:major": "dotenv release-it -- major --config release-it.config.cjs --ci"
+    },
+    "type": "module",
+    "types": "dist/index.d.ts"
 }
