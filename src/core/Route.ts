@@ -21,6 +21,8 @@ export class Route extends Element {
 
     public arguments: Set<string> = new Set<string>();
 
+    public schema: any;
+
     /**
      * Constructor
      *
@@ -148,5 +150,16 @@ export class Route extends Element {
                 this.arguments.add(key);
             });
         }
+    }
+
+    /**
+     * Schema validation (Yup)
+     *
+     * @param schema - The schema to validate
+     * @returns The route
+     */
+    public validate (schema: any): Route {
+        this.schema = schema;
+        return this;
     }
 }

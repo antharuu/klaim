@@ -61,7 +61,11 @@ export async function callApi<T> (
     api = Registry.updateApi(beforeApi);
     route = Registry.updateRoute(beforeRoute);
 
-    const response = await fetchWithRetry(api, route, url, config);
+    let response = await fetchWithRetry(api, route, url, config);
+
+    if (route.schema && "validate" in route.schema) {
+        response = await route.schema.validate(response);
+    }
 
     const {
         afterRoute,
@@ -141,6 +145,7 @@ async function fetchWithRetry (
             }
         }
     }
+
     return response;
 }
 
