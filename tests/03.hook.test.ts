@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Hook } from "../src/index.ts";
+import { Hook } from "../src/index";
 
 await describe("Route", async () => {
     it("should subscribe to a hook", () => {

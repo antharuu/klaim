@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Api, Klaim, Registry, Route } from "../src/index.ts";
+import { Api, Klaim, Registry, Route } from "../src/index";
 
 const apiName = "testApi";
 const apiUrl = "https://jsonplaceholder.typicode.com";

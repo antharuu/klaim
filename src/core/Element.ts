@@ -1,8 +1,8 @@
-import cleanUrl from "../tools/cleanUrl.ts";
-import toCamelCase from "../tools/toCamelCase.ts";
+import cleanUrl from "../tools/cleanUrl";
+import toCamelCase from "../tools/toCamelCase";
 
 import { Api } from "./Api";
-import { Route } from "./Route.ts";
+import { Route } from "./Route";
 
 export type IHeaders = Record<string, string>;
 
@@ -83,7 +83,7 @@ export abstract class Element implements IElement {
      * @param url - The base URL of the element
      * @param headers - The headers to be sent with each request
      */
-    private constructor (name: string, url: string, headers: IHeaders = {}) {
+    protected constructor (name: string, url: string, headers: IHeaders = {}) {
         this.name = toCamelCase(name);
         if (this.name !== name) {
             console.warn(`Name "${name}" has been camelCased to "${this.name}"`);

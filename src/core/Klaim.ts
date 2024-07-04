@@ -1,4 +1,4 @@
-import fetchWithCache from "../tools/fetchWithCache.ts";
+import fetchWithCache from "../tools/fetchWithCache";
 
 import { Api } from "./Api";
 import { Hook } from "./Hook";
