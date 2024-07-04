@@ -1,5 +1,5 @@
-import { Api, IHeaders } from "./Api";
-import { Element } from "./Element";
+import { Api } from "./Api";
+import { Element, IHeaders } from "./Element";
 import { Registry } from "./Registry";
 
 export enum RouteMethod {

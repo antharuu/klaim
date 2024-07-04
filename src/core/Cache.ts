@@ -32,7 +32,7 @@ export class Cache {
      * @param value The value to be cached.
      * @param ttl Time to live in milliseconds.
      */
-    public set (key: string, value: any, ttl: number): void {
+    public set (key: string, value: any, ttl: number = 0): void {
         const expiry = Date.now() + ttl;
         this.cache.set(key, { data: value, expiry });
     }
