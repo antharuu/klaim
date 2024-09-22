@@ -20,8 +20,7 @@ export interface ICallbackAfterArgs {
     data: any;
 }
 
-export interface ICallbackCallArgs {
-}
+export type ICallbackCallArgs = object;
 
 export type ICallback<ArgsType> = (args: ArgsType) => Partial<ArgsType> | void;
 

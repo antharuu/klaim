@@ -46,6 +46,7 @@ export default tseslint.config(
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-dynamic-delete": "off",
             "@typescript-eslint/no-namespace": "off",
+            "@typescript-eslint/ no-empty-object-type": "off",
             "@typescript-eslint/explicit-function-return-type": "error",
             "@typescript-eslint/consistent-indexed-object-style": "error",
 
