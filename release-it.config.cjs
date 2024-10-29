@@ -21,8 +21,8 @@ module.exports = {
     hooks: {
         'before:init': [
             'git pull',
-            'bun run lint',
-            'bun run build'
+            'npm run lint',
+            'npm run build'
         ],
         'after:bump': [
             `make update-version-deno`,
