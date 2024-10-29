@@ -35,12 +35,3 @@ release-major:
 		ssh-add ~/.ssh/id_rsa; \
 		nr release:major; \
 	)
-
-release-update-deps:
-	@echo "Updating dependencies..."
-	ncu -u
-	bun upgrade
-	git add .
-	git commit -m "auto dependencies upgrade"
-	make release
-	@echo "Dependencies updated successfully!"
