@@ -6,7 +6,7 @@ module.exports = {
         release: false,
     },
     npm: {
-        publish: false,
+        publish: true,
     },
     git: {
         tagName: "v${version}",
@@ -25,9 +25,8 @@ module.exports = {
             'npm run build'
         ],
         'after:bump': [
-            `make update-version-deno`,
-            `npx jsr publish --allow-dirty`,
-            `npm publish`,
+            'make update-version-deno',
+            'npx jsr publish --allow-dirty'
         ]
     }
 };
