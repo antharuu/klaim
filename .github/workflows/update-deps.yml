@@ -1,68 +1,44 @@
-name: Update Dependencies
+name: Auto Update & Release
 
 on:
     schedule:
-        -   cron: '0 0 * * 1'  # Tous les lundis à minuit
-    workflow_dispatch:      # Permet de lancer manuellement
+        -   cron: '0 0 * * 1'
+    workflow_dispatch:
 
 jobs:
-    update-deps:
+    update-and-release:
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v4
                 with:
-                    fetch-depth: 0  # Important pour release-it
+                    fetch-depth: 0
 
             -   name: Setup Node.js
                 uses: actions/setup-node@v4
                 with:
                     node-version: '20'
-                    cache: 'npm'
+                    registry-url: 'https://registry.npmjs.org'
+
+            -   name: Configure Git
+                run: |
+                    git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                    git config --global user.name "GitHub Actions Bot"
 
             -   name: Install dependencies
                 run: npm install
 
-            -   name: Update dependencies
+            -   name: Update ALL dependencies
                 run: |
-                    # Mise à jour des dépendances de développement
-                    npx npm-check-updates '/^@.*/' -u
                     npx npm-check-updates -u
                     npm install
 
-            -   name: Run tests
-                run: npm run test
-
-            -   name: Run lint
-                run: npm run lint
-
-            -   name: Build
-                run: npm run build
-
-            -   name: Create Pull Request
-                uses: peter-evans/create-pull-request@v6
-                with:
-                    commit-message: "chore: update dependencies"
-                    title: "📦 Update dependencies"
-                    body: |
-                        # Mise à jour automatique des dépendances
-                        
-                        ✅ Tests passés
-                        ✅ Build réussi
-                        ✅ Lint validé
-                        
-                        ## Changements
-                        Les dépendances suivantes ont été mises à jour vers leurs dernières versions :
-                        - Toutes les dépendances de développement (@types/*, eslint, etc.)
-                        
-                        Veuillez vérifier les changements avant de merger.
-                    branch: "chore/update-dependencies"
-                    labels: |
-                        dependencies
-                        automated pr
-                    delete-branch: true
-
-            -   name: Check PR Status
-                if: success()
+            -   name: Test and build
                 run: |
-                    echo "✅ Pull Request créée avec succès"
-                    echo "Vous pouvez maintenant examiner les changements et merger si tout est en ordre"
+                    npm run test
+                    npm run build
+
+            -   name: Release
+                run: npm run release
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
