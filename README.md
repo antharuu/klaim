@@ -1,3 +1,5 @@
+![NPM Downloads](https://img.shields.io/npm/d18m/klaim?style=flat)
+
 ## 📚 Table of Contents
 
 - [Features](#-features)
