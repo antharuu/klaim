@@ -24,6 +24,13 @@ jobs:
                     node-version: '20'
                     registry-url: 'https://registry.npmjs.org'
 
+            -   name: Configure NPM Authentication
+                run: |
+                    echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+                    npm whoami
+                env:
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
             -   name: Configure Git
                 run: |
                     git config --global user.email "github-actions[bot]@users.noreply.github.com"
