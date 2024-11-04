@@ -79,10 +79,10 @@
   dependencies:
     eslint-visitor-keys "^3.3.0"
 
-"@eslint-community/regexpp@^4.10.0", "@eslint-community/regexpp@^4.11.0":
-  version "4.11.0"
-  resolved "https://registry.npmjs.org/@eslint-community/regexpp/-/regexpp-4.11.0.tgz"
-  integrity sha512-G/M/tIiMrTAxEWRfLfQJMmGNX28IxBg4PBz8XqQhqUHLFI6TL2htpIB1iQCj144V5ee/JaKyT9/WZ0MGZWfA7A==
+"@eslint-community/regexpp@^4.10.0", "@eslint-community/regexpp@^4.12.1":
+  version "4.12.1"
+  resolved "https://registry.npmjs.org/@eslint-community/regexpp/-/regexpp-4.12.1.tgz"
+  integrity sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==
 
 "@eslint/config-array@^0.18.0":
   version "0.18.0"
@@ -113,10 +113,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@eslint/js@^9.13.0", "@eslint/js@9.13.0":
-  version "9.13.0"
-  resolved "https://registry.npmjs.org/@eslint/js/-/js-9.13.0.tgz"
-  integrity sha512-IFLyoY4d72Z5y/6o/BazFBezupzI/taV8sGumxTAVw3lXG9A6md1Dc34T9s1FoD/an9pJH8RHbAxsaEbBed9lA==
+"@eslint/js@^9.14.0", "@eslint/js@9.14.0":
+  version "9.14.0"
+  resolved "https://registry.npmjs.org/@eslint/js/-/js-9.14.0.tgz"
+  integrity sha512-pFoEtFWCPyDOl+C6Ift+wC7Ro89otjigCf5vcuWqWgqNSQbRrpjSvdeE6ofLz4dHmyxD5f7gIdGT4+p36L6Twg==
 
 "@eslint/object-schema@^2.1.4":
   version "2.1.4"
@@ -135,7 +135,7 @@
   resolved "https://registry.npmjs.org/@humanfs/core/-/core-0.19.1.tgz"
   integrity sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==
 
-"@humanfs/node@^0.16.5":
+"@humanfs/node@^0.16.6":
   version "0.16.6"
   resolved "https://registry.npmjs.org/@humanfs/node/-/node-0.16.6.tgz"
   integrity sha512-YuI2ZHQL78Q5HbhDiBA1X4LmYdXCKCMQIfw0pw7piHJwyREFebJUvrQN4cMssyES6x+vfUbx1CIpaQUKYdQZOw==
@@ -148,10 +148,15 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/module-importer/-/module-importer-1.0.1.tgz"
   integrity sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==
 
-"@humanwhocodes/retry@^0.3.0", "@humanwhocodes/retry@^0.3.1":
+"@humanwhocodes/retry@^0.3.0":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.3.1.tgz"
   integrity sha512-JBxkERygn7Bv/GbN5Rv8Ul6LVknS+5Bp6RgDC/O8gEBU/yeH5Ui5C/OlWrTb6qct7LjjfT6Re2NxB0ln0yYybA==
+
+"@humanwhocodes/retry@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.npmjs.org/@humanwhocodes/retry/-/retry-0.4.0.tgz"
+  integrity sha512-xnRgu9DxZbkWak/te3fcytNyp8MTbuiZIaueg2rgEvBuN55n04nwLYLU9TX/VVlusc9L2ZNXi99nUFNkHXtr5g==
 
 "@iarna/toml@2.2.5":
   version "2.2.5"
@@ -379,14 +384,14 @@
   resolved "https://registry.npmjs.org/@sindresorhus/merge-streams/-/merge-streams-2.3.0.tgz"
   integrity sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==
 
-"@stylistic/eslint-plugin@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.npmjs.org/@stylistic/eslint-plugin/-/eslint-plugin-2.9.0.tgz"
-  integrity sha512-OrDyFAYjBT61122MIY1a3SfEgy3YCMgt2vL4eoPmvTwDBwyQhAXurxNQznlRD/jESNfYWfID8Ej+31LljvF7Xg==
+"@stylistic/eslint-plugin@^2.10.1":
+  version "2.10.1"
+  resolved "https://registry.npmjs.org/@stylistic/eslint-plugin/-/eslint-plugin-2.10.1.tgz"
+  integrity sha512-U+4yzNXElTf9q0kEfnloI9XbOyD4cnEQCxjUI94q0+W++0GAEQvJ/slwEj9lwjDHfGADRSr+Tco/z0XJvmDfCQ==
   dependencies:
-    "@typescript-eslint/utils" "^8.8.0"
-    eslint-visitor-keys "^4.1.0"
-    espree "^10.2.0"
+    "@typescript-eslint/utils" "^8.12.2"
+    eslint-visitor-keys "^4.2.0"
+    espree "^10.3.0"
     estraverse "^5.3.0"
     picomatch "^4.0.2"
 
@@ -427,10 +432,10 @@
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
-"@types/node@*", "@types/node@^18.0.0 || >=20.0.0", "@types/node@^22.8.2":
-  version "22.8.2"
-  resolved "https://registry.npmjs.org/@types/node/-/node-22.8.2.tgz"
-  integrity sha512-NzaRNFV+FZkvK/KLCsNdTvID0SThyrs5SHB6tsD/lajr22FGC73N2QeDPM2wHtVde8mgcXuSsHQkH5cX1pbPLw==
+"@types/node@*", "@types/node@^18.0.0 || >=20.0.0", "@types/node@^22.8.7":
+  version "22.8.7"
+  resolved "https://registry.npmjs.org/@types/node/-/node-22.8.7.tgz"
+  integrity sha512-LidcG+2UeYIWcMuMUpBKOnryBWG/rnmOHQR5apjn8myTQcx3rinFRn7DcIFhMnS0PPFSC6OafdIKEad0lj6U0Q==
   dependencies:
     undici-types "~6.19.8"
 
@@ -511,7 +516,7 @@
     semver "^7.6.0"
     ts-api-utils "^1.3.0"
 
-"@typescript-eslint/utils@^8.8.0", "@typescript-eslint/utils@8.12.2":
+"@typescript-eslint/utils@^8.12.2", "@typescript-eslint/utils@8.12.2":
   version "8.12.2"
   resolved "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.12.2.tgz"
   integrity sha512-UTTuDIX3fkfAz6iSVa5rTuSfWIYZ6ATtEocQ/umkRSyC9O919lbZ8dcH7mysshrCdrAM03skJOEYaBugxN+M6A==
@@ -624,10 +629,10 @@ acorn-jsx@^5.3.2:
   resolved "https://registry.npmjs.org/acorn-jsx/-/acorn-jsx-5.3.2.tgz"
   integrity sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==
 
-"acorn@^6.0.0 || ^7.0.0 || ^8.0.0", acorn@^8.12.0:
-  version "8.12.1"
-  resolved "https://registry.npmjs.org/acorn/-/acorn-8.12.1.tgz"
-  integrity sha512-tcpGyI9zbizT9JbV6oYE477V6mTlXvvi0T0G3SNIYE2apm/G5huBa1+K89VGeovbg+jycCrfhl3ADxErOuO6Jg==
+"acorn@^6.0.0 || ^7.0.0 || ^8.0.0", acorn@^8.14.0:
+  version "8.14.0"
+  resolved "https://registry.npmjs.org/acorn/-/acorn-8.14.0.tgz"
+  integrity sha512-cl669nCJTZBsL97OF4kUQm5g5hC2uihk0NxY3WENAC0TYdILVkAyHymAntgxGkl7K+t0cXIrH5siy5S4XkFycA==
 
 agent-base@^7.0.2, agent-base@^7.1.0, agent-base@^7.1.1:
   version "7.1.1"
@@ -1241,10 +1246,10 @@ eslint-plugin-simple-import-sort@^12.1.1:
   resolved "https://registry.npmjs.org/eslint-plugin-simple-import-sort/-/eslint-plugin-simple-import-sort-12.1.1.tgz"
   integrity sha512-6nuzu4xwQtE3332Uz0to+TxDQYRLTKRESSc2hefVT48Zc8JthmN23Gx9lnYhu0FtkRSL1oxny3kJ2aveVhmOVA==
 
-eslint-scope@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.npmjs.org/eslint-scope/-/eslint-scope-8.1.0.tgz"
-  integrity sha512-14dSvlhaVhKKsa9Fx1l8A17s7ah7Ef7wCakJ10LYk6+GYmP9yDti2oq2SEwcyndt6knfcZyhyxwY3i9yL78EQw==
+eslint-scope@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.npmjs.org/eslint-scope/-/eslint-scope-8.2.0.tgz"
+  integrity sha512-PHlWUfG6lvPc3yvP5A4PNyBL1W8fkDUccmI21JUu/+GKZBoH/W5u6usENXUrWFRsyoW5ACUjFGgAFQp5gUlb/A==
   dependencies:
     esrecurse "^4.3.0"
     estraverse "^5.2.0"
@@ -1259,26 +1264,26 @@ eslint-visitor-keys@^3.4.3:
   resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-3.4.3.tgz"
   integrity sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==
 
-eslint-visitor-keys@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-4.1.0.tgz"
-  integrity sha512-Q7lok0mqMUSf5a/AdAZkA5a/gHcO6snwQClVNNvFKCAVlxXucdU8pKydU5ZVZjBx5xr37vGbFFWtLQYreLzrZg==
+eslint-visitor-keys@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-4.2.0.tgz"
+  integrity sha512-UyLnSehNt62FFhSwjZlHmeokpRK59rcz29j+F1/aDgbkbRTk7wIc9XzdoasMUbRNKDM0qQt/+BJ4BrpFeABemw==
 
-"eslint@^6.0.0 || ^7.0.0 || >=8.0.0", "eslint@^7.0.0 || ^8.0.0 || ^9.0.0", "eslint@^8.57.0 || ^9.0.0", eslint@^9.13.0, eslint@>=5.0.0, eslint@>=8.40.0:
-  version "9.13.0"
-  resolved "https://registry.npmjs.org/eslint/-/eslint-9.13.0.tgz"
-  integrity sha512-EYZK6SX6zjFHST/HRytOdA/zE72Cq/bfw45LSyuwrdvcclb/gqV8RRQxywOBEWO2+WDpva6UZa4CcDeJKzUCFA==
+"eslint@^6.0.0 || ^7.0.0 || >=8.0.0", "eslint@^7.0.0 || ^8.0.0 || ^9.0.0", "eslint@^8.57.0 || ^9.0.0", eslint@^9.14.0, eslint@>=5.0.0, eslint@>=8.40.0:
+  version "9.14.0"
+  resolved "https://registry.npmjs.org/eslint/-/eslint-9.14.0.tgz"
+  integrity sha512-c2FHsVBr87lnUtjP4Yhvk4yEhKrQavGafRA/Se1ouse8PfbfC/Qh9Mxa00yWsZRlqeUB9raXip0aiiUZkgnr9g==
   dependencies:
     "@eslint-community/eslint-utils" "^4.2.0"
-    "@eslint-community/regexpp" "^4.11.0"
+    "@eslint-community/regexpp" "^4.12.1"
     "@eslint/config-array" "^0.18.0"
     "@eslint/core" "^0.7.0"
     "@eslint/eslintrc" "^3.1.0"
-    "@eslint/js" "9.13.0"
+    "@eslint/js" "9.14.0"
     "@eslint/plugin-kit" "^0.2.0"
-    "@humanfs/node" "^0.16.5"
+    "@humanfs/node" "^0.16.6"
     "@humanwhocodes/module-importer" "^1.0.1"
-    "@humanwhocodes/retry" "^0.3.1"
+    "@humanwhocodes/retry" "^0.4.0"
     "@types/estree" "^1.0.6"
     "@types/json-schema" "^7.0.15"
     ajv "^6.12.4"
@@ -1286,9 +1291,9 @@ eslint-visitor-keys@^4.1.0:
     cross-spawn "^7.0.2"
     debug "^4.3.2"
     escape-string-regexp "^4.0.0"
-    eslint-scope "^8.1.0"
-    eslint-visitor-keys "^4.1.0"
-    espree "^10.2.0"
+    eslint-scope "^8.2.0"
+    eslint-visitor-keys "^4.2.0"
+    espree "^10.3.0"
     esquery "^1.5.0"
     esutils "^2.0.2"
     fast-deep-equal "^3.1.3"
@@ -1305,14 +1310,14 @@ eslint-visitor-keys@^4.1.0:
     optionator "^0.9.3"
     text-table "^0.2.0"
 
-espree@^10.0.1, espree@^10.1.0, espree@^10.2.0:
-  version "10.2.0"
-  resolved "https://registry.npmjs.org/espree/-/espree-10.2.0.tgz"
-  integrity sha512-upbkBJbckcCNBDBDXEbuhjbP68n+scUd3k/U2EkyM9nw+I/jPiL4cLF/Al06CF96wRltFda16sxDFrxsI1v0/g==
+espree@^10.0.1, espree@^10.1.0, espree@^10.3.0:
+  version "10.3.0"
+  resolved "https://registry.npmjs.org/espree/-/espree-10.3.0.tgz"
+  integrity sha512-0QYC8b24HWY8zjRnDTL6RiHfDbAWn63qb4LMj1Z4b076A4une81+z03Kg7l7mn/48PUTqoLptSXez8oknU8Clg==
   dependencies:
-    acorn "^8.12.0"
+    acorn "^8.14.0"
     acorn-jsx "^5.3.2"
-    eslint-visitor-keys "^4.1.0"
+    eslint-visitor-keys "^4.2.0"
 
 esprima@^4.0.1:
   version "4.0.1"
