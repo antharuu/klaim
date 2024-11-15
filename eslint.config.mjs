@@ -46,9 +46,10 @@ export default tseslint.config(
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-dynamic-delete": "off",
             "@typescript-eslint/no-namespace": "off",
-            "@typescript-eslint/ no-empty-object-type": "off",
+            "@typescript-eslint/no-empty-object-type": "off",
             "@typescript-eslint/explicit-function-return-type": "error",
             "@typescript-eslint/consistent-indexed-object-style": "error",
+            "@typescript-eslint/no-unused-expressions": "error",
 
             // ----------------------------------------
             // ---------------------- Stylistic
@@ -202,8 +203,8 @@ export default tseslint.config(
             ],
             "dot-notation": "off",
             "no-underscore-dangle": "off",
-            "func-style": ["error", "declaration"]
-
+            "func-style": ["error", "declaration"],
+            "no-unused-expressions": "off",
         }
     }
 );
