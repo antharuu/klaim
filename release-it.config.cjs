@@ -21,7 +21,6 @@ module.exports = {
     hooks: {
         'before:init': [
             'git pull',
-            'npm run lint',
             'npm run build'
         ],
         'after:bump': [
