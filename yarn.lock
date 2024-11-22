@@ -963,10 +963,10 @@ cosmiconfig@9.0.0:
     js-yaml "^4.1.0"
     parse-json "^5.2.0"
 
-cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.5:
-  version "7.0.5"
-  resolved "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.5.tgz"
-  integrity sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==
+cross-spawn@^7.0.0, cross-spawn@^7.0.3, cross-spawn@^7.0.5, cross-spawn@^7.0.6:
+  version "7.0.6"
+  resolved "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.6.tgz"
+  integrity sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==
   dependencies:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
@@ -1070,12 +1070,12 @@ dot-prop@^9.0.0:
   dependencies:
     type-fest "^4.18.2"
 
-dotenv-cli@^7.4.3:
-  version "7.4.3"
-  resolved "https://registry.npmjs.org/dotenv-cli/-/dotenv-cli-7.4.3.tgz"
-  integrity sha512-lf1E+TL1xFeoOHy2hSO3kLkx3KX8CDi17ccn5z5dVCnk2PuWqUKAnBVgQmhfS0BPuzFbptTEHVcIKFsGF0NAcg==
+dotenv-cli@^7.4.4:
+  version "7.4.4"
+  resolved "https://registry.npmjs.org/dotenv-cli/-/dotenv-cli-7.4.4.tgz"
+  integrity sha512-XkBYCG0tPIes+YZr4SpfFv76SQrV/LeCE8CI7JSEMi3VR9MvTihCGTOtbIexD6i2mXF+6px7trb1imVCXSNMDw==
   dependencies:
-    cross-spawn "^7.0.3"
+    cross-spawn "^7.0.6"
     dotenv "^16.3.0"
     dotenv-expand "^10.0.0"
     minimist "^1.2.6"
