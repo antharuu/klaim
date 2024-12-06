@@ -14,7 +14,7 @@ export class Route extends Element {
     public constructor (
         name: string,
         url: string,
-        headers: IHeaders,
+        headers: IHeaders = {},
         method: RouteMethod = RouteMethod.GET
     ) {
         super("route", name, url, headers);
@@ -25,7 +25,7 @@ export class Route extends Element {
     private static createRoute (
         name: string,
         url: string,
-        headers: IHeaders,
+        headers: IHeaders = {},
         method: RouteMethod
     ): Element {
         const route = new Route(name, url, headers, method);
@@ -37,23 +37,23 @@ export class Route extends Element {
         return this.createRoute(name, url, headers, RouteMethod.GET);
     }
 
-    public static post (name: string, url: string, headers: IHeaders): Element {
+    public static post (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.POST);
     }
 
-    public static put (name: string, url: string, headers: IHeaders): Element {
+    public static put (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.PUT);
     }
 
-    public static delete (name: string, url: string, headers: IHeaders): Element {
+    public static delete (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.DELETE);
     }
 
-    public static patch (name: string, url: string, headers: IHeaders): Element {
+    public static patch (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.PATCH);
     }
 
-    public static options (name: string, url: string, headers: IHeaders): Element {
+    public static options (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.OPTIONS);
     }
 

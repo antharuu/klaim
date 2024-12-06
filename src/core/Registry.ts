@@ -1,4 +1,3 @@
-// Registry.ts
 import { IElement } from "./Element";
 import { callApi, IArgs, IBody, Klaim } from "./Klaim";
 
@@ -21,7 +20,7 @@ export class Registry {
     public registerElement (element: IElement): void {
         const parent = this._currentParent;
         if (parent) {
-            element.parent = parent.name;
+            element.parent = this.getFullPath(parent);
         }
 
         const key = this.getElementKey(element);
@@ -30,27 +29,10 @@ export class Registry {
         if (element.type === "api" || element.type === "group") {
             let target = Klaim;
             if (parent) {
-                // On vérifie si on doit créer une nouvelle branche
                 target = this.getOrCreateKlaimBranch(parent);
             }
             target[element.name] = {};
         }
-    }
-
-    private getOrCreateKlaimBranch (parent: IElement): any {
-        let target = Klaim;
-        const path = this.getElementKey(parent);
-
-        if (!path) return target;
-
-        const parts = path.split(".");
-        for (const part of parts) {
-            if (!target[part]) {
-                target[part] = {};
-            }
-            target = target[part];
-        }
-        return target;
     }
 
     public getCurrentParent (): IElement | null {
@@ -73,20 +55,61 @@ export class Registry {
         if (!this._currentParent) {
             throw new Error("No current parent set, use Route only inside Api or Group create callback");
         }
-        if (element.type !== "route") {
-            throw new Error("Only routes can be registered within an API or Group");
+
+        // Get the full path for the parent and verify it exists
+        const parentFullPath = this.getFullPath(this._currentParent);
+        if (!this._elements.has(parentFullPath)) {
+            throw new Error(`Parent element ${parentFullPath} not found`);
         }
 
-        const parent = this._currentParent;
-        element.parent = this.getFullPath(parent);
-
-        const key = `${element.parent}.${element.name}`;
+        // Set the parent and register the element
+        element.parent = parentFullPath;
+        const key = this.getElementKey(element);
         this._elements.set(key, element);
 
+        // Add the route to the Klaim object
         this.addToKlaimRoute(element);
     }
 
-    private getElementKey (element: IElement): string {
+    private getOrCreateKlaimBranch (parent: IElement): any {
+        let target = Klaim;
+        const fullPath = this.getFullPath(parent);
+        const parts = fullPath.split(".");
+
+        for (const part of parts) {
+            if (!target[part]) {
+                target[part] = {};
+            }
+            target = target[part];
+        }
+        return target;
+    }
+
+    private addToKlaimRoute (route: IElement): void {
+        if (!route.parent) return;
+
+        // Split the parent path to get the hierarchy
+        const parentParts = route.parent.split(".");
+        let target = Klaim;
+
+        // Navigate through each level of the hierarchy
+        for (const part of parentParts) {
+            if (!target[part]) {
+                target[part] = {};
+            }
+            target = target[part];
+        }
+
+        // Create the route function
+        const routeFunction = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
+            return callApi(route.parent!, route, args, body);
+        };
+
+        // Add the route to the target location
+        target[route.name] = routeFunction;
+    }
+
+    public getElementKey (element: IElement): string {
         if (!element) return "";
         if (!element.parent) return element.name;
         return `${element.parent}.${element.name}`;
@@ -96,17 +119,17 @@ export class Registry {
         if (!element) return "";
         if (!element.parent) return element.name;
 
-        let path = element.name;
+        const path = [ element.name ];
         let current = element;
 
         while (current.parent) {
             const parent = this._elements.get(current.parent);
             if (!parent) break;
-            path = `${current.parent}.${path}`;
+            path.unshift(parent.name);
             current = parent;
         }
 
-        return path;
+        return path.join(".");
     }
 
     public getRoute (apiName: string, routeName: string): IElement | undefined {
@@ -118,13 +141,14 @@ export class Registry {
     }
 
     public getParent (element: IElement): IElement | undefined {
-        return element.parent ? this._elements.get(element.parent) : undefined;
+        if (!element.parent) return undefined;
+        return this._elements.get(element.parent);
     }
 
-    public getChildren (elementName: string): IElement[] {
+    public getChildren (elementPath: string): IElement[] {
         const children: IElement[] = [];
-        this._elements.forEach(element => {
-            if (element.parent === elementName) {
+        this._elements.forEach((element, key) => {
+            if (element.parent === elementPath) {
                 children.push(element);
             }
         });
@@ -132,31 +156,15 @@ export class Registry {
     }
 
     public static updateElement (element: IElement): IElement {
-        const key = Registry.i.getElementKey(element);
-
-        if (!Registry.i._elements.has(key)) {
-            Registry.i.registerElement(element);
-        }
-
-        Registry.i._elements.set(key, element);
-        return element;
+        return Registry.i._elements.get(Registry.i.getElementKey(element)) || element;
     }
 
-    private addToKlaimRoute (route: IElement): void {
-        if (!route.parent) return;
+    public getApi (name: string): IElement | undefined {
+        const element = this._elements.get(name);
+        if (!element) return undefined;
 
-        const parent = this._elements.get(route.parent);
-        if (!parent) return;
-
-        // On trouve la bonne branche dans Klaim
-        const target = this.getOrCreateKlaimBranch(parent);
-
-        // On ajoute la route
-        const routeFunction = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
-            return callApi(route.parent!, route, args, body);
-        };
-
-        target[route.name] = routeFunction;
+        if (element.type === "api") return element;
+        return this.findApi(element);
     }
 
     private findApi (element: IElement): IElement | undefined {
@@ -172,14 +180,6 @@ export class Registry {
         return undefined;
     }
 
-    public getApi (name: string): IElement | undefined {
-        const element = this._elements.get(name);
-        if (!element) return undefined;
-
-        if (element.type === "api") return element;
-        return this.findApi(element);
-    }
-
     public getEffectiveCache (element: IElement): number | false {
         return this.getInheritedProperty<number>(element, "cache") || false;
     }
@@ -189,15 +189,15 @@ export class Registry {
     }
 
     private getInheritedProperty<T>(element: IElement, property: keyof IElement): T | undefined {
-        if (!element) return undefined;
-
         let current: IElement | undefined = element;
+
         while (current) {
             if (current[property] !== undefined && current[property] !== false) {
                 return current[property] as T;
             }
             current = current.parent ? this._elements.get(current.parent) : undefined;
         }
+
         return undefined;
     }
 }
