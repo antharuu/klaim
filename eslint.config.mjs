@@ -1,7 +1,7 @@
 // @ts-check
 import stylistic from "@stylistic/eslint-plugin";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
-// import JSdoc from "eslint-plugin-jsdoc";
+import JSdoc from "eslint-plugin-jsdoc";
 
 
 import eslint from '@eslint/js';
@@ -14,7 +14,7 @@ export default tseslint.config(
         plugins: {
             "@stylistic": stylistic,
             "simple-import-sort": simpleImportSort,
-            // "jsdoc": JSdoc
+            "jsdoc": JSdoc
         },
         files: ["src/**/*.ts"],
         rules: {
@@ -127,55 +127,55 @@ export default tseslint.config(
             "@stylistic/type-generic-spacing": ["error"],
             "@stylistic/type-named-tuple-spacing": ["error"],
 
-            // // ----------------------------------------
-            // // ---------------------- JSdoc
-            // // ----------------------------------------
-            // "jsdoc/check-access": "error",
-            // "jsdoc/check-alignment": "error",
-            // "jsdoc/check-param-names": "error",
-            // "jsdoc/check-property-names": "error",
-            // "jsdoc/check-tag-names": "error",
-            // "jsdoc/check-types": "error",
-            // "jsdoc/check-values": "error",
-            // "jsdoc/empty-tags": "error",
-            // "jsdoc/implements-on-classes": "error",
-            // "jsdoc/multiline-blocks": "error",
-            // "jsdoc/no-defaults": "error",
-            // "jsdoc/no-multi-asterisks": "error",
-            // "jsdoc/require-jsdoc": [
-            //     "error",
-            //     {
-            //         "require": {
-            //             "FunctionDeclaration": true,
-            //             "MethodDefinition": true,
-            //             "ClassDeclaration": true,
-            //             "ArrowFunctionExpression": true,
-            //             "FunctionExpression": true
-            //         }
-            //     }
-            // ],
-            // "jsdoc/require-param": "error",
-            // "jsdoc/require-param-description": "error",
-            // "jsdoc/require-param-name": "error",
-            // "jsdoc/require-property": "error",
-            // "jsdoc/require-property-description": "error",
-            // "jsdoc/require-property-name": "error",
-            // "jsdoc/require-returns": "error",
-            // "jsdoc/require-returns-check": "error",
-            // "jsdoc/require-returns-description": "error",
-            // "jsdoc/require-yields": "error",
-            // "jsdoc/require-yields-check": "error",
-            // "jsdoc/tag-lines": [
-            //     "error",
-            //     "never",
-            //     {
-            //         "applyToEndTag": false,
-            //         "count": 1,
-            //         "startLines": 1,
-            //         "endLines": 0
-            //     }
-            // ],
-            // "jsdoc/valid-types": "error",
+            // ----------------------------------------
+            // ---------------------- JSdoc
+            // ----------------------------------------
+            "jsdoc/check-access": "error",
+            "jsdoc/check-alignment": "error",
+            "jsdoc/check-param-names": "error",
+            "jsdoc/check-property-names": "error",
+            "jsdoc/check-tag-names": "error",
+            "jsdoc/check-types": "error",
+            "jsdoc/check-values": "error",
+            "jsdoc/empty-tags": "error",
+            "jsdoc/implements-on-classes": "error",
+            "jsdoc/multiline-blocks": "error",
+            "jsdoc/no-defaults": "error",
+            "jsdoc/no-multi-asterisks": "error",
+            "jsdoc/require-jsdoc": [
+                "error",
+                {
+                    "require": {
+                        "FunctionDeclaration": true,
+                        "MethodDefinition": true,
+                        "ClassDeclaration": true,
+                        "ArrowFunctionExpression": true,
+                        "FunctionExpression": true
+                    }
+                }
+            ],
+            "jsdoc/require-param": "error",
+            "jsdoc/require-param-description": "error",
+            "jsdoc/require-param-name": "error",
+            "jsdoc/require-property": "error",
+            "jsdoc/require-property-description": "error",
+            "jsdoc/require-property-name": "error",
+            "jsdoc/require-returns": "error",
+            "jsdoc/require-returns-check": "error",
+            "jsdoc/require-returns-description": "error",
+            "jsdoc/require-yields": "error",
+            "jsdoc/require-yields-check": "error",
+            "jsdoc/tag-lines": [
+                "error",
+                "never",
+                {
+                    "applyToEndTag": false,
+                    "count": 1,
+                    "startLines": 1,
+                    "endLines": 0
+                }
+            ],
+            "jsdoc/valid-types": "error",
 
             // ----------------------------------------
             // ---------------------- General
