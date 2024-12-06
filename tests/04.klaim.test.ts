@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Api, Klaim, Route } from "../src/index";
+import { Api, Klaim, Route } from "../src";
 
 const apiName = "testApi";
 const apiUrl = "https://jsonplaceholder.typicode.com";
@@ -21,7 +21,7 @@ const res2 = {
     completed: false,
 };
 
-await describe("Route", async () => {
+describe("Route", async () => {
     it("should call the API", async () => {
         Api.create(apiName, apiUrl, () => {
             Route.get(routeName, routeUrl);
@@ -30,7 +30,11 @@ await describe("Route", async () => {
         expect(Klaim[apiName]).toBeDefined();
         expect(Klaim[apiName][routeName]).toBeDefined();
         expect(Klaim[apiName][routeName]).toBeInstanceOf(Function);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(Klaim[apiName][routeName]()).toBeInstanceOf(Promise);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(Klaim[apiName][routeName]()).resolves.toEqual(res);
     });
 
@@ -49,7 +53,11 @@ await describe("Route", async () => {
             Route.post(routeNameB, routeUrl);
         });
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(Klaim[apiNameA][routeNameA]()).resolves.toEqual(res);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(Klaim[apiNameB][routeNameB]()).resolves.toEqual({});
     });
 
@@ -58,9 +66,15 @@ await describe("Route", async () => {
             Route.get(routeName, routeUrlWithArg);
         });
 
-        expect(Klaim[apiName][routeName]({ id: 1 })).resolves.toEqual(res);
-        expect(Klaim[apiName][routeName]({ id: 2 })).resolves.toEqual(res2);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        expect(Klaim[apiName][routeName]({id: 1})).resolves.toEqual(res);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        expect(Klaim[apiName][routeName]({id: 2})).resolves.toEqual(res2);
         // if pass no argument, it should fail
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(Klaim[apiName][routeName]()).rejects.toThrow();
     });
 
@@ -74,6 +88,8 @@ await describe("Route", async () => {
         });
 
         expect(a).toEqual(0);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         Klaim[apiName][routeName]();
         expect(a).toEqual(1);
     });
@@ -88,8 +104,12 @@ await describe("Route", async () => {
         });
 
         expect(a).toEqual(0);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         Klaim[apiName][routeName]();
         expect(a).toEqual(0);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         await Klaim[apiName][routeName]();
         expect(a).toEqual(1);
     });

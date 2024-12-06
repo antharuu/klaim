@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Api, Klaim, Registry } from "../src/index";
+import { Api, Klaim, Registry } from "../src";
 
 describe("Api", () => {
     it("should create an API instance with correct properties", () => {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { Api, Klaim, Registry, Route } from "../src/index";
+import { Api, Klaim, Registry, Route } from "../src";
 
 const apiName = "testApi";
 const apiUrl = "https://jsonplaceholder.typicode.com";
 
-await describe("Route", async () => {
+describe("Route", async () => {
     it("should create an route instance with correct properties", () => {
         const name = "testRoute";
         const routePath = "/posts";
