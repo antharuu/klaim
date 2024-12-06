@@ -1,7 +1,6 @@
 import toCamelCase from "../tools/toCamelCase";
 
 import { Element, IHeaders } from "./Element";
-import { Klaim } from "./Klaim";
 import { Registry } from "./Registry";
 
 export type IApiCallback = () => void;
@@ -21,8 +20,6 @@ export class Api extends Element {
         const api = new Api(newName, url, headers);
         Registry.i.registerElement(api);
         Registry.i.setCurrentParent(newName);
-        // @ts-ignore
-        Klaim['bonjour'] = "Coucou le monde"
 
         callback();
         Registry.i.clearCurrentParent();

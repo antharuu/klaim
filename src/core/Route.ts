@@ -11,7 +11,7 @@ export enum RouteMethod {
 }
 
 export class Route extends Element {
-    private constructor (
+    public constructor (
         name: string,
         url: string,
         headers: IHeaders,

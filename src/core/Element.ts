@@ -27,7 +27,7 @@ interface IElementCallbacks {
 }
 
 export interface IElement {
-    type: "api" | "route";
+    type: "api" | "route" | "group";
     name: string;
     url: string;
     headers: IHeaders;
@@ -51,7 +51,7 @@ export interface IElement {
 }
 
 export abstract class Element implements IElement {
-    public type: "api" | "route";
+    public type: "api" | "route" | "group";
 
     public name: string;
 
@@ -78,7 +78,7 @@ export abstract class Element implements IElement {
     public retry: false | number = false;
 
     protected constructor (
-        type: "api" | "route",
+        type: "api" | "route" | "group",
         name: string,
         url: string,
         headers: IHeaders = {}

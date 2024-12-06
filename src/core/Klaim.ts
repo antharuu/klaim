@@ -1,14 +1,25 @@
-// Klaim.ts
 import fetchWithCache from "../tools/fetchWithCache";
 
 import { IElement } from "./Element";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
 
+// Klaim.ts
 export type IArgs = Record<string, unknown>;
 export type IBody = Record<string, unknown>;
-export type IRouteReference = Record<string, <T>(args?: IArgs, body?: IBody) => Promise<T>>;
+
+// Function type for route handlers
+export type RouteFunction = <T>(args?: IArgs, body?: IBody) => Promise<T>;
+
+// Type for objects containing routes or nested groups
+export interface IRouteReference {
+    [key: string]: RouteFunction | IRouteReference;
+}
+
+// Type for the main Klaim object
 export type IApiReference = Record<string, IRouteReference>;
+
+// Initialize the Klaim object
 export const Klaim: IApiReference = {};
 
 export async function callApi<T> (
@@ -17,7 +28,7 @@ export async function callApi<T> (
     args: IArgs = {},
     body: IBody = {}
 ): Promise<T> {
-    const api = Registry.i.getApi(parent);
+    const api = Registry.i.getApi(parent.split(".")[0]);  // Get the root API
 
     if (!element || !api || element.type !== "route" || api.type !== "api") {
         throw new Error(`Invalid path: ${parent}.${element.name}`);
