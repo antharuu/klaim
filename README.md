@@ -10,6 +10,7 @@
     - [Request Handling](#request-handling)
     - [Middleware Usage](#middleware-usage)
     - [Hook Subscription](#hook-subscription)
+    - [Group Usage](#group-usage)
     - [Caching Requests](#caching-requests)
     - [Retry Mechanism](#retry-mechanism)
     - [Response Validation](#response-validation)
@@ -25,6 +26,7 @@
 - **Lightweight**: Minimal footprint for fast load times and minimal performance impact.
 - **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
+- **Group Organization**: Organize related routes into logical groups with inherited settings.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
@@ -141,6 +143,32 @@ Hook.subscribe("hello.getFirstTodo", ({url}) => {
 });
 ```
 
+### Group Usage
+
+Use groups to organize related routes and share common settings:
+
+```typescript
+import {Api, Group, Route} from 'klaim';
+
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Create a group for user-related routes
+    Group.create("users", () => {
+        Route.get("list", "/users");
+        Route.get("getOne", "/users/[id]");
+
+        // Nested group for user posts
+        Group.create("posts", () => {
+            Route.get("list", "/users/[userId]/posts");
+        }).withCache(); // Cache enabled for all routes in this group
+    });
+});
+
+// Use the grouped routes
+const users = await Klaim.hello.users.list();
+const user = await Klaim.hello.users.getOne({id: 1});
+const userPosts = await Klaim.hello.users.posts.list({userId: 1});
+```
+
 ### Caching Requests
 
 Enable caching on requests to reduce network load and improve performance. By default, the cache duration is 20 seconds,
@@ -217,7 +245,8 @@ Now, when a request fails, it will be retried the specified number of times befo
 
 ### Response Validation
 
-You can use [Yup](https://www.npmjs.com/package/yup) to validate the response schema for increased reliability and consistency. You can specify a schema for
+You can use [Yup](https://www.npmjs.com/package/yup) to validate the response schema for increased reliability and
+consistency. You can specify a schema for
 individual routes to ensure the response data conforms to the expected structure.
 
 ⚠️ **Note**: This feature requires the `yup` package to be installed.
