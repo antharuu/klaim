@@ -85,7 +85,7 @@ describe("Group", async () => {
     });
 
     it("should inherit cache settings from group", async () => {
-        const groupName = "cached-products";
+        const groupName = "cachedProducts";
 
         Api.create(apiName, apiUrl, () => {
             Group.create(groupName, () => {
@@ -104,7 +104,7 @@ describe("Group", async () => {
     });
 
     it("should handle route-specific cache overrides in groups", async () => {
-        const groupName = "mixed-cache-products";
+        const groupName = "mixedCacheProducts";
 
         Api.create(apiName, apiUrl, () => {
             Group.create(groupName, () => {
