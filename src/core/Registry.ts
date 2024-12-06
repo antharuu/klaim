@@ -1,28 +1,16 @@
-import { Api } from "./Api";
+// Registry.ts
+import { IElement } from "./Element";
 import { callApi, IArgs, IBody, Klaim } from "./Klaim";
-import { Route } from "./Route";
 
-/**
- * Represents the registry
- */
 export class Registry {
     private static _instance: Registry;
 
-    private _apis: Map<string, Api> = new Map<string, Api>();
+    private _elements: Map<string, IElement> = new Map<string, IElement>();
 
-    private _currentApi: Api | null = null;
+    private _currentParent: IElement | null = null;
 
-    /**
-     * Constructor
-     */
-    private constructor () {
-    }
+    private constructor () {}
 
-    /**
-     * Singleton instance
-     *
-     * @returns The singleton instance
-     */
     public static get i (): Registry {
         if (!Registry._instance) {
             Registry._instance = new Registry();
@@ -30,130 +18,81 @@ export class Registry {
         return Registry._instance;
     }
 
-    /**
-     * Registers an API
-     *
-     * @param api - The API to register
-     */
-    public registerApi (api: Api): void {
-        this._apis.set(api.name, api);
-        Klaim[api.name] = {};
+    public registerElement (element: IElement): void {
+        const key = element.type === "route"
+            ? `${element.parent}.${element.name}`
+            : element.name;
+        this._elements.set(key, element);
+
+        if (element.type === "api") {
+            Klaim[element.name] = {};
+        }
     }
 
-    /**
-     * Sets the current API
-     *
-     * @param name - The name of the API
-     */
-    public setCurrent (name: string): void {
-        const api = this._apis.get(name);
-        if (!api) {
+    public setCurrentParent (name: string): void {
+        const element = this._elements.get(name);
+        if (!element || element.type !== "api") {
             throw new Error(`API ${name} not found`);
         }
-        this._currentApi = api;
+        this._currentParent = element;
     }
 
-    /**
-     * Clears the current API
-     */
-    public clearCurrent (): void {
-        this._currentApi = null;
+    public clearCurrentParent (): void {
+        this._currentParent = null;
     }
 
-    /**
-     * Registers a route
-     *
-     * @param route - The route to register
-     */
-    public registerRoute (route: Route): void {
-        if (!this._currentApi) {
-            throw new Error(`No current API set, use Route only inside Api.create callback`);
+    public registerRoute (element: IElement): void {
+        if (!this._currentParent) {
+            throw new Error("No current parent set, use Route only inside Api.create callback");
+        }
+        if (element.type !== "route") {
+            throw new Error("Only routes can be registered within an API");
         }
 
-        route.api = this._currentApi.name;
-        this._currentApi.routes.set(route.name, route);
+        element.parent = this._currentParent.name;
+        const key = `${element.parent}.${element.name}`;
+        this._elements.set(key, element);
 
-        this.addToKlaimRoute(route.api, route);
+        this.addToKlaimRoute(element);
     }
 
-    /**
-     * Gets an API
-     *
-     * @param name - The name of the API
-     * @returns The API
-     */
-    public getApi (name: string): Api | undefined {
-        return this._apis.get(name);
+    public getElement (path: string): IElement | undefined {
+        return this._elements.get(path);
     }
 
-    /**
-     * Gets a route
-     *
-     * @param api - The name of the API
-     * @param name - The name of the route
-     * @returns The route
-     */
-    public getRoute (api: string, name: string): Route | undefined {
-        const apiObj = this._apis.get(api);
-        if (!apiObj) {
-            throw new Error(`API ${api} not found`);
-        }
-        return apiObj.routes.get(name) as Route;
+    public getApi (name: string): IElement | undefined {
+        console.log(this._elements);
+        const element = this._elements.get(name);
+        return element?.type === "api" ? element : undefined;
     }
 
-    /**
-     * Updates an API
-     *
-     * @param api - The API to update
-     * @returns The updated API
-     */
-    public static updateApi (api: Api): Api {
-        if (!Registry.i._apis.has(api.name)) {
-            Registry.i.registerApi(api);
+    public getRoute (apiName: string, routeName: string): IElement | undefined {
+        const element = this._elements.get(`${apiName}.${routeName}`);
+        return element?.type === "route" ? element : undefined;
+    }
+
+    public static updateElement (element: IElement): IElement {
+        const key = element.type === "route"
+            ? `${element.parent}.${element.name}`
+            : element.name;
+
+        if (!Registry.i._elements.has(key)) {
+            Registry.i.registerElement(element);
         }
 
-        Registry.i._apis.set(api.name, api);
-
-        return api;
+        Registry.i._elements.set(key, element);
+        return element;
     }
 
-    /**
-     * Updates a route
-     *
-     * @param route - The route to update
-     * @returns The updated route
-     */
-    public static updateRoute (route: Route): Route {
-        const api = Registry.i._apis.get(route.api);
-        if (!api) {
-            throw new Error(`API ${route.api} not found`);
-        }
+    private addToKlaimRoute (route: IElement): void {
+        if (!route.parent) return;
 
-        api.routes.set(route.name, route);
-
-        return route;
-    }
-
-    /**
-     * Adds a route to Klaim object
-     *
-     * @param apiName - The name of the API
-     * @param route - The route to add
-     */
-    private addToKlaimRoute (apiName: string, route: Route): void {
-        /**
-         * The route function
-         *
-         * @param args - The arguments to pass to the route
-         * @param body - The body to pass to the route
-         * @returns The response
-         */
-        Klaim[apiName][route.name] = async <T>(args: IArgs = {}, body: IBody = {}): Promise<T> => {
-            const api = Registry.i._apis.get(apiName);
-            if (!api) {
-                throw new Error(`API ${route.api} not found`);
-            }
-            return callApi(api, route, args, body);
+        Klaim[route.parent][route.name] = async <T>(
+            args: IArgs = {},
+            body: IBody = {}
+        ): Promise<T> => {
+            const parent = route.parent!;
+            return callApi(parent, route, args, body);
         };
     }
 }

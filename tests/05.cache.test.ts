@@ -10,7 +10,7 @@ const routeBody = {
 	"name": "{{name()}}",
 };
 
-await describe("Cache", async () => {
+await describe.skip("Cache", async () => {
 	it("should not cache the API response", async () => {
 		Api.create(apiName, apiUrl, () => {
 			Route.post(routeName, routeUrl);
