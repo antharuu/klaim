@@ -3,6 +3,7 @@
 ## 📚 Table of Contents
 
 - [Features](#-features)
+- [Next features](#-next-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
     - [Basic API Configuration](#basic-api-configuration)
@@ -36,6 +37,14 @@
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
+
+# ⌛ Next features
+
+- [ ] Pagination (Version: 1.8)
+- [ ] Rate Limiting (Version: 1.9)
+- [ ] Login (Version: 1.10)
+- [ ] Time Out (Version: 1.11)
+- [ ] Error Handling (Version: 1.12)
 
 ## 📥 Installation
 
