@@ -79,22 +79,21 @@ export class Registry {
         let target = Klaim;
         const parentParts = route.parent.split('.');
         
+        // Navigate through the parent hierarchy
         for (const part of parentParts) {
             if (!target[part]) {
                 target[part] = {};
             }
-            target = target[part] as Record<string, IRouteReference>;
+            target = target[part] as Record<string, any>;
         }
 
-        // Créer une fonction qui satisfait IRouteReference
-        const routeFunction = function<T>(args: IArgs = {}, body: IBody = {}): Promise<T> {
+        // Create the route function
+        const routeFunction = async function<T>(args: IArgs = {}, body: IBody = {}): Promise<T> {
             return callApi(route.parent!, route, args, body);
         };
 
-        // Ajouter une propriété index pour satisfaire l'interface IRouteReference
-        (routeFunction as RouteFunction & Record<string, RouteFunction | IRouteReference>)[Symbol.iterator] = function* () { yield* Object.entries(this); };
-
-        target[route.name] = routeFunction as RouteFunction & IRouteReference;
+        // Add the route function to the target
+        target[route.name] = routeFunction;
     }
 
     public getElementKey(element: IElement): string {

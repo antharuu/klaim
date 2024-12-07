@@ -81,7 +81,16 @@ export async function callApi<T> (
     args: IArgs = {},
     body: IBody = {}
 ): Promise<T> {
-    const api = Registry.i.getApi(parent.split(".")[0]);
+    // Recherchez l'API dans toute la hiérarchie du chemin parent
+    const parentParts = parent.split(".");
+    let api: IElement | undefined;
+    
+    // Parcourir le chemin pour trouver l'API
+    for (let i = 0; i < parentParts.length; i++) {
+        const potentialApiName = parentParts[i];
+        api = Registry.i.getApi(potentialApiName);
+        if (api) break;
+    }
 
     if (!element || !api || element.type !== "route" || api.type !== "api") {
         throw new Error(`Invalid path: ${parent}.${element.name}`);
