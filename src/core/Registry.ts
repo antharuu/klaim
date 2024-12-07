@@ -1,5 +1,5 @@
-import { IElement } from "./Element";
-import { callApi, IArgs, IBody, IRouteReference, Klaim, RouteFunction } from "./Klaim";
+import {IElement} from "./Element";
+import {callApi, IArgs, IBody, Klaim, RouteFunction} from "./Klaim";
 
 export class Registry {
     private static _instance: Registry;
@@ -28,7 +28,7 @@ export class Registry {
             let target = Klaim;
             if (parent) {
                 const parentParts = this.getFullPath(parent).split('.');
-                
+
                 for (const part of parentParts) {
                     if (!target[part]) {
                         target[part] = {};
@@ -65,8 +65,7 @@ export class Registry {
             throw new Error("No current parent set, use Route only inside Api or Group create callback");
         }
 
-        const parentFullPath = this.getFullPath(this._currentParent);
-        element.parent = parentFullPath;
+        element.parent = this.getFullPath(this._currentParent);
         const key = this.getElementKey(element);
         this._elements.set(key, element);
 
@@ -78,8 +77,7 @@ export class Registry {
 
         let target = Klaim;
         const parentParts = route.parent.split('.');
-        
-        // Navigate through the parent hierarchy
+
         for (const part of parentParts) {
             if (!target[part]) {
                 target[part] = {};
@@ -87,13 +85,9 @@ export class Registry {
             target = target[part] as Record<string, any>;
         }
 
-        // Create the route function
-        const routeFunction = async function<T>(args: IArgs = {}, body: IBody = {}): Promise<T> {
+        target[route.name] = function <T>(args: IArgs = {}, body: IBody = {}): Promise<T> {
             return callApi(route.parent!, route, args, body);
-        };
-
-        // Add the route function to the target
-        target[route.name] = routeFunction;
+        } as RouteFunction;
     }
 
     public getElementKey(element: IElement): string {

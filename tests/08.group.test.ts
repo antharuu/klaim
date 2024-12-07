@@ -94,14 +94,8 @@ describe("Group", async () => {
         });
 
         // Validate that the route definitions are independent for each API
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[groupName][apiName].getAll).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[groupName][apiName2].list).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[groupName][apiName2].getOne).toBeDefined();
     });
 
