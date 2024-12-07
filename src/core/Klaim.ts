@@ -1,26 +1,72 @@
 import fetchWithCache from "../tools/fetchWithCache";
 
-import { IElement } from "./Element";
-import { Hook } from "./Hook";
-import { Registry } from "./Registry";
+import {IElement} from "./Element";
+import {Hook} from "./Hook";
+import {Registry} from "./Registry";
 
+/**
+ * Type representing key-value pairs for route arguments
+ */
 export type IArgs = Record<string, unknown>;
+
+/**
+ * Type representing request body data structure
+ */
 export type IBody = Record<string, unknown>;
 
+/**
+ * Generic function type for route handlers with optional arguments and body
+ */
 export type RouteFunction = {
     <T>(args?: IArgs, body?: IBody): Promise<T>;
     [key: string]: any;
 };
 
+/**
+ * Type representing a nested structure of route references
+ */
 export type IRouteReference = {
     [key: string]: RouteFunction | IRouteReference;
 };
 
+/**
+ * Type representing API references containing route references
+ */
 export type IApiReference = Record<string, IRouteReference>;
 
+/**
+ * Global Klaim object that provides access to all registered APIs and their routes
+ * @example
+ * ```typescript
+ * // Access a route
+ * await Klaim.apiName.routeName();
+ *
+ * // Access a grouped route
+ * await Klaim.apiName.groupName.routeName();
+ * ```
+ */
 export const Klaim: IApiReference = {};
 
-export async function callApi<T> (
+/**
+ * Executes an API call for a specific route with optional arguments and body
+ *
+ * @param parent - Parent path in dot notation (e.g., "api.group")
+ * @param element - Route element to be called
+ * @param args - URL parameters for the route
+ * @param body - Request body data
+ * @returns Promise resolving to the API response
+ * @throws Error if the path is invalid or required arguments are missing
+ * @example
+ * ```typescript
+ * const response = await callApi<UserData>(
+ *   "users",
+ *   userRoute,
+ *   { id: "123" },
+ *   { name: "John" }
+ * );
+ * ```
+ */
+export async function callApi<T>(
     parent: string,
     element: IElement,
     args: IArgs = {},
@@ -28,7 +74,7 @@ export async function callApi<T> (
 ): Promise<T> {
     const parentParts = parent.split(".");
     let api: IElement | undefined;
-    
+
     for (let i = 0; i < parentParts.length; i++) {
         const potentialApiName = parentParts[i];
         api = Registry.i.getApi(potentialApiName);
@@ -60,7 +106,7 @@ export async function callApi<T> (
         beforeApi,
         beforeUrl,
         beforeConfig
-    } = applyBefore({ route: element, api, url, config });
+    } = applyBefore({route: element, api, url, config});
 
     url = beforeUrl;
     config = beforeConfig;
@@ -78,7 +124,7 @@ export async function callApi<T> (
         afterRoute,
         afterApi,
         afterData
-    } = applyAfter({ route: element, api, response, data: response });
+    } = applyAfter({route: element, api, response, data: response});
 
     Registry.updateElement(afterApi);
     Registry.updateElement(afterRoute);
@@ -88,7 +134,16 @@ export async function callApi<T> (
     return afterData as T;
 }
 
-async function fetchData (
+/**
+ * Fetches data from an API with optional caching
+ *
+ * @param withCache - Whether to use caching
+ * @param url - The URL to fetch from
+ * @param config - Fetch configuration options
+ * @param api - API element containing cache settings
+ * @returns Promise resolving to the parsed response
+ */
+async function fetchData(
     withCache: boolean,
     url: string,
     config: any,
@@ -102,7 +157,17 @@ async function fetchData (
     }
 }
 
-async function fetchWithRetry (
+/**
+ * Performs a fetch request with retry capability
+ *
+ * @param api - API element containing retry settings
+ * @param route - Route element containing retry settings
+ * @param url - The URL to fetch from
+ * @param config - Fetch configuration options
+ * @returns Promise resolving to the parsed response
+ * @throws Error after all retry attempts fail
+ */
+async function fetchWithRetry(
     api: IElement,
     route: IElement,
     url: string,
@@ -135,7 +200,16 @@ async function fetchWithRetry (
     return response;
 }
 
-function applyArgs (url: string, route: IElement, args: IArgs): string {
+/**
+ * Replaces URL parameter placeholders with actual values
+ *
+ * @param url - URL template with parameter placeholders
+ * @param route - Route element containing parameter definitions
+ * @param args - Parameter values to insert
+ * @returns URL with parameters replaced
+ * @throws Error if a required parameter is missing
+ */
+function applyArgs(url: string, route: IElement, args: IArgs): string {
     let newUrl = url;
     route.arguments.forEach(arg => {
         const value = args[arg];
@@ -147,7 +221,13 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
     return newUrl;
 }
 
-function applyBefore ({ route, api, url, config }: {
+/**
+ * Applies before-request middleware to modify request parameters
+ *
+ * @param params - Object containing route, API, URL, and config
+ * @returns Modified request parameters
+ */
+function applyBefore({route, api, url, config}: {
     route: IElement;
     api: IElement;
     url: string;
@@ -158,7 +238,7 @@ function applyBefore ({ route, api, url, config }: {
     beforeUrl: string;
     beforeConfig: Record<string, unknown>;
 } {
-    const beforeRes = route.callbacks.before?.({ route, api, url, config });
+    const beforeRes = route.callbacks.before?.({route, api, url, config});
     return {
         beforeRoute: beforeRes?.route || route,
         beforeApi: beforeRes?.api || api,
@@ -167,7 +247,13 @@ function applyBefore ({ route, api, url, config }: {
     };
 }
 
-function applyAfter ({ route, api, response, data }: {
+/**
+ * Applies after-request middleware to modify response data
+ *
+ * @param params - Object containing route, API, response, and data
+ * @returns Modified response parameters
+ */
+function applyAfter({route, api, response, data}: {
     route: IElement;
     api: IElement;
     response: Response;
@@ -178,7 +264,7 @@ function applyAfter ({ route, api, response, data }: {
     afterResponse: Response;
     afterData: any;
 } {
-    const afterRes = route.callbacks.after?.({ route, api, response, data });
+    const afterRes = route.callbacks.after?.({route, api, response, data});
     return {
         afterRoute: afterRes?.route || route,
         afterApi: afterRes?.api || api,
