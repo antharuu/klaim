@@ -15,11 +15,22 @@ type GroupCallback = () => void;
  *
  * @example
  * ```typescript
+ * // Inside an API
  * Api.create("api", "https://api.example.com", () => {
  *   Group.create("users", () => {
  *     Route.get("list", "/users");
  *     Route.get("getOne", "/users/[id]");
  *   }).withCache(60); // Cache all routes for 60 seconds
+ * });
+ * 
+ * // Or grouping APIs
+ * Group.create("shared", () => {
+ *   Api.create("users", "https://users-api.com", () => {
+ *     Route.get("list", "/users");
+ *   });
+ *   Api.create("posts", "https://posts-api.com", () => {
+ *     Route.get("list", "/posts");
+ *   });
  * });
  * ```
  */
@@ -27,18 +38,25 @@ export class Group extends Element {
     /**
      * Creates a new group and registers it in the Registry.
      * Supports nested groups and inheritable configurations.
+     * Can contain both Routes (when inside an API) and APIs (when at root level).
      *
      * @param name - Name of the group (will be converted to camelCase)
-     * @param callback - Configuration callback for defining routes and nested groups
+     * @param callback - Configuration callback for defining routes, nested groups or APIs
      * @returns The created group instance
      * @throws Error if group creation fails or parent context is invalid
      * @example
      * ```typescript
+     * // Group routes within an API
      * Group.create("admin", () => {
-     *   Group.create("users", () => {
-     *     Route.get("list", "/admin/users");
+     *   Route.get("list", "/admin/users");
+     * });
+     * 
+     * // Group multiple APIs
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://users-api.com", () => {
+     *     Route.get("list", "/users");
      *   });
-     * }).before(authMiddleware);
+     * });
      * ```
      */
     public static create (name: string, callback: GroupCallback): Element {
@@ -56,7 +74,7 @@ export class Group extends Element {
             console.warn(`Group name "${name}" has been camelCased to "${camelCasedName}"`);
         }
 
-        // Register the group with camelCased name
+        // Register the group at the appropriate level
         Registry.i.registerElement(group);
 
         // Save current parent state
@@ -65,7 +83,7 @@ export class Group extends Element {
         // Set this group as the current parent using full path with camelCased name
         Registry.i.setCurrentParent(fullName);
 
-        // Execute the callback
+        // Execute the callback in the group's context
         callback();
 
         // Restore the previous parent or clear if none
@@ -92,16 +110,18 @@ export class Group extends Element {
     }
 
     /**
-     * Enables caching for the group and all its child routes.
-     * Child routes can override the cache duration with their own settings.
+     * Enables caching for the group and all its children (routes and APIs).
+     * Children can override the cache duration with their own settings.
      *
      * @param duration - Cache duration in seconds (default: 20)
      * @returns this group instance for chaining
      * @example
      * ```typescript
-     * Group.create("users", () => {
-     *   Route.get("list", "/users");
-     * }).withCache(300); // Cache all routes for 5 minutes
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://api.users.com", () => {
+     *     Route.get("list", "/users");
+     *   });
+     * }).withCache(300);
      * ```
      */
     public withCache (duration = 20): this {
@@ -117,16 +137,18 @@ export class Group extends Element {
     }
 
     /**
-     * Enables retry mechanism for the group and all its child routes.
-     * Child routes can override the retry count with their own settings.
+     * Enables retry mechanism for the group and all its children (routes and APIs).
+     * Children can override the retry count with their own settings.
      *
      * @param maxRetries - Maximum number of retry attempts (default: 2)
      * @returns this group instance for chaining
      * @example
      * ```typescript
-     * Group.create("users", () => {
-     *   Route.get("list", "/users");
-     * }).withRetry(3); // Retry failed requests up to 3 times
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://api.users.com", () => {
+     *     Route.get("list", "/users");
+     *   });
+     * }).withRetry(3);
      * ```
      */
     public withRetry (maxRetries = 2): this {
@@ -142,17 +164,19 @@ export class Group extends Element {
     }
 
     /**
-     * Adds a before-request middleware to the group and all its child routes.
-     * Child routes can override this middleware with their own.
+     * Adds a before-request middleware to the group and all its children.
+     * Children can override this middleware with their own.
      *
      * @param callback - Middleware function to execute before requests
      * @returns this group instance for chaining
      * @example
      * ```typescript
-     * Group.create("admin", () => {
-     *   Route.get("stats", "/admin/stats");
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://api.users.com", () => {
+     *     Route.get("list", "/users");
+     *   });
      * }).before(({ config }) => {
-     *   config.headers.Authorization = getAdminToken();
+     *   config.headers.Authorization = getSharedToken();
      * });
      * ```
      */
@@ -169,17 +193,19 @@ export class Group extends Element {
     }
 
     /**
-     * Adds an after-request middleware to the group and all its child routes.
-     * Child routes can override this middleware with their own.
+     * Adds an after-request middleware to the group and all its children.
+     * Children can override this middleware with their own.
      *
      * @param callback - Middleware function to execute after requests
      * @returns this group instance for chaining
      * @example
      * ```typescript
-     * Group.create("users", () => {
-     *   Route.get("list", "/users");
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://api.users.com", () => {
+     *     Route.get("list", "/users");
+     *   });
      * }).after(({ data }) => {
-     *   console.log(`Fetched ${data.length} users`);
+     *   console.log(`Fetched from shared API`);
      * });
      * ```
      */
@@ -196,17 +222,19 @@ export class Group extends Element {
     }
 
     /**
-     * Adds a request lifecycle middleware to the group and all its child routes.
-     * Child routes can override this middleware with their own.
+     * Adds a request lifecycle middleware to the group and all its children.
+     * Children can override this middleware with their own.
      *
      * @param callback - Middleware function to execute during requests
      * @returns this group instance for chaining
      * @example
      * ```typescript
-     * Group.create("api", () => {
-     *   Route.get("status", "/status");
+     * Group.create("shared", () => {
+     *   Api.create("users", "https://api.users.com", () => {
+     *     Route.get("list", "/users");
+     *   });
      * }).onCall(() => {
-     *   metrics.incrementApiCalls();
+     *   metrics.incrementSharedApiCalls();
      * });
      * ```
      */

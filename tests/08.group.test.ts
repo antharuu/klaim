@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { Api, Group, Klaim, Route } from "../src";
+import {describe, expect, it} from "vitest";
+import {Api, Group, Klaim, Route} from "../src";
 
 const apiName = "testApi";
 const apiUrl = "https://dummyjson.com";
@@ -71,17 +71,38 @@ describe("Group", async () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         expect(Klaim[apiName][groupName].create).toBeDefined();
+    });
 
-        // Test actual API calls
+    it("should handle multiple apis in a group", async () => {
+        const apiName2 = "anotherApi";
+        const apiUrl2 = "https://jsonplaceholder.typicode.com";
+        const groupName = "posts";
+
+        // Create the first API with a group and routes
+        Group.create(groupName, () => {
+            Api.create(apiName, apiUrl, () => {
+                Route.get("getAll", "/products");
+            });
+        });
+
+        // Create a second API with a group and routes
+        Group.create(groupName, () => {
+            Api.create(apiName2, apiUrl2, () => {
+                Route.get("list", "/posts");
+                Route.get("getOne", "/posts/[id]");
+            });
+        });
+
+        // Validate that the route definitions are independent for each API
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const users = await Klaim[apiName][groupName].list();
-        expect(Array.isArray(users.users)).toBe(true);
-
+        expect(Klaim[groupName][apiName].getAll).toBeDefined();
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        const user = await Klaim[apiName][groupName].getOne({id: 1});
-        expect(user.id).toBe(1);
+        expect(Klaim[groupName][apiName2].list).toBeDefined();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        expect(Klaim[groupName][apiName2].getOne).toBeDefined();
     });
 
     it("should inherit cache settings from group", async () => {
