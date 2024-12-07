@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Api, Klaim, Registry, Route } from "../src";
 
 const apiName = "testApi";
-const apiUrl = "https://jsonplaceholder.typicode.com";
+const apiUrl = "https://dummyjson.com";
 
 describe("Route", async () => {
     it("should create an route instance with correct properties", () => {

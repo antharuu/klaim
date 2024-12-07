@@ -69,7 +69,7 @@ describe("Group", async () => {
 
     it("should handle multiple apis in a group", async () => {
         const apiName2 = "anotherApi";
-        const apiUrl2 = "https://jsonplaceholder.typicode.com";
+        const apiUrl2 = "https://dummyjson.com";
         const groupName = "posts";
 
         // Create the first API with a group and routes
@@ -95,7 +95,7 @@ describe("Group", async () => {
 
     it("should handle multiple apis and routes in a group", async () => {
         const apiName2 = "anotherApi";
-        const apiUrl2 = "https://jsonplaceholder.typicode.com";
+        const apiUrl2 = "https://dummyjson.com";
         const groupApiName = "posts";
         const groupRoutesName = "test";
 

@@ -4,7 +4,7 @@ import { Api, Klaim, Registry } from "../src";
 describe("Api", () => {
     it("should create an API instance with correct properties", () => {
         const name = "testApi";
-        const url = "https://jsonplaceholder.typicode.com";
+        const url = "https://dummyjson.com";
 
         const api = Api.create(name, url, () => {});
 
@@ -13,8 +13,8 @@ describe("Api", () => {
 
     it("should format the URL correctly", () => {
         const name = "testApi";
-        const url = "https://jsonplaceholder.typicode.com/";
-        const waitingUrl = "https://jsonplaceholder.typicode.com";
+        const url = "https://dummyjson.com/";
+        const waitingUrl = "https://dummyjson.com";
 
         const api = Api.create(name, url, () => {});
 
@@ -27,7 +27,7 @@ describe("Api", () => {
 
         const api = Api.create(
             name,
-            "https://jsonplaceholder.typicode.com",
+            "https://dummyjson.com",
             () => {},
         );
 
@@ -37,7 +37,7 @@ describe("Api", () => {
     it("should access the API instance from Klaim", () => {
         const name = "testApi";
 
-        Api.create(name, "https://jsonplaceholder.typicode.com", () => {});
+        Api.create(name, "https://dummyjson.com", () => {});
 
         expect(Klaim[name]).toBeDefined();
     });
@@ -50,7 +50,7 @@ describe("Api", () => {
 
         const api = Api.create(
             name,
-            "https://jsonplaceholder.typicode.com",
+            "https://dummyjson.com",
             () => {},
             headers,
         );

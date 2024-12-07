@@ -3,7 +3,7 @@ import {Api, Klaim, Route} from "../src";
 import * as yup from "yup";
 
 const apiName = "testApi";
-const apiUrl = "https://jsonplaceholder.typicode.com";
+const apiUrl = "https://dummyjson.com";
 
 const routeName = "testRoute";
 const routeUrl = "todos/[id]";

@@ -70,8 +70,8 @@ type Todo = {
     completed: boolean;
 };
 
-// Create a new API with the name "hello" and the base URL "https://jsonplaceholder.typicode.com/"
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+// Create a new API with the name "hello" and the base URL "https://dummyjson.com/"
+Api.create("hello", "https://dummyjson.com/", () => {
     // Define routes for the API
     Route.get<Todo[]>("listTodos", "todos");
     Route.get<Todo>("getTodo", "todos/[id]");
@@ -248,7 +248,7 @@ Add middleware to modify requests and responses. Use `before` middleware to alte
 and `after` middleware to process responses:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // With before middleware
     Route.get<Todo>("getRandomTodo", "todos")
         .before(({url}) => {
@@ -286,7 +286,7 @@ but you can specify a custom duration in seconds.
 You can enable caching on individual routes:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // Get a list of todos with default cache duration (20 seconds)
     Route.get<Todo[]>("listTodos", "todos").withCache();
 
@@ -305,7 +305,7 @@ Now, when making requests, the caching feature will be applied.
 You can also enable caching for all routes defined within an API:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // Define routes for the API
     Route.get<Todo[]>("listTodos", "todos");
     Route.get<Todo>("getTodo", "todos/[id]");
@@ -323,7 +323,7 @@ routes or for the entire API.
 Enable retry on individual routes:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // Get a list of todos with retry mechanism (default: 2)
     Route.get<Todo[]>("listTodos", "todos").withRetry();
 
@@ -340,7 +340,7 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 Enable retry for all routes defined within an API:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // Define routes for the API
     Route.get<Todo[]>("listTodos", "todos");
     Route.get<Todo>("getTodo", "todos/[id]");
@@ -373,7 +373,7 @@ const todoSchema = yup.object().shape({
     completed: yup.boolean().required()
 });
 
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+Api.create("hello", "https://dummyjson.com/", () => {
     // Get a specific todo by id with validation
     Route.get<Todo>("getTodo", "todos/[id]").validate(todoSchema);
 });

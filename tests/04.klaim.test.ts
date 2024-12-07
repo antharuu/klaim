@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Api, Klaim, Route } from "../src";
 
 const apiName = "testApi";
-const apiUrl = "https://jsonplaceholder.typicode.com";
+const apiUrl = "https://dummyjson.com";
 
 const routeName = "testRoute";
 const routeUrl = "/todos/1";

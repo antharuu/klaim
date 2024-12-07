@@ -22,7 +22,7 @@ type GroupCallback = () => void;
  *     Route.get("getOne", "/users/[id]");
  *   }).withCache(60); // Cache all routes for 60 seconds
  * });
- * 
+ *
  * // Or grouping APIs
  * Group.create("shared", () => {
  *   Api.create("users", "https://users-api.com", () => {
@@ -50,7 +50,7 @@ export class Group extends Element {
      * Group.create("admin", () => {
      *   Route.get("list", "/admin/users");
      * });
-     * 
+     *
      * // Group multiple APIs
      * Group.create("shared", () => {
      *   Api.create("users", "https://users-api.com", () => {
