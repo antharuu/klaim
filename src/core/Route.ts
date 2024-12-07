@@ -1,7 +1,9 @@
-import { Api } from "./Api";
 import { Element, IHeaders } from "./Element";
 import { Registry } from "./Registry";
 
+/**
+ * Supported HTTP methods for route definitions.
+ */
 export enum RouteMethod {
     GET = "GET",
     POST = "POST",
@@ -12,135 +14,164 @@ export enum RouteMethod {
 }
 
 /**
- * Represents a route
+ * Represents an API route with its HTTP method, path, and configuration.
+ * Routes define endpoints within an API and handle URL parameter detection.
+ *
+ * @example
+ * ```typescript
+ * // Create a GET route with URL parameters
+ * Route.get("getUser", "/users/[id]");
+ *
+ * // Create a POST route with headers
+ * Route.post("createUser", "/users", {
+ *   "Content-Type": "application/json"
+ * });
+ * ```
  */
 export class Route extends Element {
-    public api: Api["name"] = "undefined";
-
-    public method: RouteMethod;
-
-    public arguments: Set<string> = new Set<string>();
-
-    public schema: any;
-
     /**
-     * Constructor
+     * Creates a new Route instance.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @param method - The HTTP method of the route
+     * @param name - Unique name for the route
+     * @param url - URL path for the route, can include parameters in [param] format
+     * @param headers - Optional HTTP headers specific to this route
+     * @param method - HTTP method for this route
      */
-    private constructor (
+    public constructor (
         name: string,
         url: string,
-        headers: IHeaders,
+        headers: IHeaders = {},
         method: RouteMethod = RouteMethod.GET
     ) {
-        super(name, url, headers);
+        super("route", name, url, headers);
         this.method = method;
-
         this.detectArguments();
     }
 
     /**
-     * Creates a new route
+     * Internal helper to create and register a new route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @param method - The HTTP method of the route
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @param method - HTTP method
+     * @returns The created route element
+     * @private
      */
     private static createRoute (
         name: string,
         url: string,
-        headers: IHeaders,
+        headers: IHeaders = {},
         method: RouteMethod
-    ): Route {
+    ): Element {
         const route = new Route(name, url, headers, method);
-        Registry.i.registerRoute(route as Route);
+        Registry.i.registerRoute(route);
         return route;
     }
 
     /**
-     * Creates a new route with the GET method
+     * Creates a GET route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created GET route
+     * @example
+     * ```typescript
+     * Route.get("listUsers", "/users");
+     * Route.get("getUser", "/users/[id]");
+     * ```
      */
-    public static get (
-        name: string,
-        url: string,
-        headers: IHeaders = {}
-    ): Route {
+    public static get (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.GET);
     }
 
     /**
-     * Creates a new route with the POST method
+     * Creates a POST route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created POST route
+     * @example
+     * ```typescript
+     * Route.post("createUser", "/users");
+     * ```
      */
-    public static post (name: string, url: string, headers: IHeaders): Route {
+    public static post (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.POST);
     }
 
     /**
-     * Creates a new route with the PUT method
+     * Creates a PUT route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created PUT route
+     * @example
+     * ```typescript
+     * Route.put("updateUser", "/users/[id]");
+     * ```
      */
-    public static put (name: string, url: string, headers: IHeaders): Route {
+    public static put (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.PUT);
     }
 
     /**
-     * Creates a new route with the DELETE method
+     * Creates a DELETE route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created DELETE route
+     * @example
+     * ```typescript
+     * Route.delete("deleteUser", "/users/[id]");
+     * ```
      */
-    public static delete (name: string, url: string, headers: IHeaders): Route {
+    public static delete (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.DELETE);
     }
 
     /**
-     * Creates a new route with the PATCH method
+     * Creates a PATCH route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created PATCH route
+     * @example
+     * ```typescript
+     * Route.patch("updateUserStatus", "/users/[id]/status");
+     * ```
      */
-    public static patch (name: string, url: string, headers: IHeaders): Route {
+    public static patch (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.PATCH);
     }
 
     /**
-     * Creates a new route with the OPTIONS method
+     * Creates an OPTIONS route.
      *
-     * @param name - The name of the route
-     * @param url - The URL of the route
-     * @param headers - The headers to be sent with the request
-     * @returns The new route
+     * @param name - Route name
+     * @param url - Route URL path
+     * @param headers - Route-specific headers
+     * @returns The created OPTIONS route
+     * @example
+     * ```typescript
+     * Route.options("userOptions", "/users");
+     * ```
      */
-    public static options (name: string, url: string, headers: IHeaders): Route {
+    public static options (name: string, url: string, headers: IHeaders = {}): Element {
         return this.createRoute(name, url, headers, RouteMethod.OPTIONS);
     }
 
     /**
-     * Detects the arguments in the URL
+     * Detects URL parameters in the route path.
+     * Parameters are defined using square brackets, e.g., [id] in /users/[id].
+     * Detected parameters are stored in the arguments Set.
+     *
+     * @private
      */
     private detectArguments (): void {
         const matches = this.url.match(/\[([^\]]+)]/g);
@@ -153,12 +184,17 @@ export class Route extends Element {
     }
 
     /**
-     * Schema validation (Yup)
+     * Sets up response validation using a schema.
      *
-     * @param schema - The schema to validate
-     * @returns The route
+     * @param schema - Validation schema (e.g., Yup schema)
+     * @returns This route instance for chaining
+     * @example
+     * ```typescript
+     * Route.get("getUser", "/users/[id]")
+     *   .validate(userSchema);
+     * ```
      */
-    public validate (schema: any): Route {
+    public validate (schema: any): Element {
         this.schema = schema;
         return this;
     }

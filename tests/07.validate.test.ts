@@ -1,5 +1,5 @@
-import {describe, it} from "vitest";
-import {Api, Klaim, Route} from "../src/index";
+import {describe, it, expect} from "vitest";
+import {Api, Klaim, Route} from "../src";
 import * as yup from "yup";
 
 const apiName = "testApi";
@@ -22,6 +22,8 @@ describe("Validate Yup", async () => {
         });
 
         // Expect the validation to not fail the promise
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(await Klaim[apiName][routeName]({id: 1})).toStrictEqual({
             userId: 1,
             id: 1,
@@ -32,15 +34,21 @@ describe("Validate Yup", async () => {
 
     it("should fail", async () => {
         Api.create(apiName, apiUrl, () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             Route.get(routeName, routeUrl).validate(schema);
         });
 
         // Expect the validation to fail the promise
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         await expect(Klaim[apiName][routeName]({id: 15})).rejects.toThrow();
     });
 
     it("should reformat if possible", async () => {
         Api.create(apiName, apiUrl, () => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
             Route.get(routeName, routeUrl).validate(yup.object().shape({
                     userId: yup.number().required(),
                     id: yup.string().required(),
@@ -51,6 +59,8 @@ describe("Validate Yup", async () => {
         });
 
         // Expect the id to be a string
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         expect(await Klaim[apiName][routeName]({id: "1"})).toStrictEqual({
             userId: 1,
             id: "1",

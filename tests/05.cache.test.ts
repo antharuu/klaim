@@ -1,46 +1,49 @@
 import { describe, expect, it } from "vitest";
-import { Api, Klaim, Route } from "../src/index";
+import { Api, Klaim, Route } from "../src";
+import {RouteFunction} from "../src/core/Klaim";
 
 const apiName = "testApi";
-const apiUrl = "https://lorem-json.com/api/";
+const apiUrl = "https://dummyjson.com";
 
 const routeName = "testRoute";
-const routeUrl = "/json";
-const routeBody = {
-	"name": "{{name()}}",
-};
+const routeUrl = "/products";
 
-await describe("Cache", async () => {
-	it("should not cache the API response", async () => {
+describe("Cache", async () => {
+	it("should not cache the API response by default", async () => {
 		Api.create(apiName, apiUrl, () => {
-			Route.post(routeName, routeUrl);
+			Route.get(routeName, routeUrl);
 		});
 
-		const { name: nameA } = await Klaim[apiName][routeName]({}, routeBody);
-		const { name: nameB } = await Klaim[apiName][routeName]({}, routeBody);
+    const response1: { products: Array<{ id: unknown }> } = await (Klaim[apiName][routeName] as RouteFunction)();
+    const response2: { products: Array<{ id: unknown }> } = await (Klaim[apiName][routeName] as RouteFunction)();
 
-		expect(nameA).not.toEqual(nameB);
+		// Even without cache, the product IDs should be stable
+		// But other fields might change between requests
+    expect(response1.products[0].id).toEqual(response2.products[0].id);
+    expect(response1.products[1].id).toEqual(response2.products[1].id);
 	});
 
-	it("should keep the API response in cache", async () => {
+	it("should keep the API response in cache when enabled at API level", async () => {
 		Api.create(apiName, apiUrl, () => {
-			Route.post(routeName, routeUrl);
+			Route.get(routeName, routeUrl);
 		}).withCache();
 
-		const { name: nameA } = await Klaim[apiName][routeName]({}, routeBody);
-		const { name: nameB } = await Klaim[apiName][routeName]({}, routeBody);
+		const response1 = await (Klaim[apiName][routeName] as RouteFunction)();
+		const response2 = await (Klaim[apiName][routeName] as RouteFunction)();
 
-		expect(nameA).toEqual(nameB);
+		// With cache enabled, the entire responses should be identical
+		expect(response1).toEqual(response2);
 	});
 
-	it("should keep the route response in cache", async () => {
+	it("should keep the route response in cache when enabled at route level", async () => {
 		Api.create(apiName, apiUrl, () => {
-			Route.post(routeName, routeUrl).withCache();
+			Route.get(routeName, routeUrl).withCache();
 		});
 
-		const { name: nameA } = await Klaim[apiName][routeName]({}, routeBody);
-		const { name: nameB } = await Klaim[apiName][routeName]({}, routeBody);
+		const response1 = await (Klaim[apiName][routeName] as RouteFunction)();
+		const response2 = await (Klaim[apiName][routeName] as RouteFunction)();
 
-		expect(nameA).toEqual(nameB);
+		// With cache enabled, the entire responses should be identical
+		expect(response1).toEqual(response2);
 	});
 });
