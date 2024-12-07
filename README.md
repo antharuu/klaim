@@ -38,7 +38,7 @@
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 
-# ⌛ Next features
+## ⌛ Next features
 
 - [ ] Pagination (Version: 1.8)
 - [ ] Rate Limiting (Version: 1.9)
