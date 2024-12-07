@@ -8,9 +8,13 @@
     - [Basic API Configuration](#basic-api-configuration)
     - [Route Definition](#route-definition)
     - [Request Handling](#request-handling)
+    - [Groups](#groups)
+        - [API Groups](#api-groups)
+        - [Route Groups](#route-groups)
+        - [Nested Groups](#nested-groups)
+        - [Group Configuration](#group-configuration)
     - [Middleware Usage](#middleware-usage)
     - [Hook Subscription](#hook-subscription)
-    - [Group Usage](#group-usage)
     - [Caching Requests](#caching-requests)
     - [Retry Mechanism](#retry-mechanism)
     - [Response Validation](#response-validation)
@@ -21,12 +25,13 @@
 ## 🚀 Features
 
 - **Efficient API Management**: Easily manage multiple APIs with streamlined integration and interaction capabilities.
+- **API Grouping**: Organize related APIs into logical groups with shared settings and configuration.
+- **Route Grouping**: Organize related routes into logical groups with inherited settings.
 - **Request Recording**: Seamlessly track requests for debugging and monitoring.
 - **User Experience Optimization**: Focused on performance and usability for a smooth user experience.
 - **Lightweight**: Minimal footprint for fast load times and minimal performance impact.
 - **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
-- **Group Organization**: Organize related routes into logical groups with inherited settings.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
@@ -76,19 +81,147 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 
 ### Route Definition
 
-Define various routes within the API callback:
+Routes represent endpoints in your API and can be defined with different HTTP methods. Routes can include parameters and custom configurations:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-    // Get a list of todos
-    Route.get<Todo[]>("listTodos", "todos");
-
-    // Get a specific todo by id
-    Route.get<Todo>("getTodo", "todos/[id]");
-
-    // Add a new todo
-    Route.post<Todo>("addTodo", "todos");
+Api.create("api", "https://api.example.com", () => {
+    // Basic GET route
+    Route.get("listUsers", "/users");
+    
+    // GET route with URL parameter
+    Route.get("getUser", "/users/[id]");
+    
+    // POST route with custom headers and body
+    Route.post("createUser", "/users", {
+        "Content-Type": "application/json"
+    }, { userId: 1, name: "John Doe" });
+    
+    // PUT route with parameter
+    Route.put("updateUser", "/users/[id]");
+    
+    // DELETE route
+    Route.delete("deleteUser", "/users/[id]");
+    
+    // PATCH route
+    Route.patch("updateUserStatus", "/users/[id]/status");
+    
+    // OPTIONS route
+    Route.options("userOptions", "/users");
 });
+```
+
+### Groups
+
+Klaim provides powerful grouping capabilities for both APIs and routes. Groups can be used to organize related elements, share configuration, and maintain a clean structure in your application.
+
+#### API Groups
+
+Organize multiple APIs that serve related purposes:
+
+```typescript
+import {Group, Api, Route} from 'klaim';
+
+// Create a group for user-related services
+Group.create("userServices", () => {
+    // Authentication API
+    Api.create("auth", "https://auth.example.com", () => {
+        Route.post("login", "/login");
+        Route.post("register", "/register");
+    });
+
+    // User Management API
+    Api.create("users", "https://users.example.com", () => {
+        Route.get("list", "/users");
+        Route.get("getOne", "/users/[id]");
+    });
+}).withRetry(3); // Apply retry mechanism to all APIs in the group
+
+// Access grouped APIs
+await Klaim.userServices.auth.login({}, { username: "user", password: "pass" });
+await Klaim.userServices.users.list();
+```
+
+#### Route Groups
+
+Organize routes within an API into logical groups:
+
+```typescript
+Api.create("hello", "https://api.example.com/", () => {
+    // Group user-related routes
+    Group.create("users", () => {
+        Route.get<User[]>("list", "/users");
+        Route.get<User>("getOne", "/users/[id]");
+        Route.post<User>("create", "/users");
+    }).withCache(60);  // Cache all user routes for 60 seconds
+    
+    // Group product-related routes
+    Group.create("products", () => {
+        Route.get("list", "/products");
+        Route.get("getOne", "/products/[id]");
+    });
+});
+
+// Use grouped routes
+const users = await Klaim.hello.users.list();
+const product = await Klaim.hello.products.getOne({ id: 1 });
+```
+
+#### Nested Groups
+
+Create complex hierarchies with nested groups:
+
+```typescript
+Group.create("services", () => {
+    // Internal services group
+    Group.create("internal", () => {
+        Api.create("logs", "https://logs.internal.example.com", () => {
+            Route.post("write", "/logs");
+        });
+        
+        Api.create("metrics", "https://metrics.internal.example.com", () => {
+            Route.post("track", "/metrics");
+        });
+    }).withRetry(5);  // More retries for internal services
+    
+    // External services group
+    Group.create("external", () => {
+        Api.create("weather", "https://api.weather.com", () => {
+            Route.get("forecast", "/forecast/[city]");
+        });
+        
+        Api.create("geocoding", "https://api.geocoding.com", () => {
+            Route.get("search", "/search/[query]");
+        });
+    }).withCache(300);  // Cache external services longer
+});
+
+// Access nested groups
+await Klaim.services.internal.logs.write({}, { message: "Log entry" });
+await Klaim.services.external.weather.forecast({ city: "Paris" });
+```
+
+#### Group Configuration
+
+Groups can share configuration among all their members:
+
+```typescript
+Group.create("apis", () => {
+    Api.create("service1", "https://api1.example.com", () => {
+        Route.get("test", "/test");
+    });
+    
+    Api.create("service2", "https://api2.example.com", () => {
+        Route.get("test", "/test");
+    });
+})
+    .withCache(60)  // Enable caching for all APIs
+    .withRetry(3)   // Enable retries for all APIs
+    .before(({ config }) => {  // Add authentication for all APIs
+        config.headers.Authorization = `Bearer ${getToken()}`;
+    })
+    .after(({ data }) => {  // Process all responses
+        logResponse(data);
+    });
 ```
 
 ### Request Handling
@@ -141,32 +274,6 @@ import {Hook} from 'klaim';
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
     console.log(`Requesting ${url}`);
 });
-```
-
-### Group Usage
-
-Use groups to organize related routes and share common settings:
-
-```typescript
-import {Api, Group, Route} from 'klaim';
-
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-    // Create a group for user-related routes
-    Group.create("users", () => {
-        Route.get("list", "/users");
-        Route.get("getOne", "/users/[id]");
-
-        // Nested group for user posts
-        Group.create("posts", () => {
-            Route.get("list", "/users/[userId]/posts");
-        }).withCache(); // Cache enabled for all routes in this group
-    });
-});
-
-// Use the grouped routes
-const users = await Klaim.hello.users.list();
-const user = await Klaim.hello.users.getOne({id: 1});
-const userPosts = await Klaim.hello.users.posts.list({userId: 1});
 ```
 
 ### Caching Requests
