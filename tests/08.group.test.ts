@@ -62,14 +62,8 @@ describe("Group", async () => {
             });
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[apiName][groupName].list).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[apiName][groupName].getOne).toBeDefined();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         expect(Klaim[apiName][groupName].create).toBeDefined();
     });
 
@@ -99,6 +93,63 @@ describe("Group", async () => {
         expect(Klaim[groupName][apiName2].getOne).toBeDefined();
     });
 
+    it("should handle multiple apis and routes in a group", async () => {
+        const apiName2 = "anotherApi";
+        const apiUrl2 = "https://jsonplaceholder.typicode.com";
+        const groupApiName = "posts";
+        const groupRoutesName = "test";
+
+        // Create the first API with a group and routes
+        Group.create(groupApiName, () => {
+            Api.create(apiName, apiUrl, () => {
+                Route.get("getAll", "/products");
+            });
+        });
+
+        // Create a second API with a group and routes
+        Group.create(groupApiName, () => {
+            Api.create(apiName2, apiUrl2, () => {
+                Group.create(groupRoutesName, () => {
+                    Route.get("list", "/posts");
+                    Route.get("getOne", "/posts/[id]");
+                });
+            });
+        });
+
+        // Validate that the route definitions are independent for each API
+        expect(Klaim[groupApiName][apiName].getAll).toBeDefined();
+        expect(Klaim[groupApiName][apiName2][groupRoutesName].list).toBeDefined();
+        expect(Klaim[groupApiName][apiName2][groupRoutesName].getOne).toBeDefined();
+    });
+
+
+    it("should handle groups with multiple subgroups correctly", () => {
+        const parentGroup = "vehicles";
+        const subGroup1 = "cars";
+        const subGroup2 = "bikes";
+        const routeName1 = "getAll";
+        const routeName2 = "getOne";
+
+        Api.create(apiName, apiUrl, () => {
+            Group.create(parentGroup, () => {
+                Group.create(subGroup1, () => {
+                    Route.get(routeName1, "/vehicles/cars");
+                    Route.get(routeName2, "/vehicles/cars/[id]");
+                });
+
+                Group.create(subGroup2, () => {
+                    Route.get(routeName1, "/vehicles/bikes");
+                    Route.get(routeName2, "/vehicles/bikes/[id]");
+                });
+            });
+        });
+
+        expect(Klaim[apiName][parentGroup][subGroup1][routeName1]).toBeDefined();
+        expect(Klaim[apiName][parentGroup][subGroup1][routeName2]).toBeDefined();
+        expect(Klaim[apiName][parentGroup][subGroup2][routeName1]).toBeDefined();
+        expect(Klaim[apiName][parentGroup][subGroup2][routeName2]).toBeDefined();
+    });
+
     it("should inherit cache settings from group", async () => {
         const groupName = "cachedProducts";
 
@@ -109,11 +160,7 @@ describe("Group", async () => {
             }).withCache(30); // 30 seconds cache
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const firstCall = await Klaim[apiName][groupName].list();
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const secondCall = await Klaim[apiName][groupName].list();
         expect(firstCall).toEqual(secondCall);
     });
@@ -128,8 +175,6 @@ describe("Group", async () => {
             }).withCache(30);
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const route = Klaim[apiName][groupName].list;
         expect(route).toBeDefined();
     });
@@ -146,8 +191,6 @@ describe("Group", async () => {
             });
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         await Klaim[apiName][groupName].list();
         expect(middlewareCalled).toBe(true);
     });
