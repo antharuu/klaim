@@ -40,11 +40,11 @@
 
 ## ⌛ Next features
 
-- [ ] Pagination (Version: 1.8)
-- [ ] Rate Limiting (Version: 1.9)
-- [ ] Login (Version: 1.10)
-- [ ] Time Out (Version: 1.11)
-- [ ] Error Handling (Version: 1.12)
+- Pagination (Version: 1.8)
+- Rate Limiting (Version: 1.9)
+- Login (Version: 1.10)
+- Time Out (Version: 1.11)
+- Error Handling (Version: 1.12)
 
 ## 📥 Installation
 

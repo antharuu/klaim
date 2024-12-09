@@ -44,10 +44,10 @@ jobs:
                     npx npm-check-updates -u
                     npm install
 
-            # -   name: Test and build
-            #     run: |
-            #         npm run test
-            #         npm run build
+            -   name: Test and build
+                run: |
+                    npm run test
+                    npm run build
 
             -   name: Release
                 run: npm run release
