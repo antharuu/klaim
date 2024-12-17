@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.7.11",
+    "version": "1.7.12",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -23,10 +23,10 @@
         "jsdom": "^25.0.1",
         "release-it": "^17.10.0",
         "typescript": "^5.7.2",
-        "typescript-eslint": "8.18.0",
+        "typescript-eslint": "8.18.1",
         "vite": "^6.0.3",
         "vitest": "^2.1.8",
-        "yup": "^1.5.0"
+        "yup": "^1.6.0"
     },
     "bugs": {
         "url": "https://github.com/antharuu/klaim/issues"
