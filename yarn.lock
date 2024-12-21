@@ -1075,10 +1075,10 @@ dot-prop@^9.0.0:
   dependencies:
     type-fest "^4.18.2"
 
-dotenv-cli@^7.4.4:
-  version "7.4.4"
-  resolved "https://registry.npmjs.org/dotenv-cli/-/dotenv-cli-7.4.4.tgz"
-  integrity sha512-XkBYCG0tPIes+YZr4SpfFv76SQrV/LeCE8CI7JSEMi3VR9MvTihCGTOtbIexD6i2mXF+6px7trb1imVCXSNMDw==
+dotenv-cli@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.npmjs.org/dotenv-cli/-/dotenv-cli-8.0.0.tgz"
+  integrity sha512-aLqYbK7xKOiTMIRf1lDPbI+Y+Ip/wo5k3eyp6ePysVaSqbyxjyK3dK35BTxG+rmd7djf5q2UPs4noPNH+cj0Qw==
   dependencies:
     cross-spawn "^7.0.6"
     dotenv "^16.3.0"
@@ -1166,7 +1166,7 @@ esbuild@^0.21.3:
     "@esbuild/win32-ia32" "0.21.5"
     "@esbuild/win32-x64" "0.21.5"
 
-esbuild@^0.24.0:
+esbuild@0.24.0:
   version "0.24.0"
   resolved "https://registry.npmjs.org/esbuild/-/esbuild-0.24.0.tgz"
   integrity sha512-FuLPevChGDshgSicjisSooU0cemp/sGXR841D5LHMB7mTVOmsEHcAxaH3irL53+8YDIeVNQEySh4DaYU/iuPqQ==
@@ -3282,12 +3282,12 @@ vite@^5.0.0:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vite@^6.0.4:
-  version "6.0.4"
-  resolved "https://registry.npmjs.org/vite/-/vite-6.0.4.tgz"
-  integrity sha512-zwlH6ar+6o6b4Wp+ydhtIKLrGM/LoqZzcdVmkGAFun0KHTzIzjh+h0kungEx7KJg/PYnC80I4TII9WkjciSR6Q==
+vite@^6.0.5:
+  version "6.0.5"
+  resolved "https://registry.npmjs.org/vite/-/vite-6.0.5.tgz"
+  integrity sha512-akD5IAH/ID5imgue2DYhzsEwCi0/4VKY31uhMLEYJwPP4TiUp8pL5PIK+Wo7H8qT8JY9i+pVfPydcFPYD1EL7g==
   dependencies:
-    esbuild "^0.24.0"
+    esbuild "0.24.0"
     postcss "^8.4.49"
     rollup "^4.23.0"
   optionalDependencies:
