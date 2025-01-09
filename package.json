@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.7.33",
+    "version": "1.7.34",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
         "eslint-plugin-simple-import-sort": "12.1.1",
         "jsdom": "^25.0.1",
         "release-it": "^18.0.0",
-        "typescript": "^5.7.2",
+        "typescript": "^5.7.3",
         "typescript-eslint": "8.19.1",
         "vite": "^6.0.7",
         "vitest": "^2.1.8",
