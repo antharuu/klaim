@@ -2,233 +2,259 @@ import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
 
 /**
- * Type definition for HTTP headers.
- * A record of string key-value pairs representing header names and values.
+ * Type definition for HTTP headers
+ * A record of string key-value pairs representing header names and values
  */
 export type IHeaders = Record<string, string>;
 
 /**
- * Arguments passed to before-request middleware callbacks.
- * Allows modification of request parameters before execution.
+ * Configuration interface for pagination settings
+ * @interface IPaginationConfig
+ * @property {number} [page] - The default starting page number
+ * @property {string} [pageParam] - The URL parameter name for page number
+ * @property {number} [limit] - The default number of items per page
+ * @property {string} [limitParam] - The URL parameter name for items per page
+ */
+export interface IPaginationConfig {
+	page?: number;
+	pageParam?: string;
+	limit?: number;
+	limitParam?: string;
+}
+
+/**
+ * Arguments passed to before-request middleware callbacks
+ * @interface ICallbackBeforeArgs
  */
 export interface ICallbackBeforeArgs {
-    /** The route element being called */
-    route: IElement;
-    /** The API element containing the route */
-    api: IElement;
-    /** The fully constructed URL for the request */
-    url: string;
-    /** The request configuration object */
-    config: Record<string, unknown>;
+	/** The route element being called */
+	route: IElement;
+	/** The API element containing the route */
+	api: IElement;
+	/** The fully constructed URL for the request */
+	url: string;
+	/** The request configuration object */
+	config: Record<string, unknown>;
 }
 
 /**
- * Arguments passed to after-request middleware callbacks.
- * Enables post-processing of responses.
+ * Arguments passed to after-request middleware callbacks
+ * @interface ICallbackAfterArgs
  */
 export interface ICallbackAfterArgs {
-    /** The route element that was called */
-    route: IElement;
-    /** The API element containing the route */
-    api: IElement;
-    /** The raw response from the request */
-    response: Response;
-    /** The parsed response data */
-    data: any;
+	/** The route element that was called */
+	route: IElement;
+	/** The API element containing the route */
+	api: IElement;
+	/** The raw response from the request */
+	response: Response;
+	/** The parsed response data */
+	data: any;
 }
 
 /**
- * Arguments for call middleware callbacks.
- * Used for request lifecycle monitoring.
+ * Arguments for call middleware callbacks
+ * @type ICallbackCallArgs
  */
 export type ICallbackCallArgs = object;
 
 /**
- * Generic callback type for middleware functions.
- *
+ * Generic callback type for middleware functions
  * @template ArgsType - The type of arguments passed to the callback
  */
 export type ICallback<ArgsType> = (args: ArgsType) => Partial<ArgsType> | void;
 
 /**
- * Collection of middleware callbacks for an element.
+ * Collection of middleware callbacks for an element
+ * @interface IElementCallbacks
  */
 interface IElementCallbacks {
-    /** Executed before the request is made */
-    before: ICallback<ICallbackBeforeArgs> | null;
-    /** Executed after the response is received */
-    after: ICallback<ICallbackAfterArgs> | null;
-    /** Executed during the request lifecycle */
-    call: ICallback<ICallbackCallArgs> | null;
+	/** Executed before the request is made */
+	before: ICallback<ICallbackBeforeArgs> | null;
+	/** Executed after the response is received */
+	after: ICallback<ICallbackAfterArgs> | null;
+	/** Executed during the request lifecycle */
+	call: ICallback<ICallbackCallArgs> | null;
 }
 
 /**
- * Core interface defining the structure and behavior of API elements.
- * Represents both APIs and routes within the system.
+ * Core interface defining the structure and behavior of API elements
+ * @interface IElement
  */
 export interface IElement {
-    /** Element type: 'api', 'route', or 'group' */
-    type: "api" | "route" | "group";
-    /** Unique identifier for the element */
-    name: string;
-    /** Base URL or path segment */
-    url: string;
-    /** HTTP headers specific to this element */
-    headers: IHeaders;
-    /** Middleware callbacks */
-    callbacks: IElementCallbacks;
-    /** Cache duration in seconds, or false if caching is disabled */
-    cache: false | number;
-    /** Number of retry attempts, or false if retries are disabled */
-    retry: false | number;
-    /** Reference to parent element name */
-    parent?: string;
-    /** HTTP method for routes */
-    method?: string;
-    /** Dynamic URL parameters */
-    arguments: Set<string>;
-    /** Response validation schema */
-    schema?: any;
+	/** Element type: 'api', 'route', or 'group' */
+	type: "api" | "route" | "group";
+	/** Unique identifier for the element */
+	name: string;
+	/** Base URL or path segment */
+	url: string;
+	/** HTTP headers specific to this element */
+	headers: IHeaders;
+	/** Middleware callbacks */
+	callbacks: IElementCallbacks;
+	/** Cache duration in seconds, or false if caching is disabled */
+	cache: false | number;
+	/** Number of retry attempts, or false if retries are disabled */
+	retry: false | number;
+	/** Reference to parent element name */
+	parent?: string;
+	/** HTTP method for routes */
+	method?: string;
+	/** Dynamic URL parameters */
+	arguments: Set<string>;
+	/** Response validation schema */
+	schema?: any;
+	/** Pagination configuration */
+	pagination?: IPaginationConfig;
 
-    /** Adds before-request middleware */
-    before(callback: ICallback<ICallbackBeforeArgs>): this;
-    /** Adds after-request middleware */
-    after(callback: ICallback<ICallbackAfterArgs>): this;
-    /** Adds request lifecycle middleware */
-    onCall(callback: ICallback<ICallbackCallArgs>): this;
-    /** Enables response caching */
-    withCache(duration?: number): this;
-    /** Enables request retries */
-    withRetry(maxRetries?: number): this;
+	/** Adds before-request middleware */
+	before(callback: ICallback<ICallbackBeforeArgs>): this;
+
+	/** Adds after-request middleware */
+	after(callback: ICallback<ICallbackAfterArgs>): this;
+
+	/** Adds request lifecycle middleware */
+	onCall(callback: ICallback<ICallbackCallArgs>): this;
+
+	/** Enables response caching */
+	withCache(duration?: number): this;
+
+	/** Enables request retries */
+	withRetry(maxRetries?: number): this;
+
+	/** Configures pagination settings */
+	withPagination(config?: IPaginationConfig): this;
 }
 
 /**
- * Abstract base class implementing common functionality for API elements.
- * Provides core features like middleware handling, caching, and retry logic.
- *
- * @example
- * ```typescript
- * class CustomElement extends Element {
- *   constructor() {
- *     super("custom", "myElement", "https://api.example.com");
- *   }
- * }
- * ```
+ * Default configuration for pagination
+ * @constant DEFAULT_PAGINATION_CONFIG
+ */
+const DEFAULT_PAGINATION_CONFIG: IPaginationConfig = {
+	page: 1,
+	pageParam: 'page',
+	limit: 10,
+	limitParam: 'limit'
+};
+
+/**
+ * Abstract base class implementing common functionality for API elements
+ * @abstract
+ * @class Element
+ * @implements {IElement}
  */
 export abstract class Element implements IElement {
-    /** Element type identifier */
-    public type: "api" | "route" | "group";
+	public type: "api" | "route" | "group";
+	public name: string;
+	public url: string;
+	public headers: IHeaders;
+	public parent?: string;
+	public method?: string;
+	public arguments: Set<string> = new Set<string>();
+	public schema?: any;
+	public pagination?: IPaginationConfig;
 
-    /** Element name (unique within its scope) */
-    public name: string;
+	public callbacks: IElementCallbacks = {
+		before: null,
+		after: null,
+		call: null
+	};
 
-    /** Base URL or path segment */
-    public url: string;
+	public cache: false | number = false;
+	public retry: false | number = false;
 
-    /** HTTP headers specific to this element */
-    public headers: IHeaders;
+	/**
+	 * Creates a new element with the specified properties
+	 * @param {("api"|"route"|"group")} type - Element type identifier
+	 * @param {string} name - Unique name for the element
+	 * @param {string} url - Base URL or path segment
+	 * @param {IHeaders} [headers={}] - HTTP headers for the element
+	 */
+	protected constructor(
+		type: "api" | "route" | "group",
+		name: string,
+		url: string,
+		headers: IHeaders = {}
+	) {
+		this.type = type;
+		this.name = toCamelCase(name);
+		if (this.name !== name) {
+			console.warn(`Name "${name}" has been camelCased to "${this.name}"`);
+		}
 
-    /** Reference to parent element name */
-    public parent?: string;
+		this.url = cleanUrl(url);
+		this.headers = headers || {};
+	}
 
-    /** HTTP method (for routes) */
-    public method?: string;
+	/**
+	 * Adds a before-request middleware callback
+	 * @param {ICallback<ICallbackBeforeArgs>} callback - Function to execute before the request
+	 * @returns {this} The element instance for chaining
+	 */
+	public before(callback: ICallback<ICallbackBeforeArgs>): this {
+		this.callbacks.before = callback;
+		return this;
+	}
 
-    /** Set of dynamic URL parameters */
-    public arguments: Set<string> = new Set<string>();
+	/**
+	 * Adds an after-request middleware callback
+	 * @param {ICallback<ICallbackAfterArgs>} callback - Function to execute after the response
+	 * @returns {this} The element instance for chaining
+	 */
+	public after(callback: ICallback<ICallbackAfterArgs>): this {
+		this.callbacks.after = callback;
+		return this;
+	}
 
-    /** Response validation schema */
-    public schema?: any;
+	/**
+	 * Adds a request lifecycle middleware callback
+	 * @param {ICallback<ICallbackCallArgs>} callback - Function to execute during the request
+	 * @returns {this} The element instance for chaining
+	 */
+	public onCall(callback: ICallback<ICallbackCallArgs>): this {
+		this.callbacks.call = callback;
+		return this;
+	}
 
-    /** Middleware callbacks collection */
-    public callbacks: IElementCallbacks = {
-        before: null,
-        after: null,
-        call: null
-    };
+	/**
+	 * Enables response caching for this element
+	 * @param {number} [duration=20] - Cache duration in seconds
+	 * @returns {this} The element instance for chaining
+	 */
+	public withCache = (duration: number = 20): this => {
+		this.cache = duration;
+		return this;
+	};
 
-    /** Cache duration in seconds, or false if disabled */
-    public cache: false | number = false;
+	/**
+	 * Enables request retries for this element
+	 * @param {number} [maxRetries=2] - Maximum number of retry attempts
+	 * @returns {this} The element instance for chaining
+	 */
+	public withRetry = (maxRetries: number = 2): this => {
+		this.retry = maxRetries;
+		return this;
+	};
 
-    /** Number of retry attempts, or false if disabled */
-    public retry: false | number = false;
-
-    /**
-     * Creates a new element with the specified properties.
-     *
-     * @param type - Element type identifier
-     * @param name - Unique name for the element
-     * @param url - Base URL or path segment
-     * @param headers - HTTP headers for the element
-     */
-    protected constructor (
-        type: "api" | "route" | "group",
-        name: string,
-        url: string,
-        headers: IHeaders = {}
-    ) {
-        this.type = type;
-        this.name = toCamelCase(name);
-        if (this.name !== name) {
-            console.warn(`Name "${name}" has been camelCased to "${this.name}"`);
-        }
-
-        this.url = cleanUrl(url);
-        this.headers = headers || {};
-    }
-
-    /**
-     * Adds a before-request middleware callback.
-     *
-     * @param callback - Function to execute before the request
-     * @returns this element instance for chaining
-     */
-    public before (callback: ICallback<ICallbackBeforeArgs>): this {
-        this.callbacks.before = callback;
-        return this;
-    }
-
-    /**
-     * Adds an after-request middleware callback.
-     *
-     * @param callback - Function to execute after the response
-     * @returns this element instance for chaining
-     */
-    public after (callback: ICallback<ICallbackAfterArgs>): this {
-        this.callbacks.after = callback;
-        return this;
-    }
-
-    /**
-     * Adds a request lifecycle middleware callback.
-     *
-     * @param callback - Function to execute during the request
-     * @returns this element instance for chaining
-     */
-    public onCall (callback: ICallback<ICallbackCallArgs>): this {
-        this.callbacks.call = callback;
-        return this;
-    }
-
-    /**
-     * Enables response caching for this element.
-     *
-     * @param duration - Cache duration in seconds (default: 20)
-     * @returns this element instance for chaining
-     */
-    public withCache (duration = 20): this {
-        this.cache = duration;
-        return this;
-    }
-
-    /**
-     * Enables request retries for this element.
-     *
-     * @param maxRetries - Maximum number of retry attempts (default: 2)
-     * @returns this element instance for chaining
-     */
-    public withRetry (maxRetries = 2): this {
-        this.retry = maxRetries;
-        return this;
-    }
+	/**
+	 * Configures pagination settings for this element
+	 * @param {IPaginationConfig} [config={}] - Pagination configuration options
+	 * @returns {this} The element instance for chaining
+	 * @example
+	 * ```typescript
+	 * Route.get("listItems", "/items").withPagination({
+	 *   page: 1,
+	 *   pageParam: 'page',
+	 *   limit: 20,
+	 *   limitParam: 'size'
+	 * });
+	 * ```
+	 */
+	public withPagination(config: IPaginationConfig = {}): this {
+		this.pagination = {
+			...DEFAULT_PAGINATION_CONFIG,
+			...config
+		};
+		return this;
+	}
 }

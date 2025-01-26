@@ -1,5 +1,4 @@
 import fetchWithCache from "../tools/fetchWithCache";
-
 import {IElement} from "./Element";
 import {Hook} from "./Hook";
 import {Registry} from "./Registry";
@@ -15,18 +14,18 @@ export type IArgs = Record<string, unknown>;
 export type IBody = Record<string, unknown>;
 
 /**
- * Generic function type for route handlers with optional arguments and body
+ * Generic function type for route handlers with pagination support
+ * @template T - The type of data returned by the route
  */
-export type RouteFunction = {
-    <T>(args?: IArgs, body?: IBody): Promise<T>;
-    [key: string]: any;
+export type RouteFunction<T = any> = {
+	(offset?: number, args?: IArgs, body?: IBody): Promise<T>;
 };
 
 /**
  * Type representing a nested structure of route references
  */
 export type IRouteReference = {
-    [key: string]: RouteFunction | IRouteReference;
+	[key: string]: RouteFunction;
 };
 
 /**
@@ -38,100 +37,134 @@ export type IApiReference = Record<string, IRouteReference>;
  * Global Klaim object that provides access to all registered APIs and their routes
  * @example
  * ```typescript
- * // Access a route
+ * // Basic usage
  * await Klaim.apiName.routeName();
  *
- * // Access a grouped route
- * await Klaim.apiName.groupName.routeName();
+ * // With pagination
+ * await Klaim.apiName.routeName(2, 10); // Page 2, 10 items per page
+ *
+ * // With pagination and additional parameters
+ * await Klaim.apiName.routeName(2, 10, { filter: 'active' });
  * ```
  */
 export const Klaim: IApiReference = {};
 
+export function createRouteHandler<T>(
+	parent: string,
+	element: IElement
+): RouteFunction<T> {
+	return async (...args: any[]): Promise<T> => {
+		if (element.pagination) {
+			const [page = 0, customArgs = {}, body = {}] = args;
+			return callApi<T>(parent, element, page, customArgs, body);
+		}
+		const [customArgs = {}, body = {}] = args;
+		return callApi<T>(parent, element, undefined, customArgs, body);
+	};
+}
+
 /**
- * Executes an API call for a specific route with optional arguments and body
+ * Executes an API call for a specific route with optional pagination, arguments and body
  *
- * @param parent - Parent path in dot notation (e.g., "api.group")
- * @param element - Route element to be called
- * @param args - URL parameters for the route
- * @param body - Request body data
- * @returns Promise resolving to the API response
- * @throws Error if the path is invalid or required arguments are missing
+ * @template T - The type of data returned by the route
+ * @param {string} parent - Parent path in dot notation (e.g., "api.group")
+ * @param {IElement} element - Route element to be called
+ * @param {number} [offset] - Page number for paginated routes
+ * @param {IArgs} [args={}] - URL parameters for the route
+ * @param {IBody} [body={}] - Request body data
+ * @returns {Promise<T>} Promise resolving to the API response
+ * @throws {Error} If the path is invalid or required arguments are missing
  * @example
  * ```typescript
- * const response = await callApi<UserData>(
+ * // Basic call
+ * const response = await callApi<UserData>("users", userRoute);
+ *
+ * // Paginated call
+ * const pagedResponse = await callApi<UserData[]>(
  *   "users",
  *   userRoute,
- *   { id: "123" },
- *   { name: "John" }
+ *   2,    // Page number
+ *   10,   // Items per page
+ *   { status: 'active' }
  * );
  * ```
  */
 export async function callApi<T>(
-    parent: string,
-    element: IElement,
-    args: IArgs = {},
-    body: IBody = {}
+	parent: string,
+	element: IElement,
+	offset?: number,
+	args: IArgs = {},
+	body: IBody = {}
 ): Promise<T> {
-    const parentParts = parent.split(".");
-    let api: IElement | undefined;
+	const parentParts = parent.split(".");
+	let api: IElement | undefined;
 
-    for (let i = 0; i < parentParts.length; i++) {
-        const potentialApiName = parentParts[i];
-        api = Registry.i.getApi(potentialApiName);
-        if (api) break;
-    }
+	for (let i = 0; i < parentParts.length; i++) {
+		const potentialApiName = parentParts[i];
+		api = Registry.i.getApi(potentialApiName);
+		if (api) break;
+	}
 
-    if (!element || !api || element.type !== "route" || api.type !== "api") {
-        throw new Error(`Invalid path: ${parent}.${element.name}`);
-    }
+	if (!element || !api || element.type !== "route" || api.type !== "api") {
+		throw new Error(`Invalid path: ${parent}.${element.name}`);
+	}
 
-    let url = applyArgs(`${api.url}/${element.url}`, element, args);
+	let url = applyArgs(`${api.url}/${element.url}`, element, args);
 
-    let config: Record<string, unknown> = {};
+	if (element.pagination && typeof offset !== 'undefined') {
+		const {pageParam = 'page', limit = 10, limitParam = 'limit'} = element.pagination;
+		const urlParams = new URLSearchParams();
+		urlParams.append(pageParam, String(offset));
+		urlParams.append(limitParam, String(limit));
+		const separator = url.includes('?') ? '&' : '?';
+		url = `${url}${separator}${urlParams.toString()}`;
+	}
 
-    if (body && element.method !== "GET") {
-        config.body = JSON.stringify(body);
-    }
+	let config: Record<string, unknown> = {};
 
-    config.headers = {
-        "Content-Type": "application/json",
-        ...api.headers,
-        ...element.headers
-    };
+	if (body && element.method !== "GET") {
+		config.body = JSON.stringify(body);
+	}
 
-    config.method = element.method;
+	config.headers = {
+		"Content-Type": "application/json",
+		...api.headers,
+		...element.headers
+	};
 
-    const {
-        beforeRoute,
-        beforeApi,
-        beforeUrl,
-        beforeConfig
-    } = applyBefore({route: element, api, url, config});
+	config.method = element.method;
 
-    url = beforeUrl;
-    config = beforeConfig;
+	const {
+		beforeRoute,
+		beforeApi,
+		beforeUrl,
+		beforeConfig
+	} = applyBefore({route: element, api, url, config});
 
-    Registry.updateElement(beforeApi);
-    Registry.updateElement(beforeRoute);
+	url = beforeUrl;
+	config = beforeConfig;
 
-    let response = await fetchWithRetry(api, element, url, config);
+	Registry.updateElement(beforeApi);
+	Registry.updateElement(beforeRoute);
 
-    if (element.schema && "validate" in element.schema) {
-        response = await element.schema.validate(response);
-    }
+	let response = await fetchWithRetry(api, element, url, config);
 
-    const {
-        afterRoute,
-        afterApi,
-        afterData
-    } = applyAfter({route: element, api, response, data: response});
+	if (element.schema && "validate" in element.schema) {
+		response = await element.schema.validate(response);
+	}
 
-    Registry.updateElement(afterApi);
-    Registry.updateElement(afterRoute);
+	const {
+		afterRoute,
+		afterApi,
+		afterData
+	} = applyAfter({route: element, api, response, data: response});
 
-    Hook.run(`${api.name}.${element.name}`);
+	Registry.updateElement(afterApi);
+	Registry.updateElement(afterRoute);
 
-    return afterData as T;
+	Hook.run(`${api.name}.${element.name}`);
+
+	return afterData as T;
 }
 
 /**
@@ -144,17 +177,17 @@ export async function callApi<T>(
  * @returns Promise resolving to the parsed response
  */
 async function fetchData(
-    withCache: boolean,
-    url: string,
-    config: any,
-    api: any
+	withCache: boolean,
+	url: string,
+	config: any,
+	api: any
 ): Promise<any> {
-    if (withCache) {
-        return await fetchWithCache(url, config, api.cache);
-    } else {
-        const rawResponse = await fetch(url, config);
-        return await rawResponse.json();
-    }
+	if (withCache) {
+		return await fetchWithCache(url, config, api.cache);
+	} else {
+		const rawResponse = await fetch(url, config);
+		return await rawResponse.json();
+	}
 }
 
 /**
@@ -168,36 +201,36 @@ async function fetchData(
  * @throws Error after all retry attempts fail
  */
 async function fetchWithRetry(
-    api: IElement,
-    route: IElement,
-    url: string,
-    config: any
+	api: IElement,
+	route: IElement,
+	url: string,
+	config: any
 ): Promise<any> {
-    const withCache = api.cache || route.cache;
-    const maxRetries = (route.retry || api.retry) || 0;
-    let response;
-    let success = false;
-    let attempt = 0;
+	const withCache = api.cache || route.cache;
+	const maxRetries = (route.retry || api.retry) || 0;
+	let response;
+	let success = false;
+	let attempt = 0;
 
-    while (attempt <= maxRetries && !success) {
-        try {
-            if (route.callbacks?.call) {
-                route.callbacks.call({});
-            } else if (api.callbacks?.call) {
-                api.callbacks.call({});
-            }
-            response = await fetchData(!!withCache, url, config, api);
-            success = true;
-        } catch (error: any) {
-            attempt++;
-            if (attempt > maxRetries) {
-                error.message = `Failed to fetch ${url} after ${maxRetries} attempts`;
-                throw error;
-            }
-        }
-    }
+	while (attempt <= maxRetries && !success) {
+		try {
+			if (route.callbacks?.call) {
+				route.callbacks.call({});
+			} else if (api.callbacks?.call) {
+				api.callbacks.call({});
+			}
+			response = await fetchData(!!withCache, url, config, api);
+			success = true;
+		} catch (error: any) {
+			attempt++;
+			if (attempt > maxRetries) {
+				error.message = `Failed to fetch ${url} after ${maxRetries} attempts`;
+				throw error;
+			}
+		}
+	}
 
-    return response;
+	return response;
 }
 
 /**
@@ -210,15 +243,15 @@ async function fetchWithRetry(
  * @throws Error if a required parameter is missing
  */
 function applyArgs(url: string, route: IElement, args: IArgs): string {
-    let newUrl = url;
-    route.arguments.forEach(arg => {
-        const value = args[arg];
-        if (value === undefined) {
-            throw new Error(`Argument ${arg} is missing`);
-        }
-        newUrl = newUrl.replace(`[${arg}]`, <string>args[arg]);
-    });
-    return newUrl;
+	let newUrl = url;
+	route.arguments.forEach(arg => {
+		const value = args[arg];
+		if (value === undefined) {
+			throw new Error(`Argument ${arg} is missing`);
+		}
+		newUrl = newUrl.replace(`[${arg}]`, <string>args[arg]);
+	});
+	return newUrl;
 }
 
 /**
@@ -228,23 +261,23 @@ function applyArgs(url: string, route: IElement, args: IArgs): string {
  * @returns Modified request parameters
  */
 function applyBefore({route, api, url, config}: {
-    route: IElement;
-    api: IElement;
-    url: string;
-    config: Record<string, unknown>;
+	route: IElement;
+	api: IElement;
+	url: string;
+	config: Record<string, unknown>;
 }): {
-    beforeRoute: IElement;
-    beforeApi: IElement;
-    beforeUrl: string;
-    beforeConfig: Record<string, unknown>;
+	beforeRoute: IElement;
+	beforeApi: IElement;
+	beforeUrl: string;
+	beforeConfig: Record<string, unknown>;
 } {
-    const beforeRes = route.callbacks.before?.({route, api, url, config});
-    return {
-        beforeRoute: beforeRes?.route || route,
-        beforeApi: beforeRes?.api || api,
-        beforeUrl: beforeRes?.url || url,
-        beforeConfig: beforeRes?.config || config
-    };
+	const beforeRes = route.callbacks.before?.({route, api, url, config});
+	return {
+		beforeRoute: beforeRes?.route || route,
+		beforeApi: beforeRes?.api || api,
+		beforeUrl: beforeRes?.url || url,
+		beforeConfig: beforeRes?.config || config
+	};
 }
 
 /**
@@ -254,21 +287,21 @@ function applyBefore({route, api, url, config}: {
  * @returns Modified response parameters
  */
 function applyAfter({route, api, response, data}: {
-    route: IElement;
-    api: IElement;
-    response: Response;
-    data: any;
+	route: IElement;
+	api: IElement;
+	response: Response;
+	data: any;
 }): {
-    afterRoute: IElement;
-    afterApi: IElement;
-    afterResponse: Response;
-    afterData: any;
+	afterRoute: IElement;
+	afterApi: IElement;
+	afterResponse: Response;
+	afterData: any;
 } {
-    const afterRes = route.callbacks.after?.({route, api, response, data});
-    return {
-        afterRoute: afterRes?.route || route,
-        afterApi: afterRes?.api || api,
-        afterResponse: afterRes?.response || response,
-        afterData: afterRes?.data || data
-    };
+	const afterRes = route.callbacks.after?.({route, api, response, data});
+	return {
+		afterRoute: afterRes?.route || route,
+		afterApi: afterRes?.api || api,
+		afterResponse: afterRes?.response || response,
+		afterData: afterRes?.data || data
+	};
 }

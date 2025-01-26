@@ -1,5 +1,5 @@
 import {IElement} from "./Element";
-import {callApi, IArgs, IBody, Klaim, RouteFunction} from "./Klaim";
+import {callApi, createRouteHandler, IArgs, IBody, Klaim, RouteFunction} from "./Klaim";
 
 /**
  * Singleton class that manages the registration and organization of API elements.
@@ -146,9 +146,8 @@ export class Registry {
             target = target[part] as Record<string, any>;
         }
 
-        target[route.name] = function <T>(args: IArgs = {}, body: IBody = {}): Promise<T> {
-            return callApi(route.parent!, route, args, body);
-        } as RouteFunction;
+        // @ts-ignore
+        target[route.name] = createRouteHandler(route.parent, route) as RouteFunction;
     }
 
     /**
