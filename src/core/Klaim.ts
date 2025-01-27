@@ -41,10 +41,7 @@ export type IApiReference = Record<string, IRouteReference>;
  * await Klaim.apiName.routeName();
  *
  * // With pagination
- * await Klaim.apiName.routeName(2, 10); // Page 2, 10 items per page
- *
- * // With pagination and additional parameters
- * await Klaim.apiName.routeName(2, 10, { filter: 'active' });
+ * await Klaim.apiName.routeName(2); // Page 2
  * ```
  */
 export const Klaim: IApiReference = {};
