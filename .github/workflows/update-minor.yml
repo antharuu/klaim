@@ -1,0 +1,55 @@
+name: Manual Minor Update & Release
+
+on:
+    workflow_dispatch:
+
+jobs:
+    update-and-release-minor:
+        runs-on: ubuntu-latest
+        permissions:
+            id-token: write
+            contents: write
+            packages: write
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+                    token: ${{ secrets.GITHUB_TOKEN }}
+
+            -   name: Setup Node.js
+                uses: actions/setup-node@v4
+                with:
+                    node-version: '20'
+                    registry-url: 'https://registry.npmjs.org'
+
+            -   name: Configure NPM Authentication
+                run: |
+                    echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+                    npm whoami
+                env:
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            -   name: Configure Git
+                run: |
+                    git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                    git config --global user.name "GitHub Actions Bot"
+
+            -   name: Install dependencies
+                run: npm install
+
+            -   name: Update ALL dependencies
+                run: |
+                    npx npm-check-updates -u
+                    npm install
+
+            -   name: Test and build
+                run: |
+                    npm run test
+                    npm run build
+
+            -   name: Release Minor
+                run: npm run release:minor
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
