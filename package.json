@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.8.26",
+    "version": "1.8.27",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -9,15 +9,15 @@
     "main": "dist/klaim.cjs.js",
     "module": "dist/klaim.es.js",
     "devDependencies": {
-        "@eslint/js": "9.20.0",
+        "@eslint/js": "9.21.0",
         "@stylistic/eslint-plugin": "4.0.1",
         "@types/bun": "latest",
-        "@types/eslint__js": "8.42.3",
-        "@types/node": "^22.13.4",
+        "@types/eslint__js": "9.14.0",
+        "@types/node": "^22.13.5",
         "@vitest/coverage-v8": "^3.0.6",
         "@vitest/ui": "^3.0.6",
         "dotenv-cli": "^8.0.0",
-        "eslint": "9.20.1",
+        "eslint": "9.21.0",
         "eslint-plugin-jsdoc": "50.6.3",
         "eslint-plugin-simple-import-sort": "12.1.1",
         "jsdom": "^26.0.0",
