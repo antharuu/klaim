@@ -22,7 +22,7 @@
         "eslint-plugin-simple-import-sort": "12.1.1",
         "jsdom": "^26.0.0",
         "release-it": "^18.1.2",
-        "typescript": "5.8",
+        "typescript": "5.7",
         "typescript-eslint": "8.24",
         "vite": "^6.2.0",
         "vitest": "^3.0.7",
