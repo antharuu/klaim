@@ -1,6 +1,6 @@
 {
     "name": "@antharuu/klaim",
-    "version": "1.8.58",
+    "version": "1.8.59",
     "description": "Klaim is a lightweight TypeScript library designed to manage APIs and record requests, optimized for an optimal user experience.",
     "repository": {
         "type": "git",
