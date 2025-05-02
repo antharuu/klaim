@@ -6,19 +6,20 @@
 - [Next features](#-next-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
-    - [Basic API Configuration](#basic-api-configuration)
-    - [Route Definition](#route-definition)
-    - [Request Handling](#request-handling)
-    - [Groups](#groups)
-        - [API Groups](#api-groups)
-        - [Route Groups](#route-groups)
-        - [Nested Groups](#nested-groups)
-        - [Group Configuration](#group-configuration)
-    - [Middleware Usage](#middleware-usage)
-    - [Hook Subscription](#hook-subscription)
-    - [Caching Requests](#caching-requests)
-    - [Retry Mechanism](#retry-mechanism)
-    - [Response Validation](#response-validation)
+  - [Basic API Configuration](#basic-api-configuration)
+  - [Route Definition](#route-definition)
+  - [Request Handling](#request-handling)
+  - [Groups](#groups)
+    - [API Groups](#api-groups)
+    - [Route Groups](#route-groups)
+    - [Nested Groups](#nested-groups)
+    - [Group Configuration](#group-configuration)
+  - [Middleware Usage](#middleware-usage)
+  - [Hook Subscription](#hook-subscription)
+  - [Caching Requests](#caching-requests)
+  - [Retry Mechanism](#retry-mechanism)
+  - [Rate Limiting](#rate-limiting)
+  - [Response Validation](#response-validation)
 - [Links](#-links)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -35,13 +36,13 @@
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
+- **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 - **Pagination**: Handle paginated requests easily with support for both page and offset based pagination.
 
 ## ⌛ Next features
 
-- Rate Limiting (Version: 1.9)
 - Login (Version: 1.10)
 - Time Out (Version: 1.11)
 - Error Handling (Version: 1.12)
@@ -73,18 +74,18 @@ import {Api, Route} from 'klaim';
 
 // Your simple Todo type
 type Todo = {
-	userId: number;
-	id: number;
-	title: string;
-	completed: boolean;
+    userId: number;
+    id: number;
+    title: string;
+    completed: boolean;
 };
 
 // Create a new API with the name "hello" and the base URL "https://jsonplaceholder.typicode.com/"
 Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Define routes for the API
-	Route.get<Todo[]>("listTodos", "todos");
-	Route.get<Todo>("getTodo", "todos/[id]");
-	Route.post<Todo>("addTodo", "todos");
+    // Define routes for the API
+    Route.get<Todo[]>("listTodos", "todos");
+    Route.get<Todo>("getTodo", "todos/[id]");
+    Route.post<Todo>("addTodo", "todos");
 });
 ```
 
@@ -95,28 +96,28 @@ custom configurations:
 
 ```typescript
 Api.create("api", "https://api.example.com", () => {
-	// Basic GET route
-	Route.get("listUsers", "/users");
+    // Basic GET route
+    Route.get("listUsers", "/users");
 
-	// GET route with URL parameter
-	Route.get("getUser", "/users/[id]");
+    // GET route with URL parameter
+    Route.get("getUser", "/users/[id]");
 
-	// POST route with custom headers and body
-	Route.post("createUser", "/users", {
-		"Content-Type": "application/json"
-	}, {userId: 1, name: "John Doe"});
+    // POST route with custom headers and body
+    Route.post("createUser", "/users", {
+        "Content-Type": "application/json"
+    }, {userId: 1, name: "John Doe"});
 
-	// PUT route with parameter
-	Route.put("updateUser", "/users/[id]");
+    // PUT route with parameter
+    Route.put("updateUser", "/users/[id]");
 
-	// DELETE route
-	Route.delete("deleteUser", "/users/[id]");
+    // DELETE route
+    Route.delete("deleteUser", "/users/[id]");
 
-	// PATCH route
-	Route.patch("updateUserStatus", "/users/[id]/status");
+    // PATCH route
+    Route.patch("updateUserStatus", "/users/[id]/status");
 
-	// OPTIONS route
-	Route.options("userOptions", "/users");
+    // OPTIONS route
+    Route.options("userOptions", "/users");
 });
 ```
 
@@ -134,17 +135,17 @@ import {Group, Api, Route} from 'klaim';
 
 // Create a group for user-related services
 Group.create("userServices", () => {
-	// Authentication API
-	Api.create("auth", "https://auth.example.com", () => {
-		Route.post("login", "/login");
-		Route.post("register", "/register");
-	});
+    // Authentication API
+    Api.create("auth", "https://auth.example.com", () => {
+        Route.post("login", "/login");
+        Route.post("register", "/register");
+    });
 
-	// User Management API
-	Api.create("users", "https://users.example.com", () => {
-		Route.get("list", "/users");
-		Route.get("getOne", "/users/[id]");
-	});
+    // User Management API
+    Api.create("users", "https://users.example.com", () => {
+        Route.get("list", "/users");
+        Route.get("getOne", "/users/[id]");
+    });
 }).withRetry(3); // Apply retry mechanism to all APIs in the group
 
 // Access grouped APIs
@@ -158,18 +159,18 @@ Organize routes within an API into logical groups:
 
 ```typescript
 Api.create("hello", "https://api.example.com/", () => {
-	// Group user-related routes
-	Group.create("users", () => {
-		Route.get<User[]>("list", "/users");
-		Route.get<User>("getOne", "/users/[id]");
-		Route.post<User>("create", "/users");
-	}).withCache(60);  // Cache all user routes for 60 seconds
+    // Group user-related routes
+    Group.create("users", () => {
+        Route.get<User[]>("list", "/users");
+        Route.get<User>("getOne", "/users/[id]");
+        Route.post<User>("create", "/users");
+    }).withCache(60);  // Cache all user routes for 60 seconds
 
-	// Group product-related routes
-	Group.create("products", () => {
-		Route.get("list", "/products");
-		Route.get("getOne", "/products/[id]");
-	});
+    // Group product-related routes
+    Group.create("products", () => {
+        Route.get("list", "/products");
+        Route.get("getOne", "/products/[id]");
+    });
 });
 
 // Use grouped routes
@@ -183,27 +184,27 @@ Create complex hierarchies with nested groups:
 
 ```typescript
 Group.create("services", () => {
-	// Internal services group
-	Group.create("internal", () => {
-		Api.create("logs", "https://logs.internal.example.com", () => {
-			Route.post("write", "/logs");
-		});
+    // Internal services group
+    Group.create("internal", () => {
+        Api.create("logs", "https://logs.internal.example.com", () => {
+            Route.post("write", "/logs");
+        });
 
-		Api.create("metrics", "https://metrics.internal.example.com", () => {
-			Route.post("track", "/metrics");
-		});
-	}).withRetry(5);  // More retries for internal services
+        Api.create("metrics", "https://metrics.internal.example.com", () => {
+            Route.post("track", "/metrics");
+        });
+    }).withRetry(5);  // More retries for internal services
 
-	// External services group
-	Group.create("external", () => {
-		Api.create("weather", "https://api.weather.com", () => {
-			Route.get("forecast", "/forecast/[city]");
-		});
+    // External services group
+    Group.create("external", () => {
+        Api.create("weather", "https://api.weather.com", () => {
+            Route.get("forecast", "/forecast/[city]");
+        });
 
-		Api.create("geocoding", "https://api.geocoding.com", () => {
-			Route.get("search", "/search/[query]");
-		});
-	}).withCache(300);  // Cache external services longer
+        Api.create("geocoding", "https://api.geocoding.com", () => {
+            Route.get("search", "/search/[query]");
+        });
+    }).withCache(300);  // Cache external services longer
 });
 
 // Access nested groups
@@ -217,22 +218,22 @@ Groups can share configuration among all their members:
 
 ```typescript
 Group.create("apis", () => {
-	Api.create("service1", "https://api1.example.com", () => {
-		Route.get("test", "/test");
-	});
+    Api.create("service1", "https://api1.example.com", () => {
+        Route.get("test", "/test");
+    });
 
-	Api.create("service2", "https://api2.example.com", () => {
-		Route.get("test", "/test");
-	});
+    Api.create("service2", "https://api2.example.com", () => {
+        Route.get("test", "/test");
+    });
 })
-	.withCache(60)  // Enable caching for all APIs
-	.withRetry(3)   // Enable retries for all APIs
-	.before(({config}) => {  // Add authentication for all APIs
-		config.headers.Authorization = `Bearer ${getToken()}`;
-	})
-	.after(({data}) => {  // Process all responses
-		logResponse(data);
-	});
+    .withCache(60)  // Enable caching for all APIs
+    .withRetry(3)   // Enable retries for all APIs
+    .before(({config}) => {  // Add authentication for all APIs
+        config.headers.Authorization = `Bearer ${getToken()}`;
+    })
+    .after(({data}) => {  // Process all responses
+        logResponse(data);
+    });
 ```
 
 ### Request Handling
@@ -260,16 +261,16 @@ and `after` middleware to process responses:
 
 ```typescript
 Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// With before middleware
-	Route.get<Todo>("getRandomTodo", "todos")
-		.before(({url}) => {
-			const random = Math.floor(Math.random() * 10) + 1;
-			return {url: `${url}/${random}`};
-		});
+    // With before middleware
+    Route.get<Todo>("getRandomTodo", "todos")
+        .before(({url}) => {
+            const random = Math.floor(Math.random() * 10) + 1;
+            return {url: `${url}/${random}`};
+        });
 
-	// With after middleware
-	Route.get<Todo>("getFirstTodo", "todos")
-		.after(({data: [first]}) => ({data: first}));
+    // With after middleware
+    Route.get<Todo>("getFirstTodo", "todos")
+        .after(({data: [first]}) => ({data: first}));
 });
 ```
 
@@ -283,7 +284,7 @@ import {Hook} from 'klaim';
 
 // Subscribe to the "hello.getFirstTodo" hook
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
-	console.log(`Requesting ${url}`);
+    console.log(`Requesting ${url}`);
 });
 ```
 
@@ -298,14 +299,14 @@ You can enable caching on individual routes:
 
 ```typescript
 Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Get a list of todos with default cache duration (20 seconds)
-	Route.get<Todo[]>("listTodos", "todos").withCache();
+    // Get a list of todos with default cache duration (20 seconds)
+    Route.get<Todo[]>("listTodos", "todos").withCache();
 
-	// Get a specific todo by id with custom cache duration (300 seconds)
-	Route.get<Todo>("getTodo", "todos/[id]").withCache(300);
+    // Get a specific todo by id with custom cache duration (300 seconds)
+    Route.get<Todo>("getTodo", "todos/[id]").withCache(300);
 
-	// Add a new todo (no cache)
-	Route.post<Todo>("addTodo", "todos");
+    // Add a new todo (no cache)
+    Route.post<Todo>("addTodo", "todos");
 });
 ```
 
@@ -317,49 +318,58 @@ You can also enable caching for all routes defined within an API:
 
 ```typescript
 Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Define routes for the API
-	Route.get<Todo[]>("listTodos", "todos");
-	Route.get<Todo>("getTodo", "todos/[id]");
-	Route.post<Todo>("addTodo", "todos");
+    // Define routes for the API
+    Route.get<Todo[]>("listTodos", "todos");
+    Route.get<Todo>("getTodo", "todos/[id]");
+    Route.post<Todo>("addTodo", "todos");
 }).withCache(); // Enable default cache duration (20 seconds) for all routes
 ```
 
 ### Retry Mechanism
 
-Automatically retry failed requests to enhance reliability. You can specify the number of retry attempts for individual
-routes or for the entire API.
-
-#### Retry on Individual Routes
-
-Enable retry on individual routes:
+Configure automatic retries for failed requests:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Get a list of todos with retry mechanism (default: 2)
-	Route.get<Todo[]>("listTodos", "todos").withRetry();
+// Apply retry at the API level
+Api.create("api", "https://api.example.com", () => {
+    Route.get("users", "/users");
+}).withRetry(3);  // Will retry failed requests up to 3 times
 
-	// Get a specific todo by id with retry mechanism (specified to 5)
-	Route.get<Todo>("getTodo", "todos/[id]").withRetry(5);
-
-	// Add a new todo (no retry)
-	Route.post<Todo>("addTodo", "todos");
+// Apply retry at the route level
+Api.create("api", "https://api.example.com", () => {
+    Route.get("unstableRoute", "/unstable-endpoint").withRetry(5);  // Will retry up to 5 times
 });
 ```
 
-#### Retry the Entire API
+### Rate Limiting
 
-Enable retry for all routes defined within an API:
+Control the frequency of API calls to prevent abuse and respect API provider rate limits:
 
 ```typescript
-Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Define routes for the API
-	Route.get<Todo[]>("listTodos", "todos");
-	Route.get<Todo>("getTodo", "todos/[id]");
-	Route.post<Todo>("addTodo", "todos");
-}).withRetry();
-```
+// Apply rate limiting at the API level
+Api.create("api", "https://api.example.com", () => {
+    Route.get("users", "/users");
+    Route.get("posts", "/posts");
+}).withRate({ limit: 5, duration: 10 });  // Max 5 requests every 10 seconds for this API
 
-Now, when a request fails, it will be retried the specified number of times before ultimately failing.
+// Apply rate limiting at the route level
+Api.create("api", "https://api.example.com", () => {
+    // This route has its own stricter limits
+    Route.get("expensive", "/expensive-operation").withRate({ limit: 2, duration: 60 });  // Max 2 requests per minute
+    
+    // This route uses the default limits (5 per 10 seconds if not specified)
+    Route.get("normal", "/normal-operation").withRate();
+});
+
+// Handling rate limit errors
+try {
+    await Klaim.api.expensive();
+} catch (error) {
+    if (error.message.includes('Rate limit exceeded')) {
+        console.log('Please wait before trying again');
+    }
+}
+```
 
 ### Response Validation
 
@@ -378,15 +388,15 @@ import * as yup from 'yup';
 
 // Define the schema using Yup
 const todoSchema = yup.object().shape({
-	userId: yup.number().required(),
-	id: yup.number().min(1).max(10).required(),
-	title: yup.string().required(),
-	completed: yup.boolean().required()
+    userId: yup.number().required(),
+    id: yup.number().min(1).max(10).required(),
+    title: yup.string().required(),
+    completed: yup.boolean().required()
 });
 
 Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
-	// Get a specific todo by id with validation
-	Route.get<Todo>("getTodo", "todos/[id]").validate(todoSchema);
+    // Get a specific todo by id with validation
+    Route.get<Todo>("getTodo", "todos/[id]").validate(todoSchema);
 });
 
 // This request will fail because the id is out of range
@@ -403,12 +413,12 @@ Configure pagination for routes that require it:
 ```typescript
 // Basic usage with custom limit and offset parameter
 Api.create("api", "https://api.example.com", () => {
-	Route.get("list", "/items").withPagination({
-		limit: 20,          // Items per page
-		page: 1,            // Default page number
-		pageParam: "offset", // Parameter name for page/offset or any other custom parameter
-		limitParam: "limit"  // Parameter name for limit
-	}); // All options are optional
+    Route.get("list", "/items").withPagination({
+        limit: 20,          // Items per page
+        page: 1,            // Default page number
+        pageParam: "offset", // Parameter name for page/offset or any other custom parameter
+        limitParam: "limit"  // Parameter name for limit
+    }); // All options are optional
 });
 
 // Using paginated endpoints

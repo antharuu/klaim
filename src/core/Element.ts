@@ -1,5 +1,6 @@
 import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
+import { IRateLimitConfig, DEFAULT_RATE_LIMIT_CONFIG } from "../tools/rateLimit";
 
 /**
  * Type definition for HTTP headers
@@ -96,6 +97,8 @@ export interface IElement {
 	cache: false | number;
 	/** Number of retry attempts, or false if retries are disabled */
 	retry: false | number;
+	/** Rate limiting configuration, or false if rate limiting is disabled */
+	rate: false | IRateLimitConfig;
 	/** Reference to parent element name */
 	parent?: string;
 	/** HTTP method for routes */
@@ -124,6 +127,9 @@ export interface IElement {
 
 	/** Configures pagination settings */
 	withPagination(config?: IPaginationConfig): this;
+
+	/** Enables rate limiting */
+	withRate(config?: Partial<IRateLimitConfig>): this;
 }
 
 /**
@@ -162,6 +168,7 @@ export abstract class Element implements IElement {
 
 	public cache: false | number = false;
 	public retry: false | number = false;
+	public rate: false | IRateLimitConfig = false;
 
 	/**
 	 * Creates a new element with the specified properties
@@ -257,4 +264,21 @@ export abstract class Element implements IElement {
 		};
 		return this;
 	}
+
+	/**
+	 * Enables rate limiting for this element
+	 * @param {Partial<IRateLimitConfig>} [config] - Rate limiting configuration options
+	 * @returns {this} The element instance for chaining
+	 * @example
+	 * ```typescript
+	 * Route.get("getUser", "/users/[id]").withRate({ limit: 5, duration: 10 });
+	 * ```
+	 */
+	public withRate = (config: Partial<IRateLimitConfig> = {}): this => {
+		this.rate = {
+			...DEFAULT_RATE_LIMIT_CONFIG,
+			...config
+		};
+		return this;
+	};
 }

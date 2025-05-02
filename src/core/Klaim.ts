@@ -1,4 +1,5 @@
 import fetchWithCache from "../tools/fetchWithCache";
+import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import {IElement} from "./Element";
 import {Hook} from "./Hook";
 import {Registry} from "./Registry";
@@ -188,14 +189,14 @@ async function fetchData(
 }
 
 /**
- * Performs a fetch request with retry capability
+ * Performs a fetch request with retry capability and rate limiting
  *
  * @param api - API element containing retry settings
  * @param route - Route element containing retry settings
  * @param url - The URL to fetch from
  * @param config - Fetch configuration options
  * @returns Promise resolving to the parsed response
- * @throws Error after all retry attempts fail
+ * @throws Error after all retry attempts fail or if rate limited
  */
 async function fetchWithRetry(
 	api: IElement,
@@ -205,6 +206,31 @@ async function fetchWithRetry(
 ): Promise<any> {
 	const withCache = api.cache || route.cache;
 	const maxRetries = (route.retry || api.retry) || 0;
+	
+	// Check rate limiting
+	// Si la route a sa propre configuration de limite, on l'utilise avec une clé spécifique à la route
+	if (route.rate) {
+		const routeKey = `${api.name}.${route.name}`;
+		const allowed = checkRateLimit(routeKey, route.rate);
+		
+		if (!allowed) {
+			const waitTime = getTimeUntilNextRequest(routeKey, route.rate);
+			const waitSeconds = Math.ceil(waitTime / 1000);
+			throw new Error(`Rate limit exceeded for ${routeKey}. Try again in ${waitSeconds} seconds.`);
+		}
+	} 
+	// Si l'API a une configuration de limite et que la route n'en a pas, utiliser une clé au niveau de l'API
+	else if (api.rate) {
+		const apiKey = `${api.name}`;
+		const allowed = checkRateLimit(apiKey, api.rate);
+		
+		if (!allowed) {
+			const waitTime = getTimeUntilNextRequest(apiKey, api.rate);
+			const waitSeconds = Math.ceil(waitTime / 1000);
+			throw new Error(`Rate limit exceeded for ${api.name} API. Try again in ${waitSeconds} seconds.`);
+		}
+	}
+	
 	let response;
 	let success = false;
 	let attempt = 0;
