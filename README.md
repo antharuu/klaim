@@ -37,15 +37,14 @@
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
+- **Timeout**: Abort requests that exceed a specified duration with an optional custom error message.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 - **Pagination**: Handle paginated requests easily with support for both page and offset based pagination.
 
 ## ⌛ Next features
 
-- Login (Version: 1.10)
-- Time Out (Version: 1.11)
-- Error Handling (Version: 1.12)
+- Error Handling (Version: 1.11)
 
 ## 📥 Installation
 
@@ -368,6 +367,22 @@ try {
     if (error.message.includes('Rate limit exceeded')) {
         console.log('Please wait before trying again');
     }
+}
+```
+
+### Request Timeout
+
+Abort requests that take too long to respond. You can specify the timeout duration in seconds and optionally provide a custom message.
+
+```typescript
+Api.create("api", "https://api.example.com", () => {
+    Route.get("slow", "/slow").withTimeout(5, "Too slow");
+}).withTimeout(10);
+
+try {
+    await Klaim.api.slow();
+} catch (error) {
+    console.error(error);
 }
 ```
 
