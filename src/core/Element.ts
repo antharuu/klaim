@@ -1,6 +1,7 @@
 import cleanUrl from "../tools/cleanUrl";
 import toCamelCase from "../tools/toCamelCase";
 import { IRateLimitConfig, DEFAULT_RATE_LIMIT_CONFIG } from "../tools/rateLimit";
+import { ITimeoutConfig, DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 
 /**
  * Type definition for HTTP headers
@@ -97,8 +98,10 @@ export interface IElement {
 	cache: false | number;
 	/** Number of retry attempts, or false if retries are disabled */
 	retry: false | number;
-	/** Rate limiting configuration, or false if rate limiting is disabled */
-	rate: false | IRateLimitConfig;
+        /** Rate limiting configuration, or false if rate limiting is disabled */
+        rate: false | IRateLimitConfig;
+        /** Request timeout configuration, or false if disabled */
+        timeout: false | ITimeoutConfig;
 	/** Reference to parent element name */
 	parent?: string;
 	/** HTTP method for routes */
@@ -128,8 +131,11 @@ export interface IElement {
 	/** Configures pagination settings */
 	withPagination(config?: IPaginationConfig): this;
 
-	/** Enables rate limiting */
-	withRate(config?: Partial<IRateLimitConfig>): this;
+        /** Enables rate limiting */
+        withRate(config?: Partial<IRateLimitConfig>): this;
+
+        /** Enables request timeout */
+        withTimeout(duration?: number, message?: string): this;
 }
 
 /**
@@ -166,9 +172,10 @@ export abstract class Element implements IElement {
 		call: null
 	};
 
-	public cache: false | number = false;
-	public retry: false | number = false;
-	public rate: false | IRateLimitConfig = false;
+        public cache: false | number = false;
+        public retry: false | number = false;
+        public rate: false | IRateLimitConfig = false;
+        public timeout: false | ITimeoutConfig = false;
 
 	/**
 	 * Creates a new element with the specified properties
@@ -274,11 +281,25 @@ export abstract class Element implements IElement {
 	 * Route.get("getUser", "/users/[id]").withRate({ limit: 5, duration: 10 });
 	 * ```
 	 */
-	public withRate = (config: Partial<IRateLimitConfig> = {}): this => {
-		this.rate = {
-			...DEFAULT_RATE_LIMIT_CONFIG,
-			...config
-		};
-		return this;
-	};
+        public withRate = (config: Partial<IRateLimitConfig> = {}): this => {
+                this.rate = {
+                        ...DEFAULT_RATE_LIMIT_CONFIG,
+                        ...config
+                };
+                return this;
+        };
+
+        /**
+         * Enables request timeout for this element
+         * @param {number} [duration] - Timeout duration in seconds
+         * @param {string} [message] - Custom error message
+         * @returns {this} The element instance for chaining
+         */
+        public withTimeout = (
+                duration: number = DEFAULT_TIMEOUT_CONFIG.duration,
+                message: string = DEFAULT_TIMEOUT_CONFIG.message
+        ): this => {
+                this.timeout = { duration, message };
+                return this;
+        };
 }
