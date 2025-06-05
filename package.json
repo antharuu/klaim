@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.9.33",
+    "version": "1.9.34",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -10,7 +10,7 @@
     "module": "dist/klaim.es.js",
     "devDependencies": {
         "@eslint/js": "9.28.0",
-        "@stylistic/eslint-plugin": "4.4.0",
+        "@stylistic/eslint-plugin": "4.4.1",
         "@types/bun": "^1.2.15",
         "@types/eslint__js": "9.14.0",
         "@types/node": "^22.15.29",
