@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.9.38",
+    "version": "1.9.39",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -14,8 +14,8 @@
         "@types/bun": "^1.2.15",
         "@types/eslint__js": "9.14.0",
         "@types/node": "^22.15.30",
-        "@vitest/coverage-v8": "^3.2.2",
-        "@vitest/ui": "^3.2.2",
+        "@vitest/coverage-v8": "^3.2.3",
+        "@vitest/ui": "^3.2.3",
         "dotenv-cli": "^8.0.0",
         "eslint": "9.28.0",
         "eslint-plugin-jsdoc": "50.7.1",
@@ -23,9 +23,9 @@
         "jsdom": "^26.1.0",
         "release-it": "^19.0.3",
         "typescript": "5.8",
-        "typescript-eslint": "8.33",
+        "typescript-eslint": "8.34",
         "vite": "^6.3.5",
-        "vitest": "^3.2.2",
+        "vitest": "^3.2.3",
         "yup": "^1.6.1"
     },
     "bugs": {
