@@ -1,6 +1,7 @@
 import toCamelCase from "../tools/toCamelCase";
 
 import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IHeaders } from "./Element";
+import { DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 import { Registry } from "./Registry";
 
 /**
@@ -158,6 +159,21 @@ export class Group extends Element {
             .forEach(child => {
                 if (!child.retry) {
                     child.retry = maxRetries;
+                }
+            });
+        return this;
+    }
+
+    /**
+     * Enables request timeout for the group and its children.
+     * Children can override with their own timeout configuration.
+     */
+    public withTimeout(duration = DEFAULT_TIMEOUT_CONFIG.duration, message = DEFAULT_TIMEOUT_CONFIG.message): this {
+        super.withTimeout(duration, message);
+        Registry.i.getChildren(Registry.i.getFullPath(this))
+            .forEach(child => {
+                if (!child.timeout) {
+                    child.timeout = { duration, message };
                 }
             });
         return this;

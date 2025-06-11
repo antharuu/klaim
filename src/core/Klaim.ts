@@ -1,5 +1,6 @@
 import fetchWithCache from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
+import { withTimeout } from "../tools/timeout";
 import {IElement} from "./Element";
 import {Hook} from "./Hook";
 import {Registry} from "./Registry";
@@ -204,8 +205,9 @@ async function fetchWithRetry(
 	url: string,
 	config: any
 ): Promise<any> {
-	const withCache = api.cache || route.cache;
-	const maxRetries = (route.retry || api.retry) || 0;
+        const withCache = api.cache || route.cache;
+        const maxRetries = (route.retry || api.retry) || 0;
+        const timeoutCfg = route.timeout || api.timeout;
 	
 	// Check rate limiting
 	// Si la route a sa propre configuration de limite, on l'utilise avec une clé spécifique à la route
@@ -242,15 +244,18 @@ async function fetchWithRetry(
 			} else if (api.callbacks?.call) {
 				api.callbacks.call({});
 			}
-			response = await fetchData(!!withCache, url, config, api);
+                        const fetchPromise = fetchData(!!withCache, url, config, api);
+                        response = timeoutCfg ? await withTimeout(fetchPromise, timeoutCfg) : await fetchPromise;
 			success = true;
-		} catch (error: any) {
-			attempt++;
-			if (attempt > maxRetries) {
-				error.message = `Failed to fetch ${url} after ${maxRetries} attempts`;
-				throw error;
-			}
-		}
+                } catch (error: any) {
+                        attempt++;
+                        if (attempt > maxRetries) {
+                                if (!error.message) {
+                                        error.message = `Failed to fetch ${url} after ${maxRetries} attempts`;
+                                }
+                                throw error;
+                        }
+                }
 	}
 
 	return response;
