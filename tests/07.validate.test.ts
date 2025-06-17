@@ -1,4 +1,4 @@
-import {describe, it, expect} from "vitest";
+import {describe, expect, it} from "vitest";
 import {Api, Klaim, Route} from "../src";
 import * as yup from "yup";
 

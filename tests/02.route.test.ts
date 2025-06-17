@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { Api, Klaim, Registry, Route } from "../src";
+import {describe, expect, it} from "vitest";
+import {Api, Klaim, Registry, Route} from "../src";
 
 const apiName = "testApi";
 const apiUrl = "https://jsonplaceholder.typicode.com";
@@ -161,7 +161,8 @@ describe("Route", async () => {
         it("should set the before middleware correctly", () => {
             const name = "testRoute";
             const routePath = "/posts";
-            const before = () => {};
+            const before = () => {
+            };
 
             Api.create(apiName, apiUrl, () => {
                 Route.get(name, routePath, {}).before(before);
@@ -173,7 +174,8 @@ describe("Route", async () => {
         it("should set the after middleware correctly", () => {
             const name = "testRoute";
             const routePath = "/posts";
-            const after = () => {};
+            const after = () => {
+            };
 
             Api.create(apiName, apiUrl, () => {
                 Route.get(name, routePath, {}).after(after);

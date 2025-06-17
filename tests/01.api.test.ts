@@ -1,12 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { Api, Klaim, Registry } from "../src";
+import {describe, expect, it} from "vitest";
+import {Api, Klaim, Registry} from "../src";
 
 describe("Api", () => {
     it("should create an API instance with correct properties", () => {
         const name = "testApi";
         const url = "https://jsonplaceholder.typicode.com";
 
-        const api = Api.create(name, url, () => {});
+        const api = Api.create(name, url, () => {
+        });
 
         expect(Registry.i.getApi(name)).toBe(api);
     });
@@ -16,7 +17,8 @@ describe("Api", () => {
         const url = "https://jsonplaceholder.typicode.com/";
         const waitingUrl = "https://jsonplaceholder.typicode.com";
 
-        const api = Api.create(name, url, () => {});
+        const api = Api.create(name, url, () => {
+        });
 
         expect(api.url).toBe(waitingUrl);
     });
@@ -28,7 +30,8 @@ describe("Api", () => {
         const api = Api.create(
             name,
             "https://jsonplaceholder.typicode.com",
-            () => {},
+            () => {
+            },
         );
 
         expect(api.name).toBe(waitingName);
@@ -37,7 +40,8 @@ describe("Api", () => {
     it("should access the API instance from Klaim", () => {
         const name = "testApi";
 
-        Api.create(name, "https://jsonplaceholder.typicode.com", () => {});
+        Api.create(name, "https://jsonplaceholder.typicode.com", () => {
+        });
 
         expect(Klaim[name]).toBeDefined();
     });
@@ -51,7 +55,8 @@ describe("Api", () => {
         const api = Api.create(
             name,
             "https://jsonplaceholder.typicode.com",
-            () => {},
+            () => {
+            },
             headers,
         );
 

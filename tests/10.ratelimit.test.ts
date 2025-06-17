@@ -1,12 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { Api, Klaim, Route } from "../src";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {Api, Klaim, Route} from "../src";
 
 // Mock fetch pour simuler les réponses API sans faire de vraies requêtes
 global.fetch = vi.fn(() =>
     Promise.resolve({
-        json: () => Promise.resolve({ success: true }),
+        json: () => Promise.resolve({success: true}),
     })
-) as any;
+) as unknown as typeof global.fetch;
 
 // Réinitialiser les mocks entre chaque test
 beforeEach(() => {
@@ -20,7 +20,7 @@ describe("Rate Limiting", () => {
         const routeName = "testRateRoute";
 
         Api.create(apiName, apiUrl, () => {
-            Route.get(routeName, "/test").withRate({ limit: 3, duration: 10 });
+            Route.get(routeName, "/test").withRate({limit: 3, duration: 10});
         });
 
         // Devrait permettre 3 requêtes successives sans problème
@@ -38,7 +38,7 @@ describe("Rate Limiting", () => {
         const routeName = "testRateRoute2";
 
         Api.create(apiName, apiUrl, () => {
-            Route.get(routeName, "/test").withRate({ limit: 2, duration: 10 });
+            Route.get(routeName, "/test").withRate({limit: 2, duration: 10});
         });
 
         // Les deux premières requêtes devraient réussir
@@ -61,7 +61,7 @@ describe("Rate Limiting", () => {
         Api.create(apiName, apiUrl, () => {
             Route.get(routeName1, "/test1");
             Route.get(routeName2, "/test2");
-        }).withRate({ limit: 3, duration: 10 });
+        }).withRate({limit: 3, duration: 10});
 
         // Différentes routes mais même API - devrait compter pour la même limite
         await Klaim[apiName][routeName1]();
@@ -82,9 +82,9 @@ describe("Rate Limiting", () => {
         const routeName2 = "testRateRoute4B";
 
         Api.create(apiName, apiUrl, () => {
-            Route.get(routeName1, "/test1").withRate({ limit: 1, duration: 10 }); // Limite plus stricte
+            Route.get(routeName1, "/test1").withRate({limit: 1, duration: 10}); // Limite plus stricte
             Route.get(routeName2, "/test2"); // Utilise la limite de l'API
-        }).withRate({ limit: 5, duration: 10 });
+        }).withRate({limit: 5, duration: 10});
 
         // La première route a une limite de 1
         await Klaim[apiName][routeName1]();

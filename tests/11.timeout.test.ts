@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { Api, Klaim, Route } from "../src";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {Api, Klaim, Route} from "../src";
 
 beforeEach(() => {
     vi.clearAllMocks();
@@ -9,9 +9,9 @@ describe("Timeout", () => {
     it("should throw on timeout", async () => {
         global.fetch = vi.fn(() =>
             new Promise(resolve => {
-                setTimeout(() => resolve({ json: () => Promise.resolve({ ok: true }) }), 200);
+                setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
             })
-        ) as any;
+        ) as unknown as typeof global.fetch;
 
         const apiName = "timeoutApi";
         const apiUrl = "https://example.com";
@@ -27,9 +27,9 @@ describe("Timeout", () => {
     it("should use custom message", async () => {
         global.fetch = vi.fn(() =>
             new Promise(resolve => {
-                setTimeout(() => resolve({ json: () => Promise.resolve({ ok: true }) }), 200);
+                setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
             })
-        ) as any;
+        ) as unknown as typeof global.fetch;
 
         const apiName = "timeoutApi2";
         const apiUrl = "https://example.com";

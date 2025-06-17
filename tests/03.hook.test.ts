@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { Hook } from "../src";
+import {describe, expect, it} from "vitest";
+import {Hook} from "../src";
 
 describe("Route", async () => {
     it("should subscribe to a hook", () => {
