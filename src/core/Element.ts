@@ -47,10 +47,10 @@ export interface ICallbackBeforeArgs {
  * @interface ICallbackAfterArgs
  */
 export interface ICallbackAfterArgs {
-    /** The route element that was called */
-    route: IElement;
-    /** The API element containing the route */
-    api: IElement;
+        /** The route element that was called */
+        route: IElement;
+        /** The API element containing the route */
+        api: IElement;
     /** The raw response from the request */
     response: Response;
     /** The parsed response data */

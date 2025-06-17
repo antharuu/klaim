@@ -11,7 +11,7 @@ describe("Timeout", () => {
             new Promise(resolve => {
                 setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
             })
-        ) as any;
+        ) as unknown as typeof global.fetch;
 
         const apiName = "timeoutApi";
         const apiUrl = "https://example.com";
@@ -29,7 +29,7 @@ describe("Timeout", () => {
             new Promise(resolve => {
                 setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
             })
-        ) as any;
+        ) as unknown as typeof global.fetch;
 
         const apiName = "timeoutApi2";
         const apiUrl = "https://example.com";
