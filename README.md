@@ -42,10 +42,6 @@
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 - **Pagination**: Handle paginated requests easily with support for both page and offset based pagination.
 
-## ⌛ Next features
-
-- Error Handling (Version: 1.11)
-
 ## 📥 Installation
 
 Install Klaim via npm:
@@ -450,6 +446,20 @@ parameters. Klaim does not handle the pagination logic, only the parameters mana
 - [NPM](https://www.npmjs.com/package/klaim)
 - [JSR](https://jsr.io/@antharuu/klaim)
 - [GitHub](https://github.com/antharuu/klaim)
+
+## 📢 Project Status
+
+Klaim is now considered **feature complete**. The library has reached a state where it provides all the core functionality originally envisioned *(even more)*, and no new features are currently planned.
+
+However, this doesn't mean the project is abandoned:
+
+- **Bug fixes and maintenance** will continue to be addressed
+- **Issues** remain open for bug reports and suggestions
+- **Pull requests** are welcome if you'd like to contribute additional features or improvements
+
+If you have ideas for new features that would enhance Klaim, please feel free to open an issue to discuss them. Collaborative contributions through pull requests are especially appreciated!
+
+Thank you for your interest in this project. I personally will be moving on to focus on other libraries, but I'm grateful for all the support and feedback the community has provided.
 
 ## 🤝 Contributing
 
