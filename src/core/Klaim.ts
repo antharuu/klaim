@@ -50,9 +50,11 @@ export type IApiReference = Record<string, IRouteReference>;
 export const Klaim: IApiReference = {};
 
 /**
+ * Creates a callable function for a specific route.
  *
- * @param parent
- * @param element
+ * @param parent - Parent path in dot notation
+ * @param element - Route element to bind
+ * @returns The generated route function
  */
 export function createRouteHandler<T> (
     parent: string,
@@ -230,9 +232,8 @@ async function fetchWithRetry (
             const waitSeconds = Math.ceil(waitTime / 1000);
             throw new Error(`Rate limit exceeded for ${routeKey}. Try again in ${waitSeconds} seconds.`);
         }
-    }
-    // Si l'API a une configuration de limite et que la route n'en a pas, utiliser une clé au niveau de l'API
-    else if (api.rate) {
+    } else if (api.rate) {
+        // Si l'API a une configuration de limite et que la route n'en a pas, utiliser une clé au niveau de l'API
         const apiKey = `${api.name}`;
         const allowed = checkRateLimit(apiKey, api.rate);
 
@@ -296,10 +297,10 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
  * Applies before-request middleware to modify request parameters
  *
  * @param params - Object containing route, API, URL, and config
- * @param params.route
- * @param params.api
- * @param params.url
- * @param params.config
+ * @param params.route - Route element being called
+ * @param params.api - API element containing the route
+ * @param params.url - URL after arguments replacement
+ * @param params.config - Fetch configuration to send
  * @returns Modified request parameters
  */
 function applyBefore ({ route, api, url, config }: {
@@ -326,10 +327,10 @@ function applyBefore ({ route, api, url, config }: {
  * Applies after-request middleware to modify response data
  *
  * @param params - Object containing route, API, response, and data
- * @param params.route
- * @param params.api
- * @param params.response
- * @param params.data
+ * @param params.route - Route element that was called
+ * @param params.api - API element containing the route
+ * @param params.response - Raw fetch Response object
+ * @param params.data - Parsed response data
  * @returns Modified response parameters
  */
 function applyAfter ({ route, api, response, data }: {

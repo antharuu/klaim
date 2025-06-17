@@ -168,8 +168,9 @@ export class Group extends Element {
      * Enables request timeout for the group and its children.
      * Children can override with their own timeout configuration.
      *
-     * @param duration
-     * @param message
+     * @param duration - Timeout duration in seconds
+     * @param message - Error message if the timeout is reached
+     * @returns The current instance for chaining
      */
     public withTimeout (duration = DEFAULT_TIMEOUT_CONFIG.duration, message = DEFAULT_TIMEOUT_CONFIG.message): this {
         super.withTimeout(duration, message);

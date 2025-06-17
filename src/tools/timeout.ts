@@ -9,9 +9,11 @@ export const DEFAULT_TIMEOUT_CONFIG: ITimeoutConfig = {
 };
 
 /**
+ * Wraps a promise with a timeout.
  *
- * @param promise
- * @param config
+ * @param promise - Promise to execute
+ * @param config - Timeout configuration
+ * @returns The result of the promise or a timeout error
  */
 export async function withTimeout<T> (promise: Promise<T>, config: ITimeoutConfig): Promise<T> {
     const { duration, message } = config;
