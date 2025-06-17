@@ -123,4 +123,29 @@ export class Cache {
         }
         return null;
     }
+
+    /**
+     * Removes a specific entry from the cache.
+     *
+     * @param key - The key of the cached item to delete
+     * @example
+     * ```typescript
+     * Cache.i.delete("userProfile");
+     * ```
+     */
+    public delete (key: string): void {
+        this.cache.delete(key);
+    }
+
+    /**
+     * Clears all entries from the cache.
+     *
+     * @example
+     * ```typescript
+     * Cache.i.clear();
+     * ```
+     */
+    public clear (): void {
+        this.cache.clear();
+    }
 }

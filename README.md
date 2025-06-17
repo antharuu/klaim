@@ -324,6 +324,13 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 }).withCache(); // Enable default cache duration (20 seconds) for all routes
 ```
 
+You can manually manage cached responses using the `Cache` singleton:
+
+```typescript
+Cache.i.delete("getTodo"); // Remove a specific entry
+Cache.i.clear();           // Purge all cached data
+```
+
 ### Retry Mechanism
 
 Configure automatic retries for failed requests:
