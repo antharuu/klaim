@@ -1,6 +1,7 @@
 import toCamelCase from "../tools/toCamelCase";
-import {Element, IHeaders} from "./Element";
-import {Registry} from "./Registry";
+
+import { Element, IHeaders } from "./Element";
+import { Registry } from "./Registry";
 
 /**
  * Callback function type for API configuration
@@ -39,7 +40,7 @@ export class Api extends Element {
      * });
      * ```
      */
-    public static create(
+    public static create (
         name: string,
         url: string,
         callback: IApiCallback,
@@ -60,7 +61,7 @@ export class Api extends Element {
         Registry.i.registerElement(api);
 
         // Get the full API path considering any parents
-        const parentPath = currentParent ? Registry.i.getFullPath(currentParent) : '';
+        const parentPath = currentParent ? Registry.i.getFullPath(currentParent) : "";
         const apiFullPath = parentPath ? `${parentPath}.${newName}` : newName;
 
         // Set this API as current parent
@@ -88,7 +89,7 @@ export class Api extends Element {
      * @param headers - Optional default headers for all routes
      * @private
      */
-    private constructor(
+    private constructor (
         name: string,
         url: string,
         headers: IHeaders = {}

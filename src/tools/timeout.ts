@@ -5,10 +5,15 @@ export interface ITimeoutConfig {
 
 export const DEFAULT_TIMEOUT_CONFIG: ITimeoutConfig = {
     duration: 5,
-    message: 'Request timed out'
+    message: "Request timed out"
 };
 
-export async function withTimeout<T>(promise: Promise<T>, config: ITimeoutConfig): Promise<T> {
+/**
+ *
+ * @param promise
+ * @param config
+ */
+export async function withTimeout<T> (promise: Promise<T>, config: ITimeoutConfig): Promise<T> {
     const { duration, message } = config;
     return Promise.race([
         promise,

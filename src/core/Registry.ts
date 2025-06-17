@@ -1,5 +1,5 @@
-import {IElement} from "./Element";
-import {callApi, createRouteHandler, IArgs, IBody, Klaim, RouteFunction} from "./Klaim";
+import { IElement } from "./Element";
+import { callApi, createRouteHandler, IArgs, IBody, Klaim, RouteFunction } from "./Klaim";
 
 /**
  * Singleton class that manages the registration and organization of API elements.
@@ -18,24 +18,30 @@ export class Registry {
 
     /**
      * Map storing all registered elements with their full paths as keys
+     *
      * @private
      */
     private _elements: Map<string, IElement> = new Map<string, IElement>();
 
     /**
      * Reference to the current parent element during registration
+     *
      * @private
      */
     private _currentParent: IElement | null = null;
 
-    private constructor() {
+    /**
+     *
+     */
+    private constructor () {
     }
 
     /**
      * Gets the singleton instance of the Registry
+     *
      * @returns The singleton Registry instance
      */
-    public static get i(): Registry {
+    public static get i (): Registry {
         if (!Registry._instance) {
             Registry._instance = new Registry();
         }
@@ -52,7 +58,7 @@ export class Registry {
      * Registry.i.registerElement(new Api("myApi", "https://api.example.com"));
      * ```
      */
-    public registerElement(element: IElement): void {
+    public registerElement (element: IElement): void {
         const parent = this._currentParent;
         if (parent) {
             element.parent = this.getFullPath(parent);
@@ -64,7 +70,7 @@ export class Registry {
         if (element.type === "api" || element.type === "group") {
             let target = Klaim;
             if (parent) {
-                const parentParts = this.getFullPath(parent).split('.');
+                const parentParts = this.getFullPath(parent).split(".");
 
                 for (const part of parentParts) {
                     if (!target[part]) {
@@ -82,9 +88,10 @@ export class Registry {
 
     /**
      * Gets the current parent element in the registration context
+     *
      * @returns The current parent element or null if none is set
      */
-    public getCurrentParent(): IElement | null {
+    public getCurrentParent (): IElement | null {
         return this._currentParent;
     }
 
@@ -94,7 +101,7 @@ export class Registry {
      * @param fullPath - Dot-notation path to the parent element
      * @throws Error if the element is not found or is not a valid parent type
      */
-    public setCurrentParent(fullPath: string): void {
+    public setCurrentParent (fullPath: string): void {
         const element = this._elements.get(fullPath);
         if (!element || (element.type !== "api" && element.type !== "group")) {
             throw new Error(`Element ${fullPath} not found or not a valid parent type`);
@@ -105,7 +112,7 @@ export class Registry {
     /**
      * Clears the current parent element reference
      */
-    public clearCurrentParent(): void {
+    public clearCurrentParent (): void {
         this._currentParent = null;
     }
 
@@ -115,7 +122,7 @@ export class Registry {
      * @param element - The route element to register
      * @throws Error if no parent context is set
      */
-    public registerRoute(element: IElement): void {
+    public registerRoute (element: IElement): void {
         if (!this._currentParent) {
             throw new Error("No current parent set, use Route only inside Api or Group create callback");
         }
@@ -133,11 +140,11 @@ export class Registry {
      * @param route - The route element to add
      * @private
      */
-    private addToKlaimRoute(route: IElement): void {
+    private addToKlaimRoute (route: IElement): void {
         if (!route.parent) return;
 
         let target = Klaim;
-        const parentParts = route.parent.split('.');
+        const parentParts = route.parent.split(".");
 
         for (const part of parentParts) {
             if (!target[part]) {
@@ -156,7 +163,7 @@ export class Registry {
      * @param element - The element to generate a key for
      * @returns The element's unique key
      */
-    public getElementKey(element: IElement): string {
+    public getElementKey (element: IElement): string {
         if (!element) return "";
         if (!element.parent) return element.name;
         return `${element.parent}.${element.name}`;
@@ -168,11 +175,11 @@ export class Registry {
      * @param element - The element to get the path for
      * @returns Dot-notation path to the element
      */
-    public getFullPath(element: IElement): string {
+    public getFullPath (element: IElement): string {
         if (!element) return "";
         if (!element.parent) return element.name;
 
-        const path = [element.name];
+        const path = [ element.name ];
         let current = element;
 
         while (current.parent) {
@@ -192,7 +199,7 @@ export class Registry {
      * @param routeName - Name of the route to retrieve
      * @returns The route element or undefined if not found
      */
-    public getRoute(apiName: string, routeName: string): IElement | undefined {
+    public getRoute (apiName: string, routeName: string): IElement | undefined {
         return this._elements.get(`${apiName}.${routeName}`);
     }
 
@@ -202,7 +209,7 @@ export class Registry {
      * @param elementPath - Full path to the parent element
      * @returns Array of child elements
      */
-    public getChildren(elementPath: string): IElement[] {
+    public getChildren (elementPath: string): IElement[] {
         const children: IElement[] = [];
         this._elements.forEach(element => {
             if (element.parent === elementPath) {
@@ -218,7 +225,7 @@ export class Registry {
      * @param element - The element to update
      * @returns The updated element
      */
-    public static updateElement(element: IElement): IElement {
+    public static updateElement (element: IElement): IElement {
         return Registry.i._elements.get(Registry.i.getElementKey(element)) || element;
     }
 
@@ -228,10 +235,10 @@ export class Registry {
      * @param name - Name of the API to find
      * @returns The API element or undefined if not found
      */
-    public getApi(name: string): IElement | undefined {
+    public getApi (name: string): IElement | undefined {
         const element = this._elements.get(name);
         if (!element) {
-            for (const [key, el] of this._elements.entries()) {
+            for (const [ key, el ] of this._elements.entries()) {
                 if (el.type === "api" && key.endsWith(`.${name}`)) {
                     return el;
                 }
@@ -250,7 +257,7 @@ export class Registry {
      * @returns The parent API element or undefined if not found
      * @private
      */
-    private findApi(element: IElement): IElement | undefined {
+    private findApi (element: IElement): IElement | undefined {
         if (!element || !element.parent) return undefined;
 
         const parentParts = element.parent.split(".");

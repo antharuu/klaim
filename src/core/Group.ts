@@ -1,7 +1,7 @@
+import { DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 import toCamelCase from "../tools/toCamelCase";
 
 import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IHeaders } from "./Element";
-import { DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 import { Registry } from "./Registry";
 
 /**
@@ -23,7 +23,7 @@ type GroupCallback = () => void;
  *     Route.get("getOne", "/users/[id]");
  *   }).withCache(60); // Cache all routes for 60 seconds
  * });
- * 
+ *
  * // Or grouping APIs
  * Group.create("shared", () => {
  *   Api.create("users", "https://users-api.com", () => {
@@ -51,7 +51,7 @@ export class Group extends Element {
      * Group.create("admin", () => {
      *   Route.get("list", "/admin/users");
      * });
-     * 
+     *
      * // Group multiple APIs
      * Group.create("shared", () => {
      *   Api.create("users", "https://users-api.com", () => {
@@ -167,8 +167,11 @@ export class Group extends Element {
     /**
      * Enables request timeout for the group and its children.
      * Children can override with their own timeout configuration.
+     *
+     * @param duration
+     * @param message
      */
-    public withTimeout(duration = DEFAULT_TIMEOUT_CONFIG.duration, message = DEFAULT_TIMEOUT_CONFIG.message): this {
+    public withTimeout (duration = DEFAULT_TIMEOUT_CONFIG.duration, message = DEFAULT_TIMEOUT_CONFIG.message): this {
         super.withTimeout(duration, message);
         Registry.i.getChildren(Registry.i.getFullPath(this))
             .forEach(child => {
