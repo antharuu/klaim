@@ -1,6 +1,6 @@
 import toCamelCase from "../tools/toCamelCase";
 
-import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IHeaders } from "./Element";
+import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IErrorCallback, IHeaders } from "./Element";
 import { DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 import { Registry } from "./Registry";
 
@@ -261,6 +261,20 @@ export class Group extends Element {
             .forEach(child => {
                 if (!child.callbacks.call) {
                     child.callbacks.call = callback;
+                }
+            });
+        return this;
+    }
+
+    /**
+     * Adds an error handler to the group and its children.
+     */
+    public onError (callback: IErrorCallback): this {
+        super.onError(callback);
+        Registry.i.getChildren(Registry.i.getFullPath(this))
+            .forEach(child => {
+                if (!child.errorHandler) {
+                    child.errorHandler = callback;
                 }
             });
         return this;

@@ -3,7 +3,6 @@
 ## 📚 Table of Contents
 
 - [Features](#-features)
-- [Next features](#-next-features)
 - [Installation](#-installation)
 - [Usage](#-usage)
   - [Basic API Configuration](#basic-api-configuration)
@@ -19,6 +18,7 @@
   - [Caching Requests](#caching-requests)
   - [Retry Mechanism](#retry-mechanism)
   - [Rate Limiting](#rate-limiting)
+  - [Error Handling](#error-handling)
   - [Response Validation](#response-validation)
 - [Links](#-links)
 - [Contributing](#-contributing)
@@ -38,13 +38,10 @@
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
 - **Timeout**: Abort requests that exceed a specified duration with an optional custom error message.
+- **Error Handling**: Register callbacks to react when a request fails.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 - **Pagination**: Handle paginated requests easily with support for both page and offset based pagination.
-
-## ⌛ Next features
-
-- Error Handling (Version: 1.11)
 
 ## 📥 Installation
 
@@ -368,6 +365,24 @@ try {
         console.log('Please wait before trying again');
     }
 }
+```
+
+### Error Handling
+
+Register callbacks to react when a request fails. Handlers can be defined on a route,
+an API (which applies to all its routes), or globally via `Klaim.onError`.
+When an error occurs, the callback receives the error and request context. If several
+handlers are defined, the route handler runs first, then the API handler, and finally
+the global handler.
+
+```typescript
+Klaim.onError((error) => console.error('Global handler', error));
+
+Api.create("api", "https://api.example.com", () => {
+    Route.get("data", "/data").onError((err, ctx) => {
+        console.log(`Failed to fetch ${ctx.url}`);
+    });
+}).onError(err => console.log('API handler', err));
 ```
 
 ### Request Timeout

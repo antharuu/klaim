@@ -1,7 +1,7 @@
 import fetchWithCache from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { withTimeout } from "../tools/timeout";
-import {IElement} from "./Element";
+import {IElement, IErrorCallback} from "./Element";
 import {Hook} from "./Hook";
 import {Registry} from "./Registry";
 
@@ -33,7 +33,14 @@ export type IRouteReference = {
 /**
  * Type representing API references containing route references
  */
-export type IApiReference = Record<string, IRouteReference>;
+export interface IApiReference {
+        [key: string]: IRouteReference;
+}
+
+export interface IKlaim extends IApiReference {
+        _errorHandler: IErrorCallback | null;
+        onError: (callback: IErrorCallback) => void;
+}
 
 /**
  * Global Klaim object that provides access to all registered APIs and their routes
@@ -46,7 +53,12 @@ export type IApiReference = Record<string, IRouteReference>;
  * await Klaim.apiName.routeName(2); // Page 2
  * ```
  */
-export const Klaim: IApiReference = {};
+export const Klaim: IKlaim = {
+        _errorHandler: null,
+        onError(callback: IErrorCallback) {
+                Klaim._errorHandler = callback;
+        }
+} as IKlaim;
 
 export function createRouteHandler<T>(
 	parent: string,
@@ -146,7 +158,19 @@ export async function callApi<T>(
 	Registry.updateElement(beforeApi);
 	Registry.updateElement(beforeRoute);
 
-	let response = await fetchWithRetry(api, element, url, config);
+        let response;
+        try {
+                response = await fetchWithRetry(api, element, url, config);
+        } catch (error: any) {
+                element.errorHandler?.(error, {route: element, api, url, config});
+                if (!element.errorHandler) {
+                        api.errorHandler?.(error, {route: element, api, url, config});
+                }
+                if (!element.errorHandler && !api.errorHandler) {
+                        Klaim._errorHandler?.(error, {route: element, api, url, config});
+                }
+                throw error;
+        }
 
 	if (element.schema && "validate" in element.schema) {
 		response = await element.schema.validate(response);

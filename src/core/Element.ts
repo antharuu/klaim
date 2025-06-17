@@ -67,6 +67,11 @@ export type ICallbackCallArgs = object;
 export type ICallback<ArgsType> = (args: ArgsType) => Partial<ArgsType> | void;
 
 /**
+ * Callback type for error handling
+ */
+export type IErrorCallback = (error: any, context: ICallbackBeforeArgs) => void;
+
+/**
  * Collection of middleware callbacks for an element
  * @interface IElementCallbacks
  */
@@ -111,7 +116,10 @@ export interface IElement {
 	/** Response validation schema */
 	schema?: any;
 	/** Pagination configuration */
-	pagination?: IPaginationConfig;
+        pagination?: IPaginationConfig;
+
+        /** Error handling callback */
+        errorHandler: IErrorCallback | null;
 
 	/** Adds before-request middleware */
 	before(callback: ICallback<ICallbackBeforeArgs>): this;
@@ -119,8 +127,11 @@ export interface IElement {
 	/** Adds after-request middleware */
 	after(callback: ICallback<ICallbackAfterArgs>): this;
 
-	/** Adds request lifecycle middleware */
-	onCall(callback: ICallback<ICallbackCallArgs>): this;
+        /** Adds request lifecycle middleware */
+        onCall(callback: ICallback<ICallbackCallArgs>): this;
+
+        /** Adds an error handler */
+        onError(callback: IErrorCallback): this;
 
 	/** Enables response caching */
 	withCache(duration?: number): this;
@@ -176,6 +187,7 @@ export abstract class Element implements IElement {
         public retry: false | number = false;
         public rate: false | IRateLimitConfig = false;
         public timeout: false | ITimeoutConfig = false;
+        public errorHandler: IErrorCallback | null = null;
 
 	/**
 	 * Creates a new element with the specified properties
@@ -225,10 +237,19 @@ export abstract class Element implements IElement {
 	 * @param {ICallback<ICallbackCallArgs>} callback - Function to execute during the request
 	 * @returns {this} The element instance for chaining
 	 */
-	public onCall(callback: ICallback<ICallbackCallArgs>): this {
-		this.callbacks.call = callback;
-		return this;
-	}
+        public onCall(callback: ICallback<ICallbackCallArgs>): this {
+                this.callbacks.call = callback;
+                return this;
+        }
+
+        /**
+         * Adds an error handling callback
+         * @param callback - Function executed when an error occurs
+         */
+        public onError(callback: IErrorCallback): this {
+                this.errorHandler = callback;
+                return this;
+        }
 
 	/**
 	 * Enables response caching for this element
