@@ -6,8 +6,8 @@
  * @property {number} duration - Time window in seconds for the rate limit
  */
 export interface IRateLimitConfig {
-	limit: number;
-	duration: number;
+    limit: number;
+    duration: number;
 }
 
 /**
@@ -22,7 +22,7 @@ export const DEFAULT_RATE_LIMIT_CONFIG: IRateLimitConfig = {
 
 // Store request timestamps for rate limiting
 type RequestLog = {
-	timestamps: number[]; // Timestamps of requests
+    timestamps: number[]; // Timestamps of requests
 };
 
 // Global request log

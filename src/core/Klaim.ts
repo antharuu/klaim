@@ -22,7 +22,7 @@ export type IBody = Record<string, unknown>;
  * @template T - The type of data returned by the route
  */
 export type RouteFunction<T = any> = {
-	(offset?: number, args?: IArgs, body?: IBody): Promise<T>;
+    (offset?: number, args?: IArgs, body?: IBody): Promise<T>;
 };
 
 /**
@@ -303,15 +303,15 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
  * @returns Modified request parameters
  */
 function applyBefore ({ route, api, url, config }: {
-	route: IElement;
-	api: IElement;
-	url: string;
-	config: Record<string, unknown>;
+    route: IElement;
+    api: IElement;
+    url: string;
+    config: Record<string, unknown>;
 }): {
-	beforeRoute: IElement;
-	beforeApi: IElement;
-	beforeUrl: string;
-	beforeConfig: Record<string, unknown>;
+    beforeRoute: IElement;
+    beforeApi: IElement;
+    beforeUrl: string;
+    beforeConfig: Record<string, unknown>;
 } {
     const beforeRes = route.callbacks.before?.({ route, api, url, config });
     return {
@@ -333,15 +333,15 @@ function applyBefore ({ route, api, url, config }: {
  * @returns Modified response parameters
  */
 function applyAfter ({ route, api, response, data }: {
-	route: IElement;
-	api: IElement;
-	response: Response;
-	data: any;
+    route: IElement;
+    api: IElement;
+    response: Response;
+    data: any;
 }): {
-	afterRoute: IElement;
-	afterApi: IElement;
-	afterResponse: Response;
-	afterData: any;
+    afterRoute: IElement;
+    afterApi: IElement;
+    afterResponse: Response;
+    afterData: any;
 } {
     const afterRes = route.callbacks.after?.({ route, api, response, data });
     return {

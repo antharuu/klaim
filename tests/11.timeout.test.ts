@@ -2,43 +2,43 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Klaim, Route} from "../src";
 
 beforeEach(() => {
-	vi.clearAllMocks();
+    vi.clearAllMocks();
 });
 
 describe("Timeout", () => {
-	it("should throw on timeout", async () => {
-		global.fetch = vi.fn(() =>
-			new Promise(resolve => {
-				setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
-			})
-		) as any;
+    it("should throw on timeout", async () => {
+        global.fetch = vi.fn(() =>
+            new Promise(resolve => {
+                setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
+            })
+        ) as any;
 
-		const apiName = "timeoutApi";
-		const apiUrl = "https://example.com";
-		const routeName = "slow";
+        const apiName = "timeoutApi";
+        const apiUrl = "https://example.com";
+        const routeName = "slow";
 
-		Api.create(apiName, apiUrl, () => {
-			Route.get(routeName, "/slow").withTimeout(0.05);
-		});
+        Api.create(apiName, apiUrl, () => {
+            Route.get(routeName, "/slow").withTimeout(0.05);
+        });
 
-		await expect(Klaim[apiName][routeName]()).rejects.toThrow(/Request timed out/);
-	});
+        await expect(Klaim[apiName][routeName]()).rejects.toThrow(/Request timed out/);
+    });
 
-	it("should use custom message", async () => {
-		global.fetch = vi.fn(() =>
-			new Promise(resolve => {
-				setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
-			})
-		) as any;
+    it("should use custom message", async () => {
+        global.fetch = vi.fn(() =>
+            new Promise(resolve => {
+                setTimeout(() => resolve({json: () => Promise.resolve({ok: true})}), 200);
+            })
+        ) as any;
 
-		const apiName = "timeoutApi2";
-		const apiUrl = "https://example.com";
-		const routeName = "slow2";
+        const apiName = "timeoutApi2";
+        const apiUrl = "https://example.com";
+        const routeName = "slow2";
 
-		Api.create(apiName, apiUrl, () => {
-			Route.get(routeName, "/slow").withTimeout(0.05, "Too slow");
-		});
+        Api.create(apiName, apiUrl, () => {
+            Route.get(routeName, "/slow").withTimeout(0.05, "Too slow");
+        });
 
-		await expect(Klaim[apiName][routeName]()).rejects.toThrow(/Too slow/);
-	});
+        await expect(Klaim[apiName][routeName]()).rejects.toThrow(/Too slow/);
+    });
 });

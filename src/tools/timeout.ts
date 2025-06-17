@@ -1,6 +1,6 @@
 export interface ITimeoutConfig {
-	duration: number; // seconds
-	message: string;
+    duration: number; // seconds
+    message: string;
 }
 
 export const DEFAULT_TIMEOUT_CONFIG: ITimeoutConfig = {

@@ -19,10 +19,10 @@ export type IHeaders = Record<string, string>;
  * @property {string} [limitParam] - The URL parameter name for items per page
  */
 export interface IPaginationConfig {
-	page?: number;
-	pageParam?: string;
-	limit?: number;
-	limitParam?: string;
+    page?: number;
+    pageParam?: string;
+    limit?: number;
+    limitParam?: string;
 }
 
 /**
@@ -31,14 +31,14 @@ export interface IPaginationConfig {
  * @interface ICallbackBeforeArgs
  */
 export interface ICallbackBeforeArgs {
-	/** The route element being called */
-	route: IElement;
-	/** The API element containing the route */
-	api: IElement;
-	/** The fully constructed URL for the request */
-	url: string;
-	/** The request configuration object */
-	config: Record<string, unknown>;
+    /** The route element being called */
+    route: IElement;
+    /** The API element containing the route */
+    api: IElement;
+    /** The fully constructed URL for the request */
+    url: string;
+    /** The request configuration object */
+    config: Record<string, unknown>;
 }
 
 /**
@@ -47,14 +47,14 @@ export interface ICallbackBeforeArgs {
  * @interface ICallbackAfterArgs
  */
 export interface ICallbackAfterArgs {
-	/** The route element that was called */
-	route: IElement;
-	/** The API element containing the route */
-	api: IElement;
-	/** The raw response from the request */
-	response: Response;
-	/** The parsed response data */
-	data: any;
+    /** The route element that was called */
+    route: IElement;
+    /** The API element containing the route */
+    api: IElement;
+    /** The raw response from the request */
+    response: Response;
+    /** The parsed response data */
+    data: any;
 }
 
 /**
@@ -77,12 +77,12 @@ export type ICallback<ArgsType> = (args: ArgsType) => Partial<ArgsType> | void;
  * @interface IElementCallbacks
  */
 interface IElementCallbacks {
-	/** Executed before the request is made */
-	before: ICallback<ICallbackBeforeArgs> | null;
-	/** Executed after the response is received */
-	after: ICallback<ICallbackAfterArgs> | null;
-	/** Executed during the request lifecycle */
-	call: ICallback<ICallbackCallArgs> | null;
+    /** Executed before the request is made */
+    before: ICallback<ICallbackBeforeArgs> | null;
+    /** Executed after the response is received */
+    after: ICallback<ICallbackAfterArgs> | null;
+    /** Executed during the request lifecycle */
+    call: ICallback<ICallbackCallArgs> | null;
 }
 
 /**
@@ -91,58 +91,58 @@ interface IElementCallbacks {
  * @interface IElement
  */
 export interface IElement {
-	/** Element type: 'api', 'route', or 'group' */
-	type: "api" | "route" | "group";
-	/** Unique identifier for the element */
-	name: string;
-	/** Base URL or path segment */
-	url: string;
-	/** HTTP headers specific to this element */
-	headers: IHeaders;
-	/** Middleware callbacks */
-	callbacks: IElementCallbacks;
-	/** Cache duration in seconds, or false if caching is disabled */
-	cache: false | number;
-	/** Number of retry attempts, or false if retries are disabled */
-	retry: false | number;
-	/** Rate limiting configuration, or false if rate limiting is disabled */
-	rate: false | IRateLimitConfig;
-	/** Request timeout configuration, or false if disabled */
-	timeout: false | ITimeoutConfig;
-	/** Reference to parent element name */
-	parent?: string;
-	/** HTTP method for routes */
-	method?: string;
-	/** Dynamic URL parameters */
-	arguments: Set<string>;
-	/** Response validation schema */
-	schema?: any;
-	/** Pagination configuration */
-	pagination?: IPaginationConfig;
+    /** Element type: 'api', 'route', or 'group' */
+    type: "api" | "route" | "group";
+    /** Unique identifier for the element */
+    name: string;
+    /** Base URL or path segment */
+    url: string;
+    /** HTTP headers specific to this element */
+    headers: IHeaders;
+    /** Middleware callbacks */
+    callbacks: IElementCallbacks;
+    /** Cache duration in seconds, or false if caching is disabled */
+    cache: false | number;
+    /** Number of retry attempts, or false if retries are disabled */
+    retry: false | number;
+    /** Rate limiting configuration, or false if rate limiting is disabled */
+    rate: false | IRateLimitConfig;
+    /** Request timeout configuration, or false if disabled */
+    timeout: false | ITimeoutConfig;
+    /** Reference to parent element name */
+    parent?: string;
+    /** HTTP method for routes */
+    method?: string;
+    /** Dynamic URL parameters */
+    arguments: Set<string>;
+    /** Response validation schema */
+    schema?: any;
+    /** Pagination configuration */
+    pagination?: IPaginationConfig;
 
-	/** Adds before-request middleware */
-	before(callback: ICallback<ICallbackBeforeArgs>): this;
+    /** Adds before-request middleware */
+    before(callback: ICallback<ICallbackBeforeArgs>): this;
 
-	/** Adds after-request middleware */
-	after(callback: ICallback<ICallbackAfterArgs>): this;
+    /** Adds after-request middleware */
+    after(callback: ICallback<ICallbackAfterArgs>): this;
 
-	/** Adds request lifecycle middleware */
-	onCall(callback: ICallback<ICallbackCallArgs>): this;
+    /** Adds request lifecycle middleware */
+    onCall(callback: ICallback<ICallbackCallArgs>): this;
 
-	/** Enables response caching */
-	withCache(duration?: number): this;
+    /** Enables response caching */
+    withCache(duration?: number): this;
 
-	/** Enables request retries */
-	withRetry(maxRetries?: number): this;
+    /** Enables request retries */
+    withRetry(maxRetries?: number): this;
 
-	/** Configures pagination settings */
-	withPagination(config?: IPaginationConfig): this;
+    /** Configures pagination settings */
+    withPagination(config?: IPaginationConfig): this;
 
-	/** Enables rate limiting */
-	withRate(config?: Partial<IRateLimitConfig>): this;
+    /** Enables rate limiting */
+    withRate(config?: Partial<IRateLimitConfig>): this;
 
-	/** Enables request timeout */
-	withTimeout(duration?: number, message?: string): this;
+    /** Enables request timeout */
+    withTimeout(duration?: number, message?: string): this;
 }
 
 /**
