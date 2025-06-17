@@ -59,8 +59,6 @@ export interface ICallbackAfterArgs {
 
 /**
  * Arguments for call middleware callbacks
- *
- * @type ICallbackCallArgs
  */
 export type ICallbackCallArgs = object;
 
