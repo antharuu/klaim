@@ -6,7 +6,7 @@ global.fetch = vi.fn(() =>
     Promise.resolve({
         json: () => Promise.resolve({success: true}),
     })
-) as any;
+) as unknown as typeof fetch;
 
 // Réinitialiser les mocks entre chaque test
 beforeEach(() => {
