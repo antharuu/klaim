@@ -1,5 +1,5 @@
 import { IElement } from "./Element";
-import { callApi, createRouteHandler, IArgs, IBody, Klaim, RouteFunction } from "./Klaim";
+import { createRouteHandler, Klaim, RouteFunction } from "./Klaim";
 
 /**
  * Singleton class that manages the registration and organization of API elements.

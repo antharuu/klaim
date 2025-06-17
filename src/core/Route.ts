@@ -5,12 +5,12 @@ import { Registry } from "./Registry";
  * Supported HTTP methods for route definitions.
  */
 export enum RouteMethod {
-    GET = "GET",
-    POST = "POST",
-    PUT = "PUT",
-    DELETE = "DELETE",
-    PATCH = "PATCH",
-    OPTIONS = "OPTIONS"
+	GET = "GET",
+	POST = "POST",
+	PUT = "PUT",
+	DELETE = "DELETE",
+	PATCH = "PATCH",
+	OPTIONS = "OPTIONS"
 }
 
 /**

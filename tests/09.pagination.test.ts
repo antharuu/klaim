@@ -1,5 +1,5 @@
-import {Api, Route, Klaim} from "../src";
-import {describe, it, expect} from "vitest";
+import {Api, Klaim, Route} from "../src";
+import {describe, expect, it} from "vitest";
 
 const limit = 3;
 

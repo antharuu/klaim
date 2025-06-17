@@ -1,6 +1,6 @@
 import cleanUrl from "../tools/cleanUrl";
-import { DEFAULT_RATE_LIMIT_CONFIG,IRateLimitConfig } from "../tools/rateLimit";
-import { DEFAULT_TIMEOUT_CONFIG,ITimeoutConfig } from "../tools/timeout";
+import { DEFAULT_RATE_LIMIT_CONFIG, IRateLimitConfig } from "../tools/rateLimit";
+import { DEFAULT_TIMEOUT_CONFIG, ITimeoutConfig } from "../tools/timeout";
 import toCamelCase from "../tools/toCamelCase";
 
 /**
@@ -105,10 +105,10 @@ export interface IElement {
 	cache: false | number;
 	/** Number of retry attempts, or false if retries are disabled */
 	retry: false | number;
-        /** Rate limiting configuration, or false if rate limiting is disabled */
-        rate: false | IRateLimitConfig;
-        /** Request timeout configuration, or false if disabled */
-        timeout: false | ITimeoutConfig;
+	/** Rate limiting configuration, or false if rate limiting is disabled */
+	rate: false | IRateLimitConfig;
+	/** Request timeout configuration, or false if disabled */
+	timeout: false | ITimeoutConfig;
 	/** Reference to parent element name */
 	parent?: string;
 	/** HTTP method for routes */
@@ -138,11 +138,11 @@ export interface IElement {
 	/** Configures pagination settings */
 	withPagination(config?: IPaginationConfig): this;
 
-        /** Enables rate limiting */
-        withRate(config?: Partial<IRateLimitConfig>): this;
+	/** Enables rate limiting */
+	withRate(config?: Partial<IRateLimitConfig>): this;
 
-        /** Enables request timeout */
-        withTimeout(duration?: number, message?: string): this;
+	/** Enables request timeout */
+	withTimeout(duration?: number, message?: string): this;
 }
 
 /**
