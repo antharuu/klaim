@@ -1242,10 +1242,10 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@51.0.3:
-  version "51.0.3"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-51.0.3.tgz"
-  integrity sha512-9BRR+b5nKwp6LGTffnrxKxduhzO/DzyBmRNqyt1wIlBFP+q9mq+sq1hIQCVetZAn1PaOl0Evo4PUOlT+xbtctQ==
+eslint-plugin-jsdoc@51.0.4:
+  version "51.0.4"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-51.0.4.tgz"
+  integrity sha512-9IueO9fIj4h2w9pY7iH0/h5oq3Iq6iYuyuLRvPY1+LUDiEVaBh4ceHaHGvfAnUY31e93m7e39sJj1LrQTWjnow==
   dependencies:
     "@es-joy/jsdoccomment" "~0.50.2"
     are-docs-informative "^0.0.2"
