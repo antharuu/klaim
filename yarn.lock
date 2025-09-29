@@ -586,12 +586,12 @@
   resolved "https://registry.npmjs.org/@tootallnate/quickjs-emscripten/-/quickjs-emscripten-0.23.0.tgz"
   integrity sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==
 
-"@types/bun@^1.2.22":
-  version "1.2.22"
-  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.2.22.tgz"
-  integrity sha512-5A/KrKos2ZcN0c6ljRSOa1fYIyCKhZfIVYeuyb4snnvomnpFqC0tTsEkdqNxbAgExV384OETQ//WAjl3XbYqQA==
+"@types/bun@^1.2.23":
+  version "1.2.23"
+  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.2.23.tgz"
+  integrity sha512-le8ueOY5b6VKYf19xT3McVbXqLqmxzPXHsQT/q9JHgikJ2X22wyTW3g3ohz2ZMnp7dod6aduIiq8A14Xyimm0A==
   dependencies:
-    bun-types "1.2.22"
+    bun-types "1.2.23"
 
 "@types/chai@^5.2.2":
   version "5.2.2"
@@ -635,9 +635,9 @@
   integrity sha512-LriObC2+KYZD3FzCrgWGv/qufdUy4eXrxcLgQMfYXgPbLIecKIsVBaQgUPmxSSLcjmYbDTQbMgr6qr6l/eb7Bg==
 
 "@types/react@^19":
-  version "19.1.13"
-  resolved "https://registry.npmjs.org/@types/react/-/react-19.1.13.tgz"
-  integrity sha512-hHkbU/eoO3EG5/MZkuFSKmYqPbSVk5byPFa3e7y/8TybHiLMACgI8seVYlicwk7H5K/rI2px9xrQp/C+AUDTiQ==
+  version "19.1.15"
+  resolved "https://registry.npmjs.org/@types/react/-/react-19.1.15.tgz"
+  integrity sha512-+kLxJpaJzXybyDyFXYADyP1cznTO8HSuBpenGlnKOAkH4hyNINiywvXS/tGJhsrGGP/gM185RA3xpjY0Yg4erA==
   dependencies:
     csstype "^3.0.2"
 
@@ -961,10 +961,10 @@ braces@^3.0.3:
   dependencies:
     fill-range "^7.1.1"
 
-bun-types@1.2.22:
-  version "1.2.22"
-  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.2.22.tgz"
-  integrity sha512-hwaAu8tct/Zn6Zft4U9BsZcXkYomzpHJX28ofvx7k0Zz2HNz54n1n+tDgxoWFGB4PcFvJXJQloPhaV2eP3Q6EA==
+bun-types@1.2.23:
+  version "1.2.23"
+  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.2.23.tgz"
+  integrity sha512-R9f0hKAZXgFU3mlrA0YpE/fiDvwV0FT9rORApt2aQVWSuJDzZOyB5QLc0N/4HF57CS8IXJ6+L5E4W1bW6NS2Aw==
   dependencies:
     "@types/node" "*"
 
@@ -1312,10 +1312,10 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@60.4.1:
-  version "60.4.1"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-60.4.1.tgz"
-  integrity sha512-ThiCaCUu0UQlKcQszs7Zv/6ghBowDh5B33rNXwQK1MMPh/defS3hcuDxONUhoBGfFe/v4hpe1xbxXCFs6XvSnQ==
+eslint-plugin-jsdoc@60.5.0:
+  version "60.5.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-60.5.0.tgz"
+  integrity sha512-3ivSigRDi/04GFRRYqvv4PgLD/+ZBLfHEk/0WKNpDBcmucnEAhqFjmJhLo4W4SIpXKZ/WVQNVPEsFXVPz9fRjA==
   dependencies:
     "@es-joy/jsdoccomment" "~0.62.0"
     are-docs-informative "^0.0.2"
