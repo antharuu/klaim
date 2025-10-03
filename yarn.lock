@@ -622,10 +622,10 @@
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
-"@types/node@*", "@types/node@^18.0.0 || ^20.0.0 || >=22.0.0", "@types/node@^20.19.0 || >=22.12.0", "@types/node@^24.6.1", "@types/node@>=18":
-  version "24.6.1"
-  resolved "https://registry.npmjs.org/@types/node/-/node-24.6.1.tgz"
-  integrity sha512-ljvjjs3DNXummeIaooB4cLBKg2U6SPI6Hjra/9rRIy7CpM0HpLtG9HptkMKAb4HYWy5S7HUvJEuWgr/y0U8SHw==
+"@types/node@*", "@types/node@^18.0.0 || ^20.0.0 || >=22.0.0", "@types/node@^20.19.0 || >=22.12.0", "@types/node@^24.6.2", "@types/node@>=18":
+  version "24.6.2"
+  resolved "https://registry.npmjs.org/@types/node/-/node-24.6.2.tgz"
+  integrity sha512-d2L25Y4j+W3ZlNAeMKcy7yDsK425ibcAOO2t7aPTz6gNMH0z2GThtwENCDc0d/Pw9wgyRqE5Px1wkV7naz8ang==
   dependencies:
     undici-types "~7.13.0"
 
@@ -1312,10 +1312,10 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@60.7.0:
-  version "60.7.0"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-60.7.0.tgz"
-  integrity sha512-y1AYoLoWNIOzjctcem9MjIZb9XDoTBI6D9lyaWT0W8/t6jpNvTuMQJljRzaQyjTDDFbONAEcuufdu0DXtCUP8A==
+eslint-plugin-jsdoc@60.7.1:
+  version "60.7.1"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-60.7.1.tgz"
+  integrity sha512-JCLls7B3Tlb2YS5M6+aZqxb0gnEkr+H9/qMm5HSzynlvq3wqbxS7+4RS954EGuLrITfbaB6nmf3FyZAhOeCUEg==
   dependencies:
     "@es-joy/jsdoccomment" "~0.65.2"
     are-docs-informative "^0.0.2"
@@ -2963,10 +2963,10 @@ vite-node@3.2.4:
     pathe "^2.0.3"
     vite "^5.0.0 || ^6.0.0 || ^7.0.0-0"
 
-"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0", vite@^7.1.7:
-  version "7.1.7"
-  resolved "https://registry.npmjs.org/vite/-/vite-7.1.7.tgz"
-  integrity sha512-VbA8ScMvAISJNJVbRDTJdCwqQoAareR/wutevKanhR2/1EkoXVZVkkORaYm/tNVCjP/UDTKtcw3bAkwOUdedmA==
+"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0", vite@^7.1.8:
+  version "7.1.8"
+  resolved "https://registry.npmjs.org/vite/-/vite-7.1.8.tgz"
+  integrity sha512-oBXvfSHEOL8jF+R9Am7h59Up07kVVGH1NrFGFoEG6bPDZP3tGpQhvkBpy5x7U6+E6wZCu9OihsWgJqDbQIm8LQ==
   dependencies:
     esbuild "^0.25.0"
     fdir "^6.5.0"
