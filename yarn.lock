@@ -99,16 +99,16 @@
   resolved "https://registry.npmjs.org/@csstools/css-tokenizer/-/css-tokenizer-3.0.4.tgz"
   integrity sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==
 
-"@es-joy/jsdoccomment@~0.71.0":
-  version "0.71.0"
-  resolved "https://registry.npmjs.org/@es-joy/jsdoccomment/-/jsdoccomment-0.71.0.tgz"
-  integrity sha512-2p9+dXWNQnp5Kq/V0XVWZiVAabzlX6rUW8vXXvtX8Yc1CkKgD93IPDEnv1sYZFkkS6HMvg6H0RMZfob/Co0YXA==
+"@es-joy/jsdoccomment@~0.75.0":
+  version "0.75.0"
+  resolved "https://registry.npmjs.org/@es-joy/jsdoccomment/-/jsdoccomment-0.75.0.tgz"
+  integrity sha512-Bj+oF8reFb4b+6LUmG6ETpDsBU/28y/bAAzioyIR4VK/V6UodYBNGbtxRyGxk0aJJQqpZZ6jz82vVZWCX6Mwmg==
   dependencies:
     "@types/estree" "^1.0.8"
     "@typescript-eslint/types" "^8.46.0"
     comment-parser "1.4.1"
     esquery "^1.6.0"
-    jsdoc-type-pratt-parser "~6.6.0"
+    jsdoc-type-pratt-parser "~6.9.1"
 
 "@esbuild/linux-x64@0.25.4":
   version "0.25.4"
@@ -1314,12 +1314,12 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@60.8.3:
-  version "60.8.3"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-60.8.3.tgz"
-  integrity sha512-4191bTMvnd5WUtopCdzNhQchvv/MxtPD86ZGl3vem8Ibm22xJhKuIyClmgSxw+YERtorVc/NhG+bGjfFVa6+VQ==
+eslint-plugin-jsdoc@61.0.0:
+  version "61.0.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-61.0.0.tgz"
+  integrity sha512-YxvOY3A9H8usnOfOEH82y71yHR7zVNWZJpQbjkC+rWqrADQtM+Gza3+db/j9euNNWCNKnN+/gBrowg16n9lwgg==
   dependencies:
-    "@es-joy/jsdoccomment" "~0.71.0"
+    "@es-joy/jsdoccomment" "~0.75.0"
     are-docs-informative "^0.0.2"
     comment-parser "1.4.1"
     debug "^4.4.3"
@@ -1329,7 +1329,7 @@ eslint-plugin-jsdoc@60.8.3:
     html-entities "^2.6.0"
     object-deep-merge "^1.0.5"
     parse-imports-exports "^0.2.4"
-    semver "^7.7.2"
+    semver "^7.7.3"
     spdx-expression-parse "^4.0.0"
 
 eslint-plugin-simple-import-sort@12.1.1:
@@ -1891,10 +1891,10 @@ jsbn@1.1.0:
   resolved "https://registry.npmjs.org/jsbn/-/jsbn-1.1.0.tgz"
   integrity sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==
 
-jsdoc-type-pratt-parser@~6.6.0:
-  version "6.6.0"
-  resolved "https://registry.npmjs.org/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-6.6.0.tgz"
-  integrity sha512-3hSD14nXx66Rspx1RMnz1Pj4JacrMBAsC0CrF9lZYO/Qsp5/oIr6KqujVUNhQu94B6mMip2ukki8MpEWZwyhKA==
+jsdoc-type-pratt-parser@~6.9.1:
+  version "6.9.1"
+  resolved "https://registry.npmjs.org/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-6.9.1.tgz"
+  integrity sha512-HbYNAorY51GnpKvgDf4YINSY+V1segv0qEeijvTSI6OWMCmqah0W6mVwBFeWskJ81uTJJVnDQlwhpJMREvGsXg==
 
 jsdom@*, jsdom@^27.0.0:
   version "27.0.0"
@@ -2587,10 +2587,15 @@ saxes@^6.0.0:
   dependencies:
     xmlchars "^2.2.0"
 
-semver@^7.5.3, semver@^7.6.0, semver@^7.7.2, semver@7.7.2:
+semver@^7.5.3, semver@^7.6.0, semver@7.7.2:
   version "7.7.2"
   resolved "https://registry.npmjs.org/semver/-/semver-7.7.2.tgz"
   integrity sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==
+
+semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.npmjs.org/semver/-/semver-7.7.3.tgz"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 shebang-command@^2.0.0:
   version "2.0.0"
