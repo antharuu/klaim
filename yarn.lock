@@ -99,16 +99,16 @@
   resolved "https://registry.npmjs.org/@csstools/css-tokenizer/-/css-tokenizer-3.0.4.tgz"
   integrity sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==
 
-"@es-joy/jsdoccomment@~0.75.0":
-  version "0.75.0"
-  resolved "https://registry.npmjs.org/@es-joy/jsdoccomment/-/jsdoccomment-0.75.0.tgz"
-  integrity sha512-Bj+oF8reFb4b+6LUmG6ETpDsBU/28y/bAAzioyIR4VK/V6UodYBNGbtxRyGxk0aJJQqpZZ6jz82vVZWCX6Mwmg==
+"@es-joy/jsdoccomment@~0.76.0":
+  version "0.76.0"
+  resolved "https://registry.npmjs.org/@es-joy/jsdoccomment/-/jsdoccomment-0.76.0.tgz"
+  integrity sha512-g+RihtzFgGTx2WYCuTHbdOXJeAlGnROws0TeALx9ow/ZmOROOZkVg5wp/B44n0WJgI4SQFP1eWM2iRPlU2Y14w==
   dependencies:
     "@types/estree" "^1.0.8"
     "@typescript-eslint/types" "^8.46.0"
     comment-parser "1.4.1"
     esquery "^1.6.0"
-    jsdoc-type-pratt-parser "~6.9.1"
+    jsdoc-type-pratt-parser "~6.10.0"
 
 "@esbuild/linux-x64@0.25.4":
   version "0.25.4"
@@ -624,10 +624,10 @@
   resolved "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.15.tgz"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
 
-"@types/node@*", "@types/node@^18.0.0 || ^20.0.0 || >=22.0.0", "@types/node@^20.19.0 || >=22.12.0", "@types/node@^24.7.0", "@types/node@>=18":
-  version "24.7.0"
-  resolved "https://registry.npmjs.org/@types/node/-/node-24.7.0.tgz"
-  integrity sha512-IbKooQVqUBrlzWTi79E8Fw78l8k1RNtlDDNWsFZs7XonuQSJ8oNYfEeclhprUldXISRMLzBpILuKgPlIxm+/Yw==
+"@types/node@*", "@types/node@^18.0.0 || ^20.0.0 || >=22.0.0", "@types/node@^20.19.0 || >=22.12.0", "@types/node@^24.7.1", "@types/node@>=18":
+  version "24.7.1"
+  resolved "https://registry.npmjs.org/@types/node/-/node-24.7.1.tgz"
+  integrity sha512-CmyhGZanP88uuC5GpWU9q+fI61j2SkhO3UGMUdfYRE6Bcy0ccyzn1Rqj9YAB/ZY4kOXmNf0ocah5GtphmLMP6Q==
   dependencies:
     undici-types "~7.14.0"
 
@@ -1314,12 +1314,12 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@61.0.1:
-  version "61.0.1"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-61.0.1.tgz"
-  integrity sha512-J4spzu8Y43P+QD/V2HOsg+YbJmVcP6+G33fbT4pBRA5UAEuL/fU5AI75GuCCzgw25OAlfXq7z3s9o/nnvEmGVQ==
+eslint-plugin-jsdoc@61.1.0:
+  version "61.1.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-61.1.0.tgz"
+  integrity sha512-X6cGyMgwPh15CJ6Vv+yjEUam1ilRwalmPNfTNvd0/0JO8+ZbE1ST1xkKQtCUqF2sofTC3P/u1g0VHgygbTUjrw==
   dependencies:
-    "@es-joy/jsdoccomment" "~0.75.0"
+    "@es-joy/jsdoccomment" "~0.76.0"
     are-docs-informative "^0.0.2"
     comment-parser "1.4.1"
     debug "^4.4.3"
@@ -1891,10 +1891,10 @@ jsbn@1.1.0:
   resolved "https://registry.npmjs.org/jsbn/-/jsbn-1.1.0.tgz"
   integrity sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==
 
-jsdoc-type-pratt-parser@~6.9.1:
-  version "6.9.1"
-  resolved "https://registry.npmjs.org/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-6.9.1.tgz"
-  integrity sha512-HbYNAorY51GnpKvgDf4YINSY+V1segv0qEeijvTSI6OWMCmqah0W6mVwBFeWskJ81uTJJVnDQlwhpJMREvGsXg==
+jsdoc-type-pratt-parser@~6.10.0:
+  version "6.10.0"
+  resolved "https://registry.npmjs.org/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-6.10.0.tgz"
+  integrity sha512-+LexoTRyYui5iOhJGn13N9ZazL23nAHGkXsa1p/C8yeq79WRfLBag6ZZ0FQG2aRoc9yfo59JT9EYCQonOkHKkQ==
 
 jsdom@*, jsdom@^27.0.0:
   version "27.0.0"
