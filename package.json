@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.11.112",
+    "version": "1.11.113",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -24,7 +24,7 @@
         "release-it": "^19.0.6",
         "typescript": "5.9.3",
         "typescript-eslint": "8.46.3",
-        "vite": "^7.2.0",
+        "vite": "^7.2.1",
         "vitest": "^4.0.7",
         "yup": "^1.7.1"
     },
