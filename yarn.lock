@@ -544,12 +544,12 @@
   resolved "https://registry.npmjs.org/@tootallnate/quickjs-emscripten/-/quickjs-emscripten-0.23.0.tgz"
   integrity sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==
 
-"@types/bun@^1.3.3":
-  version "1.3.3"
-  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.3.3.tgz"
-  integrity sha512-ogrKbJ2X5N0kWLLFKeytG0eHDleBYtngtlbu9cyBKFtNL3cnpDZkNdQj8flVf6WTZUX5ulI9AY1oa7ljhSrp+g==
+"@types/bun@^1.3.4":
+  version "1.3.4"
+  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.3.4.tgz"
+  integrity sha512-EEPTKXHP+zKGPkhRLv+HI0UEX8/o+65hqARxLy8Ov5rIxMBPNTjeZww00CIihrIQGEQBYg+0roO5qOnS/7boGA==
   dependencies:
-    bun-types "1.3.3"
+    bun-types "1.3.4"
 
 "@types/chai@^5.2.2":
   version "5.2.3"
@@ -895,10 +895,10 @@ brace-expansion@^2.0.1:
   dependencies:
     balanced-match "^1.0.0"
 
-bun-types@1.3.3:
-  version "1.3.3"
-  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.3.3.tgz"
-  integrity sha512-z3Xwlg7j2l9JY27x5Qn3Wlyos8YAp0kKRlrePAOjgjMGS5IG6E7Jnlx736vH9UVI4wUICwwhC9anYL++XeOgTQ==
+bun-types@1.3.4:
+  version "1.3.4"
+  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.3.4.tgz"
+  integrity sha512-5ua817+BZPZOlNaRgGBpZJOSAQ9RQ17pkwPD0yR7CfJg+r8DgIILByFifDTa+IPDDxzf5VNhtNlcKqFzDgJvlQ==
   dependencies:
     "@types/node" "*"
 
@@ -1211,10 +1211,10 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-plugin-jsdoc@61.4.2:
-  version "61.4.2"
-  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-61.4.2.tgz"
-  integrity sha512-WzZNvefoUaG/JWikVFhNLYqE2BEd6LQD2ZyfJOe1Ld3Cir05csDMMf0AihGwrSbB/e7fHRSfQOZ4F/hik9fQww==
+eslint-plugin-jsdoc@61.5.0:
+  version "61.5.0"
+  resolved "https://registry.npmjs.org/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-61.5.0.tgz"
+  integrity sha512-PR81eOGq4S7diVnV9xzFSBE4CDENRQGP0Lckkek8AdHtbj+6Bm0cItwlFnxsLFriJHspiE3mpu8U20eODyToIg==
   dependencies:
     "@es-joy/jsdoccomment" "~0.76.0"
     "@es-joy/resolve.exports" "1.2.0"
