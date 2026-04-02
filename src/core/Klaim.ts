@@ -266,6 +266,10 @@ async function fetchWithRetry (
                 }
                 throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts`);
             }
+            // Exponential backoff with jitter: base * 2^attempt + random jitter
+            const baseDelay = 200;
+            const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 100;
+            await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
 
