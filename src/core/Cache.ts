@@ -1,8 +1,15 @@
 /**
- * A singleton cache implementation that provides in-memory storage with time-based expiration.
+ * Maximum number of entries the cache can hold before evicting the oldest.
+ */
+const DEFAULT_MAX_SIZE = 1000;
+
+/**
+ * A singleton cache implementation that provides in-memory storage with time-based expiration
+ * and LRU eviction policy.
  *
  * The cache stores key-value pairs with optional time-to-live (TTL) durations.
  * When a TTL is specified, cached items will automatically expire after the specified duration.
+ * When the cache reaches its maximum size, the least recently used entry is evicted.
  *
  * @example
  * ```typescript
@@ -22,19 +29,29 @@ export class Cache {
     /**
      * Internal storage for cached items.
      * Maps keys to objects containing the data and expiration timestamp.
+     * Map insertion order is used for LRU eviction.
      *
      * @private
      */
     private cache: Map<string, { data: unknown; expiry: number }>;
 
     /**
-     * Private constructor to enforce singleton pattern.
-     * Initializes an empty cache storage.
+     * Maximum number of entries allowed in the cache.
      *
      * @private
      */
-    private constructor () {
+    private maxSize: number;
+
+    /**
+     * Private constructor to enforce singleton pattern.
+     * Initializes an empty cache storage.
+     *
+     * @param maxSize - Maximum cache entries before eviction
+     * @private
+     */
+    private constructor (maxSize: number = DEFAULT_MAX_SIZE) {
         this.cache = new Map();
+        this.maxSize = maxSize;
     }
 
     /**
@@ -56,6 +73,7 @@ export class Cache {
 
     /**
      * Stores a value in the cache with an optional time-to-live duration.
+     * Evicts the least recently used entry if the cache is full.
      *
      * @param key - Unique identifier for the cached item
      * @param value - The data to cache
@@ -70,6 +88,19 @@ export class Cache {
      * ```
      */
     public set (key: string, value: unknown, ttl: number = 0): void {
+        // Delete first so re-insertion moves to end (most recent)
+        if (this.cache.has(key)) {
+            this.cache.delete(key);
+        }
+
+        // Evict oldest entry if at capacity
+        if (this.cache.size >= this.maxSize) {
+            const oldestKey = this.cache.keys().next().value;
+            if (oldestKey !== undefined) {
+                this.cache.delete(oldestKey);
+            }
+        }
+
         const expiry = ttl > 0 ? Date.now() + ttl : Infinity;
         this.cache.set(key, { data: value, expiry });
     }
@@ -104,6 +135,7 @@ export class Cache {
     /**
      * Retrieves a value from the cache if it exists and hasn't expired.
      * Returns null for non-existent or expired entries.
+     * Moves the accessed entry to the most recent position (LRU).
      *
      * @param key - The key of the cached item to retrieve
      * @returns The cached value if valid, null otherwise
@@ -119,8 +151,33 @@ export class Cache {
      */
     public get (key: string): unknown | null {
         if (this.has(key)) {
-            return this.cache.get(key)!.data;
+            const entry = this.cache.get(key)!;
+            // Move to end (most recently used) for LRU
+            this.cache.delete(key);
+            this.cache.set(key, entry);
+            return entry.data;
         }
         return null;
+    }
+
+    /**
+     * Removes all entries from the cache.
+     *
+     * @example
+     * ```typescript
+     * Cache.i.clear();
+     * ```
+     */
+    public clear (): void {
+        this.cache.clear();
+    }
+
+    /**
+     * Returns the number of entries currently in the cache.
+     *
+     * @returns The number of cached entries
+     */
+    public get size (): number {
+        return this.cache.size;
     }
 }
