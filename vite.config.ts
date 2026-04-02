@@ -1,8 +1,15 @@
 import { defineConfig } from "vite";
 import { configDefaults } from "vitest/config";
+import dts from "vite-plugin-dts";
 import * as path from "path";
 
 export default defineConfig({
+    plugins: [
+        dts({
+            insertTypesEntry: true,
+            rollupTypes: true,
+        }),
+    ],
     build: {
         lib: {
             entry: path.resolve(__dirname, "src/index.ts"),
