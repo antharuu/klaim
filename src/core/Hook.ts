@@ -67,4 +67,20 @@ export class Hook {
 
         callback();
     }
+
+    /**
+     * Removes a specific hook callback.
+     *
+     * @param routeName - The fully qualified name of the route
+     */
+    public static unsubscribe (routeName: string): void {
+        this._callbacks.delete(routeName);
+    }
+
+    /**
+     * Removes all registered hook callbacks.
+     */
+    public static unsubscribeAll (): void {
+        this._callbacks.clear();
+    }
 }

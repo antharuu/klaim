@@ -269,4 +269,18 @@ export class Registry {
 
         return undefined;
     }
+
+    /**
+     * Resets the registry, clearing all registered elements and the Klaim object.
+     * Useful for testing and cleanup.
+     */
+    public reset (): void {
+        this._elements.clear();
+        this._currentParent = null;
+
+        // Clear all properties from Klaim object
+        for (const key of Object.keys(Klaim)) {
+            delete Klaim[key];
+        }
+    }
 }
