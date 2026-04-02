@@ -25,7 +25,7 @@ export class Cache {
      *
      * @private
      */
-    private cache: Map<string, { data: any; expiry: number }>;
+    private cache: Map<string, { data: unknown; expiry: number }>;
 
     /**
      * Private constructor to enforce singleton pattern.
@@ -69,8 +69,8 @@ export class Cache {
      * Cache.i.set("appConfig", configData);
      * ```
      */
-    public set (key: string, value: any, ttl: number = 0): void {
-        const expiry = Date.now() + ttl;
+    public set (key: string, value: unknown, ttl: number = 0): void {
+        const expiry = ttl > 0 ? Date.now() + ttl : Infinity;
         this.cache.set(key, { data: value, expiry });
     }
 
@@ -117,7 +117,7 @@ export class Cache {
      * }
      * ```
      */
-    public get (key: string): any | null {
+    public get (key: string): unknown | null {
         if (this.has(key)) {
             return this.cache.get(key)!.data;
         }
