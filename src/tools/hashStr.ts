@@ -11,17 +11,19 @@ export default function (str: string): string {
 
     for (let i = 0; i < str.length; i++) {
         hash ^= str.charCodeAt(i);
-        hash *= prime;
+        hash = Math.imul(hash, prime) >>> 0;
     }
 
     // Convert the integer hash to a hexadecimal string
     let hexHash = (hash >>> 0).toString(16).padStart(8, "0");
 
-    // Extend the hash to 32 characters by rehashing and concatenating
+    // Extend the hash to 32 characters by rehashing with varying positions
+    let iteration = 0;
     while (hexHash.length < 32) {
-        hash ^= hexHash.charCodeAt(hexHash.length % hexHash.length);
-        hash *= prime;
+        hash ^= hexHash.charCodeAt(iteration % hexHash.length);
+        hash = Math.imul(hash, prime) >>> 0;
         hexHash += (hash >>> 0).toString(16).padStart(8, "0");
+        iteration++;
     }
 
     return hexHash.substring(0, 32);
