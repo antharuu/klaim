@@ -1,3 +1,5 @@
+import { TimeoutError } from "../core/errors";
+
 export interface ITimeoutConfig {
     duration: number; // seconds
     message: string;
@@ -22,7 +24,7 @@ export async function withTimeout<T> (promise: Promise<T>, config: ITimeoutConfi
         new Promise<T>((_, reject) => {
             const id = setTimeout(() => {
                 clearTimeout(id);
-                reject(new Error(message));
+                reject(new TimeoutError(message));
             }, duration * 1000);
         })
     ]);

@@ -47,9 +47,6 @@ export class Api extends Element {
         headers: IHeaders = {}
     ): Element {
         const newName = toCamelCase(name);
-        if (newName !== name) {
-            console.warn(`API name "${name}" has been camelCased to "${newName}"`);
-        }
 
         // Create API instance
         const api = new Api(newName, url, headers);

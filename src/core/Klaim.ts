@@ -3,6 +3,7 @@ import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { withTimeout } from "../tools/timeout";
 
 import { IElement } from "./Element";
+import { InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
 
@@ -117,7 +118,7 @@ export async function callApi<T> (
     }
 
     if (!element || !api || element.type !== "route" || api.type !== "api") {
-        throw new Error(`Invalid path: ${parent}.${element.name}`);
+        throw new InvalidPathError(`${parent}.${element.name}`);
     }
 
     let url = applyArgs(`${api.url}/${element.url}`, element, args);
@@ -229,8 +230,7 @@ async function fetchWithRetry (
 
         if (!allowed) {
             const waitTime = getTimeUntilNextRequest(routeKey, route.rate);
-            const waitSeconds = Math.ceil(waitTime / 1000);
-            throw new Error(`Rate limit exceeded for ${routeKey}. Try again in ${waitSeconds} seconds.`);
+            throw new RateLimitError(`Rate limit exceeded for ${routeKey}. Try again in ${Math.ceil(waitTime / 1000)} seconds.`, waitTime);
         }
     } else if (api.rate) {
         // Si l'API a une configuration de limite et que la route n'en a pas, utiliser une clé au niveau de l'API
@@ -239,8 +239,7 @@ async function fetchWithRetry (
 
         if (!allowed) {
             const waitTime = getTimeUntilNextRequest(apiKey, api.rate);
-            const waitSeconds = Math.ceil(waitTime / 1000);
-            throw new Error(`Rate limit exceeded for ${api.name} API. Try again in ${waitSeconds} seconds.`);
+            throw new RateLimitError(`Rate limit exceeded for ${api.name} API. Try again in ${Math.ceil(waitTime / 1000)} seconds.`, waitTime);
         }
     }
 
@@ -261,10 +260,12 @@ async function fetchWithRetry (
         } catch (error: unknown) {
             attempt++;
             if (attempt > maxRetries) {
-                if (error instanceof Error) {
-                    throw error;
-                }
-                throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts`);
+                const cause = error instanceof Error ? error : undefined;
+                throw new RetryExhaustedError(
+                    `Failed to fetch ${url} after ${maxRetries + 1} attempts`,
+                    attempt,
+                    cause
+                );
             }
             // Exponential backoff with jitter: base * 2^attempt + random jitter
             const baseDelay = 200;
@@ -290,7 +291,7 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
     route.arguments.forEach(arg => {
         const value = args[arg];
         if (value === undefined) {
-            throw new Error(`Argument ${arg} is missing`);
+            throw new MissingArgumentError(arg);
         }
         newUrl = newUrl.replace(`[${arg}]`, encodeURIComponent(String(value)));
     });

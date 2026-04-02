@@ -71,10 +71,6 @@ export class Group extends Element {
         // Create the group with the camelCased name
         const group = new Group(camelCasedName, "");
 
-        if (camelCasedName !== name) {
-            console.warn(`Group name "${name}" has been camelCased to "${camelCasedName}"`);
-        }
-
         // Register the group at the appropriate level
         Registry.i.registerElement(group);
 

@@ -211,9 +211,6 @@ export abstract class Element implements IElement {
     ) {
         this.type = type;
         this.name = toCamelCase(name);
-        if (this.name !== name) {
-            console.warn(`Name "${name}" has been camelCased to "${this.name}"`);
-        }
 
         this.url = cleanUrl(url);
         this.headers = headers || {};
