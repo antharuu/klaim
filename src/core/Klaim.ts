@@ -225,16 +225,16 @@ async function fetchWithRetry (
     // Check rate limiting
     // Si la route a sa propre configuration de limite, on l'utilise avec une clé spécifique à la route
     if (route.rate) {
-        const routeKey = `${api.name}.${route.name}`;
+        const routeKey = `ROUTE:${api.name}:${route.name}`;
         const allowed = checkRateLimit(routeKey, route.rate);
 
         if (!allowed) {
             const waitTime = getTimeUntilNextRequest(routeKey, route.rate);
-            throw new RateLimitError(`Rate limit exceeded for ${routeKey}. Try again in ${Math.ceil(waitTime / 1000)} seconds.`, waitTime);
+            throw new RateLimitError(`Rate limit exceeded for ${api.name}.${route.name}. Try again in ${Math.ceil(waitTime / 1000)} seconds.`, waitTime);
         }
     } else if (api.rate) {
         // Si l'API a une configuration de limite et que la route n'en a pas, utiliser une clé au niveau de l'API
-        const apiKey = `${api.name}`;
+        const apiKey = `API:${api.name}`;
         const allowed = checkRateLimit(apiKey, api.rate);
 
         if (!allowed) {

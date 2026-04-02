@@ -177,7 +177,7 @@ export class Route extends Element {
         const matches = this.url.match(/\[([^\]]+)]/g);
         if (matches) {
             matches.forEach(match => {
-                const key = match.replace("[", "").replace("]", "");
+                const key = match.slice(1, -1);
                 this.arguments.add(key);
             });
         }
