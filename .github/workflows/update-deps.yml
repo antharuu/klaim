@@ -39,9 +39,9 @@ jobs:
             -   name: Install dependencies
                 run: npm install
 
-            -   name: Update ALL dependencies
+            -   name: Update dependencies (minor and patch only)
                 run: |
-                    npx npm-check-updates -u
+                    npx npm-check-updates -u --target minor
                     npm install
 
             -   name: Test and build
