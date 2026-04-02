@@ -195,7 +195,7 @@ async function fetchData (
     api: IElement
 ): Promise<unknown> {
     if (withCache) {
-        return await fetchWithCache(url, config, api.cache);
+        return await fetchWithCache(url, config, api.cache || undefined);
     } else {
         const rawResponse = await fetch(url, config);
         return await rawResponse.json();
@@ -260,6 +260,10 @@ async function fetchWithRetry (
         } catch (error: unknown) {
             attempt++;
             if (attempt > maxRetries) {
+                // If no retries were configured, throw the original error
+                if (maxRetries === 0 && error instanceof Error) {
+                    throw error;
+                }
                 const cause = error instanceof Error ? error : undefined;
                 throw new RetryExhaustedError(
                     `Failed to fetch ${url} after ${maxRetries + 1} attempts`,

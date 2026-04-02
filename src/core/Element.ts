@@ -255,10 +255,10 @@ export abstract class Element implements IElement {
      * @param {number} [duration] - Cache duration in seconds
      * @returns {this} The element instance for chaining
      */
-    public withCache = (duration: number = 20): this => {
+    public withCache (duration: number = 20): this {
         this.cache = duration;
         return this;
-    };
+    }
 
     /**
      * Enables request retries for this element
@@ -266,10 +266,10 @@ export abstract class Element implements IElement {
      * @param {number} [maxRetries] - Maximum number of retry attempts
      * @returns {this} The element instance for chaining
      */
-    public withRetry = (maxRetries: number = 2): this => {
+    public withRetry (maxRetries: number = 2): this {
         this.retry = maxRetries;
         return this;
-    };
+    }
 
     /**
      * Configures pagination settings for this element
@@ -304,13 +304,13 @@ export abstract class Element implements IElement {
      * Route.get("getUser", "/users/[id]").withRate({ limit: 5, duration: 10 });
      * ```
      */
-    public withRate = (config: Partial<IRateLimitConfig> = {}): this => {
+    public withRate (config: Partial<IRateLimitConfig> = {}): this {
         this.rate = {
             ...DEFAULT_RATE_LIMIT_CONFIG,
             ...config
         };
         return this;
-    };
+    }
 
     /**
      * Enables request timeout for this element
@@ -319,11 +319,11 @@ export abstract class Element implements IElement {
      * @param {string} [message] - Custom error message
      * @returns {this} The element instance for chaining
      */
-    public withTimeout = (
+    public withTimeout (
         duration: number = DEFAULT_TIMEOUT_CONFIG.duration,
         message: string = DEFAULT_TIMEOUT_CONFIG.message
-    ): this => {
+    ): this {
         this.timeout = { duration, message };
         return this;
-    };
+    }
 }

@@ -1,6 +1,6 @@
 export { Api } from "./core/Api";
 export { Cache } from "./core/Cache";
-export {
+export type {
     ICallbackAfterArgs,
     ICallbackBeforeArgs,
     ICallbackCallArgs,
@@ -18,8 +18,9 @@ export {
 } from "./core/errors";
 export { Group } from "./core/Group";
 export { Hook } from "./core/Hook";
-export { IArgs, IBody, Klaim } from "./core/Klaim";
+export type { IArgs, IBody } from "./core/Klaim";
+export { Klaim } from "./core/Klaim";
 export { Registry } from "./core/Registry";
 export { Route } from "./core/Route";
-export { IRateLimitConfig } from "./tools/rateLimit";
-export { ITimeoutConfig } from "./tools/timeout";
+export type { IRateLimitConfig } from "./tools/rateLimit";
+export type { ITimeoutConfig } from "./tools/timeout";
