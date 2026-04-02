@@ -190,9 +190,9 @@ export async function callApi<T> (
 async function fetchData (
     withCache: boolean,
     url: string,
-    config: any,
-    api: any
-): Promise<any> {
+    config: Record<string, unknown>,
+    api: IElement
+): Promise<unknown> {
     if (withCache) {
         return await fetchWithCache(url, config, api.cache);
     } else {
@@ -215,8 +215,8 @@ async function fetchWithRetry (
     api: IElement,
     route: IElement,
     url: string,
-    config: any
-): Promise<any> {
+    config: Record<string, unknown>
+): Promise<unknown> {
     const withCache = api.cache || route.cache;
     const maxRetries = (route.retry || api.retry) || 0;
     const timeoutCfg = route.timeout || api.timeout;
@@ -258,13 +258,13 @@ async function fetchWithRetry (
             const fetchPromise = fetchData(!!withCache, url, config, api);
             response = timeoutCfg ? await withTimeout(fetchPromise, timeoutCfg) : await fetchPromise;
             success = true;
-        } catch (error: any) {
+        } catch (error: unknown) {
             attempt++;
             if (attempt > maxRetries) {
-                if (!error.message) {
-                    error.message = `Failed to fetch ${url} after ${maxRetries} attempts`;
+                if (error instanceof Error) {
+                    throw error;
                 }
-                throw error;
+                throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts`);
             }
         }
     }
@@ -336,13 +336,13 @@ function applyBefore ({ route, api, url, config }: {
 function applyAfter ({ route, api, response, data }: {
     route: IElement;
     api: IElement;
-    response: Response;
-    data: any;
+    response: unknown;
+    data: unknown;
 }): {
     afterRoute: IElement;
     afterApi: IElement;
-    afterResponse: Response;
-    afterData: any;
+    afterResponse: unknown;
+    afterData: unknown;
 } {
     const afterRes = route.callbacks.after?.({ route, api, response, data });
     return {
