@@ -60,17 +60,17 @@ export function createRouteHandler<T> (
     parent: string,
     element: IElement
 ): RouteFunction<T> {
-    return async (...args: any[]): Promise<T> => {
+    return async (...args: [number?, IArgs?, IBody?] | [IArgs?, IBody?]): Promise<T> => {
         if (element.pagination) {
             const [
                 page = 0,
                 customArgs = {},
                 body = {}
-            ] = args;
-            return callApi<T>(parent, element, page, customArgs, body);
+            ] = args as [number?, IArgs?, IBody?];
+            return callApi<T>(parent, element, page, customArgs as IArgs, body as IBody);
         }
-        const [ customArgs = {}, body = {} ] = args;
-        return callApi<T>(parent, element, undefined, customArgs, body);
+        const [ customArgs = {}, body = {} ] = args as [IArgs?, IBody?];
+        return callApi<T>(parent, element, undefined, customArgs as IArgs, body as IBody);
     };
 }
 
@@ -160,7 +160,7 @@ export async function callApi<T> (
 
     let response = await fetchWithRetry(api, element, url, config);
 
-    if (element.schema && "validate" in element.schema) {
+    if (element.schema) {
         response = await element.schema.validate(response);
     }
 

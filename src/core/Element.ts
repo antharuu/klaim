@@ -114,7 +114,7 @@ export interface IElement {
     /** Dynamic URL parameters */
     arguments: Set<string>;
     /** Response validation schema */
-    schema?: any;
+    schema?: { validate: (data: unknown) => Promise<unknown> };
     /** Pagination configuration */
     pagination?: IPaginationConfig;
 
@@ -177,7 +177,7 @@ export abstract class Element implements IElement {
 
     public arguments: Set<string> = new Set<string>();
 
-    public schema?: any;
+    public schema?: { validate: (data: unknown) => Promise<unknown> };
 
     public pagination?: IPaginationConfig;
 

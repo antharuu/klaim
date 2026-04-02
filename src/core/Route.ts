@@ -194,7 +194,7 @@ export class Route extends Element {
      *   .validate(userSchema);
      * ```
      */
-    public validate (schema: any): Element {
+    public validate (schema: { validate: (data: unknown) => Promise<unknown> }): Element {
         this.schema = schema;
         return this;
     }
