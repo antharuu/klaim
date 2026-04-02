@@ -35,7 +35,7 @@ describe("Route", async () => {
         expect(Klaim[apiName][routeName]()).toBeInstanceOf(Promise);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiName][routeName]()).resolves.toEqual(res);
+        await expect(Klaim[apiName][routeName]()).resolves.toEqual(res);
     });
 
     it("should have a body if post but not if get", async () => {
@@ -55,10 +55,10 @@ describe("Route", async () => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiNameA][routeNameA]()).resolves.toEqual(res);
+        await expect(Klaim[apiNameA][routeNameA]()).resolves.toEqual(res);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiNameB][routeNameB]()).resolves.toEqual({});
+        await expect(Klaim[apiNameB][routeNameB]()).resolves.toEqual({});
     });
 
     it("should can have arguments", async () => {
@@ -68,14 +68,14 @@ describe("Route", async () => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiName][routeName]({id: 1})).resolves.toEqual(res);
+        await expect(Klaim[apiName][routeName]({id: 1})).resolves.toEqual(res);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiName][routeName]({id: 2})).resolves.toEqual(res2);
+        await expect(Klaim[apiName][routeName]({id: 2})).resolves.toEqual(res2);
         // if pass no argument, it should fail
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiName][routeName]()).rejects.toThrow();
+        await expect(Klaim[apiName][routeName]()).rejects.toThrow();
     });
 
     it("should call the before and after hooks", async () => {

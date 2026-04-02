@@ -19,7 +19,7 @@ describe("Retry", async () => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        expect(Klaim[apiName][routeName]()).rejects.toThrow();
+        await expect(Klaim[apiName][routeName]()).rejects.toThrow();
         expect(a).toEqual(1);
     });
 
