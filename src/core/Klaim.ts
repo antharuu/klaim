@@ -288,7 +288,7 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
         if (value === undefined) {
             throw new Error(`Argument ${arg} is missing`);
         }
-        newUrl = newUrl.replace(`[${arg}]`, <string>args[arg]);
+        newUrl = newUrl.replace(`[${arg}]`, encodeURIComponent(String(value)));
     });
     return newUrl;
 }
