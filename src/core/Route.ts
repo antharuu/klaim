@@ -186,7 +186,8 @@ export class Route extends Element {
     /**
      * Sets up response validation using a schema.
      *
-     * @param schema - Validation schema (e.g., Yup schema)
+     * @param {object} schema - Validation schema object with a validate method (e.g., Yup schema)
+     * @param {Function} schema.validate - Async validation function
      * @returns This route instance for chaining
      * @example
      * ```typescript
