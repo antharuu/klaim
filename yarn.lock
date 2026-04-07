@@ -3012,10 +3012,10 @@ vite-plugin-dts@^4.5.4:
     local-pkg "^1.0.0"
     magic-string "^0.30.17"
 
-vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.3:
-  version "8.0.3"
-  resolved "https://registry.npmjs.org/vite/-/vite-8.0.3.tgz"
-  integrity sha512-B9ifbFudT1TFhfltfaIPgjo9Z3mDynBTJSUYxTjOQruf/zHH+ezCQKcoqO+h7a9Pw9Nm/OtlXAiGT1axBgwqrQ==
+vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.5:
+  version "8.0.5"
+  resolved "https://registry.npmjs.org/vite/-/vite-8.0.5.tgz"
+  integrity sha512-nmu43Qvq9UopTRfMx2jOYW5l16pb3iDC1JH6yMuPkpVbzK0k+L7dfsEDH4jRgYFmsg0sTAqkojoZgzLMlwHsCQ==
   dependencies:
     lightningcss "^1.32.0"
     picomatch "^4.0.4"
