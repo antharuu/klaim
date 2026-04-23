@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.12.21",
+    "version": "1.12.22",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -11,7 +11,7 @@
     "devDependencies": {
         "@eslint/js": "10.0.1",
         "@stylistic/eslint-plugin": "5.10.0",
-        "@types/bun": "^1.3.12",
+        "@types/bun": "^1.3.13",
         "@types/node": "^25.6.0",
         "@vitest/coverage-v8": "^4.1.5",
         "@vitest/ui": "^4.1.5",

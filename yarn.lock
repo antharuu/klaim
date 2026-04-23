@@ -620,12 +620,12 @@
   resolved "https://registry.npmjs.org/@types/argparse/-/argparse-1.0.38.tgz"
   integrity sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==
 
-"@types/bun@^1.3.12":
-  version "1.3.12"
-  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.3.12.tgz"
-  integrity sha512-DBv81elK+/VSwXHDlnH3Qduw+KxkTIWi7TXkAeh24zpi5l0B2kUg9Ga3tb4nJaPcOFswflgi/yAvMVBPrxMB+A==
+"@types/bun@^1.3.13":
+  version "1.3.13"
+  resolved "https://registry.npmjs.org/@types/bun/-/bun-1.3.13.tgz"
+  integrity sha512-9fqXWk5YIHGGnUau9TEi+qdlTYDAnOj+xLCmSTwXfAIqXr2x4tytJb43E9uCvt09zJURKXwAtkoH4nLQfzeTXw==
   dependencies:
-    bun-types "1.3.12"
+    bun-types "1.3.13"
 
 "@types/chai@^5.2.2":
   version "5.2.3"
@@ -1079,10 +1079,10 @@ brace-expansion@^5.0.2, brace-expansion@^5.0.5:
   dependencies:
     balanced-match "^4.0.2"
 
-bun-types@1.3.12:
-  version "1.3.12"
-  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.3.12.tgz"
-  integrity sha512-HqOLj5PoFajAQciOMRiIZGNoKxDJSr6qigAttOX40vJuSp6DN/CxWp9s3C1Xwm4oH7ybueITwiaOcWXoYVoRkA==
+bun-types@1.3.13:
+  version "1.3.13"
+  resolved "https://registry.npmjs.org/bun-types/-/bun-types-1.3.13.tgz"
+  integrity sha512-QXKeHLlOLqQX9LgYaHJfzdBaV21T63HhFJnvuRCcjZiaUDpbs5ED1MgxbMra71CsryN/1dAoXuJJJwIv/2drVA==
   dependencies:
     "@types/node" "*"
 
