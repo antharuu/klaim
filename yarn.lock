@@ -503,10 +503,10 @@
   dependencies:
     "@octokit/openapi-types" "^27.0.0"
 
-"@oxc-project/types@=0.126.0":
-  version "0.126.0"
-  resolved "https://registry.npmjs.org/@oxc-project/types/-/types-0.126.0.tgz"
-  integrity sha512-oGfVtjAgwQVVpfBrbtk4e1XDyWHRFta6BS3GWVzrF8xYBT2VGQAk39yJS/wFSMrZqoiCU4oghT3Ch0HaHGIHcQ==
+"@oxc-project/types@=0.127.0":
+  version "0.127.0"
+  resolved "https://registry.npmjs.org/@oxc-project/types/-/types-0.127.0.tgz"
+  integrity sha512-aIYXQBo4lCbO4z0R3FHeucQHpF46l2LbMdxRvqvuRuW2OxdnSkcng5B8+K12spgLDj93rtN3+J2Vac/TIO+ciQ==
 
 "@phun-ky/typeof@2.0.3":
   version "2.0.3"
@@ -518,20 +518,15 @@
   resolved "https://registry.npmjs.org/@polka/url/-/url-1.0.0-next.29.tgz"
   integrity sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==
 
-"@rolldown/binding-linux-x64-gnu@1.0.0-rc.16":
-  version "1.0.0-rc.16"
-  resolved "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.0.0-rc.16.tgz"
-  integrity sha512-FIb8+uG49sZBtLTn+zt1AJ20TqVcqWeSIyoVt0or7uAWesgKaHbiBh6OpA/k9v0LTt+PTrb1Lao133kP4uVxkg==
+"@rolldown/binding-linux-x64-gnu@1.0.0-rc.17":
+  version "1.0.0-rc.17"
+  resolved "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.0.0-rc.17.tgz"
+  integrity sha512-cLnjV3xfo7KslbU41Z7z8BH/E1y5mzUYzAqih1d1MDaIGZRCMqTijqLv76/P7fyHuvUcfGsIpqCdddbxLLK9rA==
 
-"@rolldown/binding-linux-x64-musl@1.0.0-rc.16":
-  version "1.0.0-rc.16"
-  resolved "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.0.0-rc.16.tgz"
-  integrity sha512-RuERhF9/EgWxZEXYWCOaViUWHIboceK4/ivdtQ3R0T44NjLkIIlGIAVAuCddFxsZ7vnRHtNQUrt2vR2n2slB2w==
-
-"@rolldown/pluginutils@1.0.0-rc.16":
-  version "1.0.0-rc.16"
-  resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.16.tgz"
-  integrity sha512-45+YtqxLYKDWQouLKCrpIZhke+nXxhsw+qAHVzHDVwttyBlHNBVs2K25rDXrZzhpTp9w1FlAlvweV1H++fdZoA==
+"@rolldown/pluginutils@1.0.0-rc.17":
+  version "1.0.0-rc.17"
+  resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.17.tgz"
+  integrity sha512-n8iosDOt6Ig1UhJ2AYqoIhHWh/isz0xpicHTzpKBeotdVsTEcxsSA/i3EVM7gQAj0rU27OLAxCjzlj15IWY7bg==
 
 "@rollup/pluginutils@^5.1.4":
   version "5.3.0"
@@ -2598,29 +2593,29 @@ retry@0.13.1:
   resolved "https://registry.npmjs.org/retry/-/retry-0.13.1.tgz"
   integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
-rolldown@1.0.0-rc.16:
-  version "1.0.0-rc.16"
-  resolved "https://registry.npmjs.org/rolldown/-/rolldown-1.0.0-rc.16.tgz"
-  integrity sha512-rzi5WqKzEZw3SooTt7cgm4eqIoujPIyGcJNGFL7iPEuajQw7vxMHUkXylu4/vhCkJGXsgRmxqMKXUpT6FEgl0g==
+rolldown@1.0.0-rc.17:
+  version "1.0.0-rc.17"
+  resolved "https://registry.npmjs.org/rolldown/-/rolldown-1.0.0-rc.17.tgz"
+  integrity sha512-ZrT53oAKrtA4+YtBWPQbtPOxIbVDbxT0orcYERKd63VJTF13zPcgXTvD4843L8pcsI7M6MErt8QtON6lrB9tyA==
   dependencies:
-    "@oxc-project/types" "=0.126.0"
-    "@rolldown/pluginutils" "1.0.0-rc.16"
+    "@oxc-project/types" "=0.127.0"
+    "@rolldown/pluginutils" "1.0.0-rc.17"
   optionalDependencies:
-    "@rolldown/binding-android-arm64" "1.0.0-rc.16"
-    "@rolldown/binding-darwin-arm64" "1.0.0-rc.16"
-    "@rolldown/binding-darwin-x64" "1.0.0-rc.16"
-    "@rolldown/binding-freebsd-x64" "1.0.0-rc.16"
-    "@rolldown/binding-linux-arm-gnueabihf" "1.0.0-rc.16"
-    "@rolldown/binding-linux-arm64-gnu" "1.0.0-rc.16"
-    "@rolldown/binding-linux-arm64-musl" "1.0.0-rc.16"
-    "@rolldown/binding-linux-ppc64-gnu" "1.0.0-rc.16"
-    "@rolldown/binding-linux-s390x-gnu" "1.0.0-rc.16"
-    "@rolldown/binding-linux-x64-gnu" "1.0.0-rc.16"
-    "@rolldown/binding-linux-x64-musl" "1.0.0-rc.16"
-    "@rolldown/binding-openharmony-arm64" "1.0.0-rc.16"
-    "@rolldown/binding-wasm32-wasi" "1.0.0-rc.16"
-    "@rolldown/binding-win32-arm64-msvc" "1.0.0-rc.16"
-    "@rolldown/binding-win32-x64-msvc" "1.0.0-rc.16"
+    "@rolldown/binding-android-arm64" "1.0.0-rc.17"
+    "@rolldown/binding-darwin-arm64" "1.0.0-rc.17"
+    "@rolldown/binding-darwin-x64" "1.0.0-rc.17"
+    "@rolldown/binding-freebsd-x64" "1.0.0-rc.17"
+    "@rolldown/binding-linux-arm-gnueabihf" "1.0.0-rc.17"
+    "@rolldown/binding-linux-arm64-gnu" "1.0.0-rc.17"
+    "@rolldown/binding-linux-arm64-musl" "1.0.0-rc.17"
+    "@rolldown/binding-linux-ppc64-gnu" "1.0.0-rc.17"
+    "@rolldown/binding-linux-s390x-gnu" "1.0.0-rc.17"
+    "@rolldown/binding-linux-x64-gnu" "1.0.0-rc.17"
+    "@rolldown/binding-linux-x64-musl" "1.0.0-rc.17"
+    "@rolldown/binding-openharmony-arm64" "1.0.0-rc.17"
+    "@rolldown/binding-wasm32-wasi" "1.0.0-rc.17"
+    "@rolldown/binding-win32-arm64-msvc" "1.0.0-rc.17"
+    "@rolldown/binding-win32-x64-msvc" "1.0.0-rc.17"
 
 run-applescript@^7.0.0:
   version "7.1.0"
@@ -3018,15 +3013,15 @@ vite-plugin-dts@^4.5.4:
     local-pkg "^1.0.0"
     magic-string "^0.30.17"
 
-vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.9:
-  version "8.0.9"
-  resolved "https://registry.npmjs.org/vite/-/vite-8.0.9.tgz"
-  integrity sha512-t7g7GVRpMXjNpa67HaVWI/8BWtdVIQPCL2WoozXXA7LBGEFK4AkkKkHx2hAQf5x1GZSlcmEDPkVLSGahxnEEZw==
+vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.10:
+  version "8.0.10"
+  resolved "https://registry.npmjs.org/vite/-/vite-8.0.10.tgz"
+  integrity sha512-rZuUu9j6J5uotLDs+cAA4O5H4K1SfPliUlQwqa6YEwSrWDZzP4rhm00oJR5snMewjxF5V/K3D4kctsUTsIU9Mw==
   dependencies:
     lightningcss "^1.32.0"
     picomatch "^4.0.4"
     postcss "^8.5.10"
-    rolldown "1.0.0-rc.16"
+    rolldown "1.0.0-rc.17"
     tinyglobby "^0.2.16"
   optionalDependencies:
     fsevents "~2.3.3"
