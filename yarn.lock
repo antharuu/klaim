@@ -1921,10 +1921,10 @@ jsdoc-type-pratt-parser@~7.2.0:
   resolved "https://registry.npmjs.org/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-7.2.0.tgz"
   integrity sha512-dh140MMgjyg3JhJZY/+iEzW+NO5xR2gpbDFKHqotCmexElVntw7GjWjt511+C/Ef02RU5TKYrJo/Xlzk+OLaTw==
 
-jsdom@*, jsdom@^29.1.0:
-  version "29.1.0"
-  resolved "https://registry.npmjs.org/jsdom/-/jsdom-29.1.0.tgz"
-  integrity sha512-YNUc7fB9QuvSSQWfrH0xF+TyABkxUwx8sswgIDaCrw4Hol8BghdZDkITtZheRJeMtzWlnTfsM3bBBusRvpO1wg==
+jsdom@*, jsdom@^29.1.1:
+  version "29.1.1"
+  resolved "https://registry.npmjs.org/jsdom/-/jsdom-29.1.1.tgz"
+  integrity sha512-ECi4Fi2f7BdJtUKTflYRTiaMxIB0O6zfR1fX0GXpUrf6flp8QIYn1UT20YQqdSOfk2dfkCwS8LAFoJDEppNK5Q==
   dependencies:
     "@asamuzakjp/css-color" "^5.1.11"
     "@asamuzakjp/dom-selector" "^7.1.1"
