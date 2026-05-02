@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.12.30",
+    "version": "1.12.31",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -16,7 +16,7 @@
         "@vitest/coverage-v8": "^4.1.5",
         "@vitest/ui": "^4.1.5",
         "dotenv-cli": "^11.0.0",
-        "eslint": "10.2.1",
+        "eslint": "10.3.0",
         "eslint-plugin-jsdoc": "62.9.0",
         "eslint-plugin-simple-import-sort": "12.1.1",
         "jsdom": "^29.1.1",
