@@ -1,6 +1,6 @@
 {
     "name": "klaim",
-    "version": "1.12.36",
+    "version": "1.12.37",
     "author": "antharuu",
     "repository": {
         "type": "git",
@@ -12,7 +12,7 @@
         "@eslint/js": "10.0.1",
         "@stylistic/eslint-plugin": "5.10.0",
         "@types/bun": "^1.3.13",
-        "@types/node": "^25.6.0",
+        "@types/node": "^25.6.2",
         "@vitest/coverage-v8": "^4.1.5",
         "@vitest/ui": "^4.1.5",
         "dotenv-cli": "^11.0.0",
@@ -23,7 +23,7 @@
         "release-it": "^19.2.4",
         "typescript": "6.0.3",
         "typescript-eslint": "8.59.2",
-        "vite": "^8.0.10",
+        "vite": "^8.0.11",
         "vite-plugin-dts": "^4.5.4",
         "vitest": "^4.1.5",
         "yup": "^1.7.1"
