@@ -530,6 +530,11 @@
   resolved "https://registry.npmjs.org/@rolldown/binding-linux-x64-gnu/-/binding-linux-x64-gnu-1.0.0.tgz"
   integrity sha512-Dfn7iak9BcMMePxcoJfpSbWqnEyrp/dRF63/8qW/eHBdOZov6x5aShLLEYGYdIeSJ6vMLK/XCVB+lGIxm41bQA==
 
+"@rolldown/binding-linux-x64-musl@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@rolldown/binding-linux-x64-musl/-/binding-linux-x64-musl-1.0.0.tgz"
+  integrity sha512-5/utzzDmD/pD/bmuaUcbTf/sZYy0aztwIVlfpoW1fTjCZ0BaPOMVWGZL1zvgxyi7ZIVYWlxKONHmSbHuiOh8Jw==
+
 "@rolldown/pluginutils@1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0.tgz"
