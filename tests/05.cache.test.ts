@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Klaim, Route} from "../src";
 import {RouteFunction} from "../src/core/Klaim";
 
@@ -7,6 +7,16 @@ const apiUrl = "https://dummyjson.com";
 
 const routeName = "testRoute";
 const routeUrl = "/products";
+
+const mockProducts = {products: [{id: 1, title: "Product 1"}, {id: 2, title: "Product 2"}]};
+
+global.fetch = vi.fn(() =>
+    Promise.resolve({json: () => Promise.resolve(mockProducts)})
+) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
 describe("Cache", async () => {
 	it("should not cache the API response by default", async () => {

@@ -1,11 +1,29 @@
 import {Api, Klaim, Route} from "../src";
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 
 const limit = 3;
 
 type Pokemon = {
     name: string;
 }
+
+const allPokemon = [
+    {name: "bulbasaur"}, {name: "ivysaur"}, {name: "venusaur"},
+    {name: "charmander"}, {name: "charmeleon"}, {name: "charizard"},
+    {name: "squirtle"}, {name: "wartortle"}, {name: "blastoise"},
+];
+
+global.fetch = vi.fn((url: string | URL | Request) => {
+    const urlObj = new URL(url.toString());
+    const offset = Number(urlObj.searchParams.get("offset") ?? "0");
+    const pageLimit = Number(urlObj.searchParams.get("limit") ?? String(limit));
+    const results = allPokemon.slice(offset, offset + pageLimit);
+    return Promise.resolve({json: () => Promise.resolve({results})});
+}) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
 // Tests
 describe("Pagination Feature", () => {

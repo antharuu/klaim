@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Klaim, Route} from "../src";
 import * as yup from "yup";
 
@@ -13,6 +13,18 @@ const schema = yup.object().shape({
     id: yup.number().min(1).max(10).required(),
     title: yup.string().required(),
     completed: yup.boolean().required()
+});
+
+global.fetch = vi.fn((url: string | URL | Request) => {
+    const urlStr = url.toString();
+    if (urlStr.includes("/todos/15")) {
+        return Promise.resolve({json: () => Promise.resolve({userId: 1, id: 15, title: "any title", completed: false})});
+    }
+    return Promise.resolve({json: () => Promise.resolve({userId: 1, id: 1, title: "delectus aut autem", completed: false})});
+}) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
 });
 
 describe("Validate Yup", async () => {

@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Klaim, Route} from "../src";
 
 const apiName = "testApi";
@@ -6,6 +6,14 @@ const apiUrl = "https://myfakeapi.jardin-des-slimes.com";
 
 const routeName = "testRoute";
 const routeUrl = "/fake/1";
+
+global.fetch = vi.fn(() =>
+    Promise.reject(new Error("Network error"))
+) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
 describe("Retry", async () => {
     it("should just fail", async () => {

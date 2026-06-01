@@ -1,8 +1,16 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Group, Klaim, Route} from "../src";
 
 const apiName = "testApi";
 const apiUrl = "https://dummyjson.com";
+
+global.fetch = vi.fn(() =>
+    Promise.resolve({json: () => Promise.resolve({products: [{id: 1}, {id: 2}]})})
+) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
 describe("Group", async () => {
     it("should create a group instance with correct properties", () => {

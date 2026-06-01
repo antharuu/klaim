@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {Api, Klaim, Route} from "../src";
 
 const apiName = "testApi";
@@ -20,6 +20,20 @@ const res2 = {
     title: "quis ut nam facilis et officia qui",
     completed: false,
 };
+
+global.fetch = vi.fn((url: string | URL | Request, options?: RequestInit) => {
+    if (options?.method === "POST") {
+        return Promise.resolve({json: () => Promise.resolve({})});
+    }
+    if (url.toString().includes("/todos/2")) {
+        return Promise.resolve({json: () => Promise.resolve(res2)});
+    }
+    return Promise.resolve({json: () => Promise.resolve(res)});
+}) as unknown as typeof global.fetch;
+
+beforeEach(() => {
+    vi.clearAllMocks();
+});
 
 describe("Route", async () => {
     it("should call the API", async () => {
