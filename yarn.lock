@@ -2523,7 +2523,7 @@ pkg-types@^2.3.0:
     exsolve "^1.0.7"
     pathe "^2.0.3"
 
-postcss@^8.5.23:
+postcss@^8.5.25:
   version "8.5.25"
   resolved "https://registry.npmjs.org/postcss/-/postcss-8.5.25.tgz"
   integrity sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==
@@ -2650,7 +2650,7 @@ retry@0.13.1:
   resolved "https://registry.npmjs.org/retry/-/retry-0.13.1.tgz"
   integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
-rolldown@~1.2.0:
+rolldown@~1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/rolldown/-/rolldown-1.2.1.tgz"
   integrity sha512-4FKJhg8d3OiyQOA6Q1Q0hoFFpW9/OoX+VsHzpECsdsIZoOArrAK90gl59YK/Z+gnDel45bgJZK03ozH/9bCqEw==
@@ -3070,15 +3070,15 @@ vite-plugin-dts@^4.5.4:
     local-pkg "^1.0.0"
     magic-string "^0.30.17"
 
-vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.npmjs.org/vite/-/vite-8.2.0.tgz"
-  integrity sha512-pn+CFpM0lwDeKwmOq1ZaBK/9sjorZcgqxki6MbY/jPEVd9vichIlmlD4HmQ5wdP5EgqQCFRaACBxMC7uEGc6lQ==
+vite@*, "vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.2.1:
+  version "8.2.1"
+  resolved "https://registry.npmjs.org/vite/-/vite-8.2.1.tgz"
+  integrity sha512-EU/eS7BH3XROHh2YnBefjM6DBKA6ZeMZEYQbj7NLWg5wHYlhB8B/Mayd5XsgWq+NFYccDOTemRpdETWR6Ka/lw==
   dependencies:
     lightningcss "^1.33.0"
     picomatch "^4.0.5"
-    postcss "^8.5.23"
-    rolldown "~1.2.0"
+    postcss "^8.5.25"
+    rolldown "~1.2.1"
     tinyglobby "^0.2.17"
   optionalDependencies:
     fsevents "~2.3.3"
