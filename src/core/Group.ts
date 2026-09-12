@@ -1,7 +1,7 @@
 import { DEFAULT_TIMEOUT_CONFIG } from "../tools/timeout";
 import toCamelCase from "../tools/toCamelCase";
 
-import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IHeaders } from "./Element";
+import { Element, ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, ICallbackCallArgs, IHeaders, ResponsePolicy } from "./Element";
 import { Registry } from "./Registry";
 
 /**
@@ -104,6 +104,24 @@ export class Group extends Element {
      */
     private constructor (name: string, url: string, headers: IHeaders = {}) {
         super("group", name, url, headers);
+    }
+
+    /**
+     * Copies the policy to existing direct children whose policy is undefined.
+     * Does not recurse, overwrite configured children, or affect future children.
+     *
+     * @param policy - Explicit response policy
+     * @returns This group instance for chaining
+     */
+    public withResponsePolicy (policy: ResponsePolicy): this {
+        super.withResponsePolicy(policy);
+        Registry.i.getChildren(Registry.i.getFullPath(this))
+            .forEach(child => {
+                if (child.responsePolicy === undefined) {
+                    child.responsePolicy = policy;
+                }
+            });
+        return this;
     }
 
     /**

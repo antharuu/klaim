@@ -9,6 +9,9 @@ import toCamelCase from "../tools/toCamelCase";
  */
 export type IHeaders = Record<string, string>;
 
+/** Response handling policy; execution support is configured separately. */
+export type ResponsePolicy = "legacy" | "http";
+
 /**
  * Configuration interface for pagination settings
  *
@@ -118,6 +121,12 @@ export interface IElement {
     /** Pagination configuration */
     pagination?: IPaginationConfig;
 
+    /** Response policy override; undefined leaves the policy unconfigured. */
+    responsePolicy?: ResponsePolicy;
+
+    /** Configures response handling; optional for structural compatibility. */
+    withResponsePolicy?(policy: ResponsePolicy): this;
+
     /** Adds before-request middleware */
     before(callback: ICallback<ICallbackBeforeArgs>): this;
 
@@ -180,6 +189,8 @@ export abstract class Element implements IElement {
     public schema?: { validate: (data: unknown) => Promise<unknown> };
 
     public pagination?: IPaginationConfig;
+
+    public responsePolicy?: ResponsePolicy;
 
     public callbacks: IElementCallbacks = {
         before: null,
@@ -257,6 +268,17 @@ export abstract class Element implements IElement {
      */
     public withCache (duration: number = 20): this {
         this.cache = duration;
+        return this;
+    }
+
+    /**
+     * Stores a response policy override without changing request execution.
+     *
+     * @param policy - Explicit response policy
+     * @returns The element instance for chaining
+     */
+    public withResponsePolicy (policy: ResponsePolicy): this {
+        this.responsePolicy = policy;
         return this;
     }
 
