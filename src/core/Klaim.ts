@@ -1,4 +1,4 @@
-import fetchWithCache from "../tools/fetchWithCache";
+import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { withTimeout } from "../tools/timeout";
 
@@ -159,7 +159,7 @@ export async function callApi<T> (
     Registry.updateElement(beforeApi);
     Registry.updateElement(beforeRoute);
 
-    let response = await fetchWithRetry(api, element, url, config);
+    let response = await fetchWithRetry(api, element, url, config, parent);
 
     if (element.schema) {
         response = await element.schema.validate(response);
@@ -182,20 +182,18 @@ export async function callApi<T> (
 /**
  * Fetches data from an API with optional caching
  *
- * @param withCache - Whether to use caching
+ * @param cacheOptions - Captured cache settings, or undefined to bypass the cache
  * @param url - The URL to fetch from
  * @param config - Fetch configuration options
- * @param api - API element containing cache settings
  * @returns Promise resolving to the parsed response
  */
 async function fetchData (
-    withCache: boolean,
+    cacheOptions: FetchCacheOptions | undefined,
     url: string,
-    config: Record<string, unknown>,
-    api: IElement
+    config: Record<string, unknown>
 ): Promise<unknown> {
-    if (withCache) {
-        return await fetchWithCache(url, config, api.cache || undefined);
+    if (cacheOptions) {
+        return await fetchWithCache(url, config, cacheOptions);
     } else {
         const rawResponse = await fetch(url, config);
         return await rawResponse.json();
@@ -209,6 +207,7 @@ async function fetchData (
  * @param route - Route element containing retry settings
  * @param url - The URL to fetch from
  * @param config - Fetch configuration options
+ * @param parent - Parent path captured by the route handler
  * @returns Promise resolving to the parsed response
  * @throws Error after all retry attempts fail or if rate limited
  */
@@ -216,9 +215,17 @@ async function fetchWithRetry (
     api: IElement,
     route: IElement,
     url: string,
-    config: Record<string, unknown>
+    config: Record<string, unknown>,
+    parent: string
 ): Promise<unknown> {
-    const withCache = api.cache || route.cache;
+    const cacheDuration = route.cache || api.cache;
+    const cacheOptions: FetchCacheOptions | undefined = cacheDuration
+        ? {
+            ttl: cacheDuration * 1000,
+            namespace: `${parent}.${route.name}`,
+            policy: route.responsePolicy ?? api.responsePolicy ?? "legacy"
+        }
+        : undefined;
     const maxRetries = (route.retry || api.retry) || 0;
     const timeoutCfg = route.timeout || api.timeout;
 
@@ -254,7 +261,7 @@ async function fetchWithRetry (
             } else if (api.callbacks?.call) {
                 api.callbacks.call({});
             }
-            const fetchPromise = fetchData(!!withCache, url, config, api);
+            const fetchPromise = fetchData(cacheOptions, url, config);
             response = timeoutCfg ? await withTimeout(fetchPromise, timeoutCfg) : await fetchPromise;
             success = true;
         } catch (error: unknown) {

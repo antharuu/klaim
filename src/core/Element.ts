@@ -261,7 +261,10 @@ export abstract class Element implements IElement {
     }
 
     /**
-     * Enables response caching for this element
+     * Enables response caching for this element (20 seconds by default).
+     * Requests use a truthy route duration, otherwise the API duration.
+     * Zero and NaN allow API fallback; negative and infinite durations do not expire.
+     * Expiration starts after decoding and is not extended by reads.
      *
      * @param {number} [duration] - Cache duration in seconds
      * @returns {this} The element instance for chaining

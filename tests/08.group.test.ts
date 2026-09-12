@@ -1,15 +1,25 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {Api, Group, Klaim, Route} from "../src";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
+import {Api, Cache, Group, Klaim, Registry, Route} from "../src";
+import {callApi} from "../src/core/Klaim";
 
 const apiName = "testApi";
 const apiUrl = "https://dummyjson.com";
 
-global.fetch = vi.fn(() =>
-    Promise.resolve({json: () => Promise.resolve({products: [{id: 1}, {id: 2}]})})
-) as unknown as typeof global.fetch;
-
 beforeEach(() => {
-    vi.clearAllMocks();
+    Registry.i.reset();
+    Cache.i.clear();
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    let sequence = 0;
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({id: ++sequence}))));
+});
+
+afterEach(() => {
+    Registry.i.reset();
+    Cache.i.clear();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
 });
 
 describe("Group", async () => {
@@ -160,31 +170,80 @@ describe("Group", async () => {
 
     it("should inherit cache settings from group", async () => {
         const groupName = "cachedProducts";
+        let route!: ReturnType<typeof Route.get>;
 
         Api.create(apiName, apiUrl, () => {
             Group.create(groupName, () => {
-                Route.get("list", "/products");
+                route = Route.get("list", "/products");
                 Route.get("getOne", "/products/[id]");
             }).withCache(30); // 30 seconds cache
         });
 
-        const firstCall = await Klaim[apiName][groupName].list();
-        const secondCall = await Klaim[apiName][groupName].list();
+        const call = () => callApi(`${apiName}.${groupName}`, route);
+        const firstCall = await call();
+        vi.setSystemTime(30_000);
+        const secondCall = await call();
+        expect(firstCall).toEqual({id: 1});
         expect(firstCall).toEqual(secondCall);
+        expect(fetch).toHaveBeenCalledTimes(1);
+        vi.setSystemTime(30_001);
+        expect(await call()).toEqual({id: 2});
+        expect(fetch).toHaveBeenCalledTimes(2);
     });
 
     it("should handle route-specific cache overrides in groups", async () => {
         const groupName = "mixedCacheProducts";
-
-        Api.create(apiName, apiUrl, () => {
+        let explicit!: ReturnType<typeof Route.get>;
+        let inherited!: ReturnType<typeof Route.get>;
+        const api = Api.create(apiName, apiUrl, () => {
             Group.create(groupName, () => {
-                Route.get("list", "/products").withCache(60);
-                Route.get("getOne", "/products/[id]");
+                explicit = Route.get("list", "/products").withCache(60);
+                inherited = Route.get("getOne", "/products");
             }).withCache(30);
-        });
+        }).withCache(1);
+        const parent = `${apiName}.${groupName}`;
+        expect([api.cache, explicit.cache, inherited.cache]).toEqual([1, 60, 30]);
+        expect(await callApi(parent, explicit)).toEqual({id: 1});
+        expect(await callApi(parent, inherited)).toEqual({id: 2});
+        vi.setSystemTime(30_000);
+        expect(await callApi(parent, explicit)).toEqual({id: 1});
+        expect(await callApi(parent, inherited)).toEqual({id: 2});
+        expect(fetch).toHaveBeenCalledTimes(2);
+        vi.setSystemTime(30_001);
+        expect(await callApi(parent, inherited)).toEqual({id: 3});
+        vi.setSystemTime(60_000);
+        expect(await callApi(parent, explicit)).toEqual({id: 1});
+        vi.setSystemTime(60_001);
+        expect(await callApi(parent, explicit)).toEqual({id: 4});
+        expect(fetch).toHaveBeenCalledTimes(4);
+        expect([api.cache, explicit.cache, inherited.cache]).toEqual([1, 60, 30]);
+    });
 
-        const route = Klaim[apiName][groupName].list;
-        expect(route).toBeDefined();
+    it("keeps direct-only cache propagation to APIs without configuring their routes", () => {
+        let api!: ReturnType<typeof Api.create>;
+        let route!: ReturnType<typeof Route.get>;
+        let nested!: ReturnType<typeof Group.create>;
+        let deep!: ReturnType<typeof Api.create>;
+        const group = Group.create("shared", () => {
+            api = Api.create("api", apiUrl, () => { route = Route.get("list", "/products"); });
+            nested = Group.create("nested", () => {
+                deep = Api.create("deep", apiUrl, () => {});
+            });
+        }).withCache(30);
+        expect([group.cache, api.cache, route.cache, nested.cache, deep.cache]).toEqual([30, 30, false, 30, false]);
+    });
+
+    it("isolates identical route names and requests across captured parent paths", async () => {
+        let one!: ReturnType<typeof Route.get>;
+        let two!: ReturnType<typeof Route.get>;
+        Api.create(apiName, apiUrl, () => {
+            Group.create("one", () => { one = Route.get("list", "/products").withCache(1); });
+            Group.create("two", () => { two = Route.get("list", "/products").withCache(1); });
+        });
+        expect(await callApi(`${apiName}.one`, one)).toEqual({id: 1});
+        expect(await callApi(`${apiName}.two`, two)).toEqual({id: 2});
+        expect(await callApi(`${apiName}.one`, one)).toEqual({id: 1});
+        expect(fetch).toHaveBeenCalledTimes(2);
     });
 
     it("should properly handle group-level middleware", async () => {

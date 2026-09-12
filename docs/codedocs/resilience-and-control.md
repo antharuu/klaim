@@ -29,7 +29,7 @@ Each one solves a different failure mode:
 
 `fetchWithRetry()` in `src/core/Klaim.ts` is where retry, timeout, cache, and rate limiting come together. The function computes:
 
-- `withCache` from `api.cache || route.cache`
+- Cache duration from `route.cache || api.cache`, captured after `before` and before retries, then converted once from seconds to milliseconds
 - `maxRetries` from `route.retry || api.retry || 0`
 - `timeoutCfg` from `route.timeout || api.timeout`
 
@@ -109,7 +109,13 @@ const nextPage = await Klaim.pokemon.list(6);
 - [Types](/docs/types) documents `IPaginationConfig`, `IRateLimitConfig`, and `ITimeoutConfig`.
 - [Guide: Advanced Runtime Patterns](/docs/guides/advanced-runtime-patterns) shows how to combine these controls in an app-level setup.
 
-<Callout type="warn">Cache behavior has an implementation detail worth knowing. In `src/core/Klaim.ts`, cache enablement checks `api.cache || route.cache`, but `fetchWithCache()` receives `api.cache` as the TTL source. That means API-level cache durations are honored, while route-level or group-propagated cache durations enable caching but do not currently pass their own TTL to the cache layer. Also note that paginated routes reinterpret the first function argument as the page or offset number, so `Klaim.api.route({ id: 1 })` becomes invalid once `withPagination()` is enabled.</Callout>
+`withCache()` defaults to 20 seconds. A truthy route duration takes precedence over the API duration, including a duration copied from a group. Route values `false`, `0`, `-0`, or `NaN` allow API fallback; if both values are falsy, the request never accesses the cache. Positive fractions are kept without rounding. Negative durations, infinities, and multiplication overflow remain unbounded, without new validation. Group propagation remains limited to existing direct children with falsy cache settings.
+
+Expiration starts when the decoded response is inserted, not when the request starts. An entry is valid at the exact expiry timestamp and expires strictly after it; reads do not extend its lifetime. Concurrent misses still make separate fetches, and the last successful insertion wins for the same key. `Cache.i.clear()` invalidates all entries.
+
+Compatibility note: route durations now actually expire, and API durations now use seconds rather than the previous accidental milliseconds. Remove any application workaround that compensated for these bugs. Klaim's new in-memory keys isolate route paths, effective TTLs, and response policies; aliases no longer share entries just because their URL/config match. Only `signal` is excluded from request-config identity. There is no persistent migration. See [Cache](/docs/api-reference/cache) for the distinction from the millisecond `Cache.i.set()` API.
+
+<Callout type="warn">Paginated routes reinterpret the first function argument as the page or offset number, so `Klaim.api.route({ id: 1 })` becomes invalid once `withPagination()` is enabled.</Callout>
 
 <Accordions>
 <Accordion title="When should configuration live at the API level versus the route level?">
