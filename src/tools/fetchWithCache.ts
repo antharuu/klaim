@@ -8,7 +8,7 @@ export interface FetchCacheOptions {
     namespace?: string;
     /** Cache identity only; HTTP decoding is implemented separately. */
     policy?: "legacy" | "http";
-    /** Reserved for the timeout runner's terminal-state guard. */
+    /** Throws the runner's memorized terminal error; absent is a no-op. */
     assertActive?: () => void;
 }
 
@@ -26,6 +26,8 @@ export default async function (
     ttlOrOptions?: number | FetchCacheOptions
 ): Promise<unknown> {
     const options = typeof ttlOrOptions === "object" ? ttlOrOptions : undefined;
+    const assertActive = options?.assertActive;
+    assertActive?.();
     const ttl = typeof ttlOrOptions === "number" ? ttlOrOptions : options?.ttl;
     let baseString: string;
     if (options?.namespace !== undefined) {
@@ -47,12 +49,16 @@ export default async function (
     const cacheKey = hashStr(baseString);
 
     if (Cache.i.has(cacheKey)) {
+        assertActive?.();
         return Cache.i.get(cacheKey);
     }
 
+    assertActive?.();
     const response = await fetch(input, init);
+    assertActive?.();
     const data: unknown = await response.json();
 
+    assertActive?.();
     Cache.i.set(cacheKey, data, ttl);
     return data;
 }

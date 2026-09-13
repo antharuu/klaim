@@ -1,6 +1,6 @@
 import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
-import { withTimeout } from "../tools/timeout";
+import { runWithTimeout } from "../tools/timeout";
 
 import { IElement } from "./Element";
 import { InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
@@ -185,18 +185,26 @@ export async function callApi<T> (
  * @param cacheOptions - Captured cache settings, or undefined to bypass the cache
  * @param url - The URL to fetch from
  * @param config - Fetch configuration options
+ * @param assertActive - Attempt terminal guard, absent without timeout
  * @returns Promise resolving to the parsed response
  */
 async function fetchData (
     cacheOptions: FetchCacheOptions | undefined,
     url: string,
-    config: Record<string, unknown>
+    config: RequestInit,
+    assertActive?: () => void
 ): Promise<unknown> {
+    assertActive?.();
     if (cacheOptions) {
-        return await fetchWithCache(url, config, cacheOptions);
+        const data = await fetchWithCache(url, config, { ...cacheOptions, assertActive });
+        assertActive?.();
+        return data;
     } else {
         const rawResponse = await fetch(url, config);
-        return await rawResponse.json();
+        assertActive?.();
+        const data: unknown = await rawResponse.json();
+        assertActive?.();
+        return data;
     }
 }
 
@@ -228,6 +236,8 @@ async function fetchWithRetry (
         : undefined;
     const maxRetries = (route.retry || api.retry) || 0;
     const timeoutCfg = route.timeout || api.timeout;
+    const init: RequestInit = config;
+    const callerSignal = init.signal;
 
     // Check rate limiting
     // Si la route a sa propre configuration de limite, on l'utilise avec une clé spécifique à la route
@@ -261,8 +271,13 @@ async function fetchWithRetry (
             } else if (api.callbacks?.call) {
                 api.callbacks.call({});
             }
-            const fetchPromise = fetchData(cacheOptions, url, config);
-            response = timeoutCfg ? await withTimeout(fetchPromise, timeoutCfg) : await fetchPromise;
+            response = timeoutCfg
+                ? await runWithTimeout(
+                    (signal, assertActive) => fetchData(cacheOptions, url, { ...init, signal }, assertActive),
+                    timeoutCfg,
+                    callerSignal
+                )
+                : await fetchData(cacheOptions, url, init);
             success = true;
         } catch (error: unknown) {
             attempt++;

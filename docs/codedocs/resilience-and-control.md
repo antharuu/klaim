@@ -48,17 +48,30 @@ flowchart TD
   B -->|blocked| C[Throw RateLimitError]
   B -->|allowed| D{Retry loop}
   D --> E[onCall callback]
-  E --> F[fetch or fetchWithCache]
-  F --> G{Timeout configured?}
-  G -->|yes| H[wrap with withTimeout]
-  G -->|no| I[use fetch result]
-  H --> J{Success?}
-  I --> J
-  J -->|no and retries left| D
+  E --> G{Timeout configured?}
+  G -->|yes| H[arm attempt timer and controller]
+  G -->|no| F[cache lookup or fetch and body decode]
+  H --> F
+  F --> I[settle attempt and clean timer and relay]
+  I --> J{Success?}
+  J -->|no and retries left| N[backoff outside budget]
+  N --> D
   J -->|no and exhausted| K[Throw RetryExhaustedError]
   J -->|yes| L[validate schema]
   L --> M[return data]
 ```
+
+## Timeout boundaries and cancellation
+
+Timeout is off by default. Calling `withTimeout()` enables a five-second budget; durations are seconds and route settings take precedence over API settings. Every retry gets a new timer and, when available, a new `AbortController`. The attempt is armed after `before`, the rate check and `onCall`, but **before cache lookup**. Cache hits may allocate a timer/controller, then clean them without fetch or abort.
+
+The budget includes cache work, fetch, headers, body reading and decoding. Validation, `after`, `Hook` and retry backoff are outside it. The first observed terminal outcome wins: timeout records one `TimeoutError` before requesting abort, so a transport `AbortError` cannot replace it. Without retries the error is returned directly; exhausted retries retain the final error as `RetryExhaustedError.cause`.
+
+Guards on both cached and uncached paths stop a late response before any body access, and stop an already-started body read before cache insertion or success callbacks. A losing rejection is observed. Timers and caller-signal relays are cleaned on success, rejection, timeout and synchronous setup failure; cleanup neither waits for a non-cooperative request nor aborts a successful one.
+
+`before` can supply `config.signal`: timeout-enabled attempts relay pre-existing or later cancellation with its original reason; timeout-disabled requests keep the original signal. Caller abort does not become a new terminal policy and does not interrupt retry backoff. A transport ignoring caller abort can still succeed before the timeout. The source helper `withTimeout(promise, config)` remains a logical wrapper for an already-started promise; it cannot retroactively attach a transport signal.
+
+Without `AbortController`, logical timeout and late-result guards still apply, but network closure is not guaranteed. Expiration depends on event-loop progress and cannot preempt synchronous decoding. Server-side effects already performed cannot be reversed. Tests prove native Node stream closure for blocked headers and open bodies, with and without cache; Bun, Deno and browser transport cancellation remain unverified.
 
 ## Basic Usage
 

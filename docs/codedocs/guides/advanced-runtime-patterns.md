@@ -89,6 +89,22 @@ async function loadProducts() {
 </Step>
 </Steps>
 
+## Caller cancellation with an attempt timeout
+
+```typescript
+const controller = new AbortController();
+Registry.i.getRoute("inventory", "getProduct")?.before(({ config }) => ({
+  config: { ...config, signal: controller.signal },
+}));
+// Later: controller.abort(new Error("View closed"));
+```
+
+With timeout enabled, each attempt relays this signal (including pre-abort and its reason) into a fresh controller, then removes the relay when the attempt settles. Without timeout, fetch receives the original signal. Cancellation does not interrupt backoff or suppress historical retries: subsequent attempts still receive the same caller signal, possibly already aborted. A transport that ignores caller abort may still succeed before timeout.
+
+The timeout budget starts after `before`, rate limiting and `onCall`, and covers cache lookup, fetch, headers and body decoding. Validation, `after`, hooks and backoff run outside that per-attempt budget. On timeout, late responses cannot begin reading their body or publish cache/success effects; reads already in progress cannot insert late data. Cleanup does not abort successful requests.
+
+No `AbortController` means logical timeout and guards only. Even with cooperative cancellation, server-side effects already performed are not reversible and synchronous code is not preempted. The native transport tests exercise Node loopback stream closure; Bun, Deno and browser behavior have not been verified by those tests. The low-level `withTimeout(promise, config)` helper cannot cancel a promise that was started elsewhere.
+
 ## Complete Example
 
 ```typescript
