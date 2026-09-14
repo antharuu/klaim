@@ -1,3 +1,5 @@
+import { clearInFlightRequests } from "../tools/dedupe";
+
 import { IElement } from "./Element";
 import { createRouteHandler, Klaim, RouteFunction } from "./Klaim";
 
@@ -272,11 +274,14 @@ export class Registry {
 
     /**
      * Resets the registry, clearing all registered elements and the Klaim object.
-     * Useful for testing and cleanup.
+     * Also clears any pending in-flight deduplication entries, so a fresh
+     * environment (e.g. a new test) never inherits promises tied to elements
+     * that no longer exist. Useful for testing and cleanup.
      */
     public reset (): void {
         this._elements.clear();
         this._currentParent = null;
+        clearInFlightRequests();
 
         // Clear all properties from Klaim object
         for (const key of Object.keys(Klaim)) {

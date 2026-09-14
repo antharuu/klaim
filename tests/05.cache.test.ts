@@ -148,49 +148,71 @@ describe("Cache", () => {
     it.each(["ttl", "policy"] as const)("captures concurrent %s policies independently", async dimension => {
         const {route, call} = setup();
         route.withCache(1).withResponsePolicy("legacy");
+        await call();
+        const [input, init] = fetchMock.mock.calls[0];
+        // Concurrent identical calls are now coalesced by request-level dedup
+        // (see src/tools/dedupe.ts); exercise the cache layer directly here so
+        // this test keeps validating that cache identity captures ttl/policy
+        // independently of later route mutations, unaffected by dedup. A
+        // dedicated namespace keeps this isolated from the warmup call above.
+        const namespace = "direct-cache-policy-test";
         const first = deferred<Response>();
         fetchMock.mockImplementationOnce(() => first.promise);
-        const pending = call();
-        if (dimension === "ttl") route.withCache(2);
-        else route.withResponsePolicy("http");
-        expect(await call()).toEqual({id: 1});
+        const pending = fetchWithCache(input, init, {ttl: 1000, namespace, policy: "legacy"});
+        const secondCallOptions = dimension === "ttl"
+            ? {ttl: 2000, namespace, policy: "legacy" as const}
+            : {ttl: 1000, namespace, policy: "http" as const};
+        expect(await fetchWithCache(input, init, secondCallOptions)).toEqual({id: 2});
         first.resolve(new Response(JSON.stringify({id: "first"})));
         expect(await pending).toEqual({id: "first"});
-        expect(await call()).toEqual({id: 1});
-        route.withCache(1).withResponsePolicy("legacy");
-        expect(await call()).toEqual({id: "first"});
-        expect(fetchMock).toHaveBeenCalledTimes(2);
-        expect(Cache.i.size).toBe(2);
+        expect(await fetchWithCache(input, init, secondCallOptions)).toEqual({id: 2});
+        expect(await fetchWithCache(input, init, {ttl: 1000, namespace, policy: "legacy"})).toEqual({id: "first"});
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+        expect(Cache.i.size).toBe(3);
     });
 
-    it("does not coalesce misses and the last successful write wins", async () => {
+    it("does not coalesce cache misses at the cache layer, and the last successful write wins", async () => {
         const {route, call} = setup();
         route.withCache(1);
+        await call();
+        const [input, init] = fetchMock.mock.calls[0];
+        // Bypasses request-level dedup on purpose: this validates the cache
+        // layer's own concurrent-miss handling, independently of the newer
+        // GET request coalescing added in src/tools/dedupe.ts. A dedicated
+        // namespace keeps this isolated from the warmup call above.
+        const namespace = "direct-cache-miss-test";
         const first = deferred<Response>();
         const second = deferred<Response>();
         fetchMock.mockImplementationOnce(() => first.promise).mockImplementationOnce(() => second.promise);
-        const a = call();
-        const b = call();
-        expect(fetchMock).toHaveBeenCalledTimes(2);
+        const a = fetchWithCache(input, init, {ttl: 1000, namespace});
+        const b = fetchWithCache(input, init, {ttl: 1000, namespace});
+        expect(fetchMock).toHaveBeenCalledTimes(3);
         second.resolve(new Response(JSON.stringify({id: "B"})));
         expect(await b).toEqual({id: "B"});
         first.resolve(new Response(JSON.stringify({id: "A"})));
         expect(await a).toEqual({id: "A"});
-        expect(await call()).toEqual({id: "A"});
-        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(await fetchWithCache(input, init, {ttl: 1000, namespace})).toEqual({id: "A"});
+        expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
     it("does not replace a successful concurrent entry on decode rejection", async () => {
         const {route, call} = setup();
         route.withCache(1);
+        await call();
+        const [input, init] = fetchMock.mock.calls[0];
+        // Bypasses request-level dedup on purpose: identical concurrent Klaim
+        // calls would now be coalesced, which would prevent exercising this
+        // cache-layer decode-rejection race at all. A dedicated namespace
+        // keeps this isolated from the warmup call above.
+        const namespace = "direct-cache-decode-rejection-test";
         const first = deferred<Response>();
         fetchMock.mockImplementationOnce(() => first.promise);
-        const failed = expect(call()).rejects.toBeInstanceOf(SyntaxError);
-        expect(await call()).toEqual({id: 1});
+        const failed = expect(fetchWithCache(input, init, {ttl: 1000, namespace})).rejects.toBeInstanceOf(SyntaxError);
+        expect(await fetchWithCache(input, init, {ttl: 1000, namespace})).toEqual({id: 2});
         first.resolve(new Response("not JSON"));
         await failed;
-        expect(await call()).toEqual({id: 1});
-        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(await fetchWithCache(input, init, {ttl: 1000, namespace})).toEqual({id: 2});
+        expect(fetchMock).toHaveBeenCalledTimes(3);
     });
 
     it("isolates different init values", async () => {

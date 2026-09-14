@@ -21,10 +21,10 @@ function responseFixture (data: Promise<unknown>) {
     return {response, read, body};
 }
 
-function routeFor (cache: boolean) {
+function routeFor (cache: boolean, urlPath = "/slow") {
     let route!: ReturnType<typeof Route.get>;
     Api.create("transport", "http://localhost", () => {
-        route = Route.get("slow", "/slow").withTimeout(0.05);
+        route = Route.get("slow", urlPath).withTimeout(0.05);
         if (cache) route.withCache(10);
     });
     return route;
@@ -370,10 +370,13 @@ describe("attempt setup and cache isolation", () => {
             signals.push(init?.signal);
             return Promise.resolve(responseFixture(bodies[signals.length - 1].promise).response);
         }));
-        const route = routeFor(false);
-        const first = Klaim.transport.slow().catch((error: unknown) => error);
+        const route = routeFor(false, "/slow/[id]");
+        // GET dedup coalesces identical concurrent calls onto one attempt, so the
+        // two attempts under test resolve distinct URLs via a route argument: this
+        // keeps them independent while exercising the same timeout/budget behavior.
+        const first = Klaim.transport.slow({ id: "1" }).catch((error: unknown) => error);
         route.withTimeout(1);
-        const second = Klaim.transport.slow();
+        const second = Klaim.transport.slow({ id: "2" });
         await vi.advanceTimersByTimeAsync(50);
         expect(await first).toBeInstanceOf(TimeoutError);
         expect(signals[0]?.aborted).toBe(true);
