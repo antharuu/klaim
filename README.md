@@ -15,6 +15,7 @@
     - [Nested Groups](#nested-groups)
     - [Group Configuration](#group-configuration)
   - [Middleware Usage](#middleware-usage)
+  - [Global Middleware](#global-middleware)
   - [Hook Subscription](#hook-subscription)
   - [Caching Requests](#caching-requests)
   - [Retry Mechanism](#retry-mechanism)
@@ -268,6 +269,52 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
         .after(({data: [first]}) => ({data: first}));
 });
 ```
+
+### Global Middleware
+
+`before`/`after` middleware also exists at a **global** level, on the `Klaim` object itself. A
+global middleware runs for **every route of every API**, in addition to (not instead of) any
+local `before`/`after` already set on a route. This is the same before/after concept, just
+extended to a global scope — no new middleware system was introduced.
+
+```typescript
+import {Klaim} from 'klaim';
+// For deno: import { Klaim } from "@antharuu/klaim";
+
+// Runs before every request, for every API/route
+Klaim.before(({url, config}) => {
+    console.log(`[global] requesting ${url}`);
+    return {config: {...config, headers: {...config.headers as object, "X-Trace-Id": "123"}}};
+});
+
+// Runs after every response, for every API/route
+Klaim.after(({data}) => {
+    console.log("[global] response received");
+    return {data};
+});
+```
+
+Multiple global middlewares can be stacked — each call to `Klaim.before`/`Klaim.after` adds
+another one, executed in registration order (unlike the local `before`/`after`, which is a
+single callback replaced if called again).
+
+#### Execution order
+
+For a single route call, the full order is:
+
+1. **global before** middlewares (registration order, each fed the previous result)
+2. *(api-level `before`, if the API used `.before(...)` — see note below)*
+3. **route before** (the existing local `.before(...)` hook)
+4. network request execution
+5. **route after** (the existing local `.after(...)` hook)
+6. *(api-level `after`, if the API used `.after(...)` — see note below)*
+7. **global after** middlewares (registration order, each fed the previous result)
+
+> **Known limitation:** as of this version, an API-level `before`/`after` (set with
+> `Api.create(...).before(...)` directly on the API, as opposed to on one of its routes) is
+> stored but not invoked during a request — only the route-level `before`/`after` runs. This is
+> a pre-existing behavior, unrelated to global middleware, and is documented here for
+> transparency rather than fixed by this feature.
 
 ### Hook Subscription
 
