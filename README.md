@@ -20,6 +20,7 @@
   - [Retry Mechanism](#retry-mechanism)
   - [Rate Limiting](#rate-limiting)
   - [Response Validation](#response-validation)
+  - [Batch Requests](#batch-requests)
 - [Links](#-links)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -41,6 +42,7 @@
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
 - **Pagination**: Handle paginated requests easily with support for both page and offset based pagination.
+- **Batch Requests**: Run several route calls concurrently and get partial success/failure results, `Promise.allSettled`-style.
 
 ## 📥 Installation
 
@@ -446,6 +448,43 @@ const customPage = await Klaim.api.list(5);  // Fifth page
 
 ⚠️ **Note**: The pagination feature simplifies your pagination parameters, but your API/backend needs to respond to these
 parameters. Klaim does not handle the pagination logic, only the parameters management.
+
+### Batch Requests
+
+Run several route calls concurrently with `batch()` and get a partial-success result, the same way
+[`Promise.allSettled`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled)
+works: a failing call never rejects the whole batch nor blocks the other calls. Each entry of the result is either
+`{status: 'fulfilled', value}` or `{status: 'rejected', reason}`.
+
+`batch()` only orchestrates existing route calls — it does not bypass per-route protections, so caching, retry,
+timeout and rate limiting configured on your routes/APIs still apply exactly as if each call had been made
+individually.
+
+Two input shapes are supported, both returning a result with the same shape as the input:
+
+- **Named object** (recommended): keys let you destructure results by name.
+- **Array**: results keep the same order/positions as the input.
+
+Prefer thunks (`() => Klaim.api.route()`) over bare promises so the request is only fired when `batch()` runs.
+
+```typescript
+import { batch, Klaim } from "klaim";
+
+// Named form
+const {todos, user} = await batch({
+    todos: () => Klaim.hello.listTodos(),
+    user: () => Klaim.hello.getUser({id: 1})
+});
+
+if (todos.status === "fulfilled") console.log(todos.value);
+if (user.status === "rejected") console.error(user.reason);
+
+// Array form
+const [todosResult, userResult] = await batch([
+    () => Klaim.hello.listTodos(),
+    () => Klaim.hello.getUser({id: 1})
+]);
+```
 
 ## 🔗 Links
 

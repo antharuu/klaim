@@ -1,4 +1,15 @@
 export { Api } from "./core/Api";
+export type {
+    BatchInput,
+    BatchInputArray,
+    BatchInputObject,
+    BatchOutputArray,
+    BatchOutputObject,
+    BatchResult
+} from "./core/batch";
+export {
+    batch
+} from "./core/batch";
 export { Cache } from "./core/Cache";
 export type {
     ICallbackAfterArgs,
