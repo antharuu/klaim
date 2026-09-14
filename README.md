@@ -368,7 +368,13 @@ try {
 
 ### Request Timeout
 
-Abort requests that take too long to respond. You can specify the timeout duration in seconds and optionally provide a custom message.
+Bound each request attempt with a timeout in seconds and an optional custom message. Timeout is disabled by default; `.withTimeout()` enables 5 seconds, and a route setting takes precedence over the API setting.
+
+The budget starts after `before`, rate limiting and `onCall`, before cache lookup or fetch. It includes headers and body reading/decoding, but excludes validation, `after`, hooks and retry backoff. Each retry gets a fresh budget and transport controller. Cache hits are also inside the budget, but do not fetch or abort.
+
+On expiration, Klaim rejects with `TimeoutError` and asks cooperative transports to abort. Late responses cannot start body reading, update the cache or run success callbacks; an already-started body read cannot publish a late result. Timers and caller-signal relays are removed when the attempt settles, without aborting successful requests. With retries enabled, the final timeout remains the `cause` of `RetryExhaustedError`.
+
+A signal supplied through `before` as `config.signal` is relayed with its reason when timeout is enabled, and passed through unchanged otherwise. Caller cancellation preserves the existing retry/backoff behavior; it is not a new global cancellation policy. Without `AbortController`, only logical timeout and late-result guards are available. Server-side effects already performed cannot be undone, and synchronous work cannot be preempted. Native transport cancellation is tested on Node; Bun, Deno and browser transports are not verified by these tests.
 
 ```typescript
 Api.create("api", "https://api.example.com", () => {

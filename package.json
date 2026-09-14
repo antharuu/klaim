@@ -6,7 +6,7 @@
         "type": "git",
         "url": "git+https://github.com/antharuu/klaim.git"
     },
-    "main": "dist/klaim.cjs.js",
+    "main": "dist/klaim.cjs",
     "module": "dist/klaim.es.js",
     "devDependencies": {
         "@eslint/js": "10.0.1",
@@ -20,7 +20,7 @@
         "eslint-plugin-jsdoc": "62.9.0",
         "eslint-plugin-simple-import-sort": "12.1.1",
         "jsdom": "^29.1.1",
-        "release-it": "^19.2.4",
+        "release-it": "19.2.4",
         "typescript": "6.0.3",
         "typescript-eslint": "8.68.0",
         "vite": "^8.2.2",
@@ -46,9 +46,11 @@
         "build": "vite build",
         "dev": "vite build --watch",
         "test": "vitest",
+        "test:package": "node scripts/smoke-package.mjs",
         "test:ui": "vitest --ui --coverage.enabled=true",
         "test:cover": "vitest --coverage",
         "lint": "eslint src",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
         "lint:fix": "eslint src **/*.ts --fix",
         "release": "dotenv release-it -- patch --config release-it.config.cjs --ci",
         "release:minor": "dotenv release-it -- minor --config release-it.config.cjs --ci",
@@ -63,10 +65,15 @@
                 "default": "./dist/klaim.es.js"
             },
             "require": {
-                "types": "./dist/index.d.ts",
-                "default": "./dist/klaim.cjs.js"
+                "types": "./dist/index.d.cts",
+                "default": "./dist/klaim.cjs"
             }
         }
     },
-    "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "packageManager": "npm@11.19.0",
+    "overrides": {
+        "release-it@19.2.4": {
+            "undici": "6.28.1"
+        }
+    }
 }

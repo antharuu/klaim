@@ -6,7 +6,8 @@ export type {
     ICallbackCallArgs,
     IElement,
     IHeaders,
-    IPaginationConfig
+    IPaginationConfig,
+    ResponsePolicy
 } from "./core/Element";
 export {
     InvalidPathError,

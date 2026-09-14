@@ -176,4 +176,10 @@ dist
 
 .npmrc
 
-bun.lockb
+# Contributor installations use package-lock.json; keep alternate locks local.
+/yarn.lock
+/bun.lock
+/bun.lockb
+
+# Agent worktrees (not part of repo history)
+.worktrees/
