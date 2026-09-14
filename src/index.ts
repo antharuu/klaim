@@ -24,6 +24,7 @@ export type {
 } from "./core/Element";
 export {
     CancelledError,
+    CircuitOpenError,
     InvalidPathError,
     KlaimError,
     MissingArgumentError,
@@ -38,5 +39,6 @@ export type { CancellablePromise, IArgs, IBody } from "./core/Klaim";
 export { Klaim } from "./core/Klaim";
 export { Registry } from "./core/Registry";
 export { Route } from "./core/Route";
+export type { CircuitBreakerState, ICircuitBreakerConfig } from "./tools/circuitBreaker";
 export type { IRateLimitConfig } from "./tools/rateLimit";
 export type { ITimeoutConfig } from "./tools/timeout";

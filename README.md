@@ -19,6 +19,7 @@
   - [Caching Requests](#caching-requests)
   - [Retry Mechanism](#retry-mechanism)
   - [Rate Limiting](#rate-limiting)
+  - [Circuit Breaker](#circuit-breaker)
   - [Response Validation](#response-validation)
   - [Batch Requests](#batch-requests)
 - [Links](#-links)
@@ -38,6 +39,7 @@
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
+- **Circuit Breaker**: Fail fast and stop hammering a failing API/route after repeated failures, with automatic recovery testing.
 - **Timeout**: Abort requests that exceed a specified duration with an optional custom error message.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
@@ -384,6 +386,46 @@ try {
 } catch (error) {
     if (error.message.includes('Rate limit exceeded')) {
         console.log('Please wait before trying again');
+    }
+}
+```
+
+### Circuit Breaker
+
+Stop hammering an API/route that keeps failing: once a configurable number of **consecutive**
+failures is reached, the circuit **opens** and subsequent calls fail fast with a `CircuitOpenError`
+— no network request, no retry attempt consumed — until a reset timeout elapses. After the
+timeout, the circuit moves to **half-open** and lets exactly one probe call through: if it
+succeeds the circuit **closes** again (normal traffic resumes and the failure count resets); if
+it fails the circuit **reopens** and the timeout restarts.
+
+The breaker guards the whole call, not each individual retry attempt: it is checked once before
+`fetchWithRetry`'s retry loop starts, and only the loop's overall outcome (all attempts
+exhausted vs. at least one success) is recorded against it. This keeps the breaker focused on
+"is this endpoint down" rather than reacting to single transient errors that retry/backoff is
+already designed to absorb.
+
+Like retry and rate limiting, the breaker can be configured at the route level (takes precedence)
+or at the API level (shared across all routes of that API that don't set their own):
+
+```typescript
+// Apply a circuit breaker at the route level
+Api.create("api", "https://api.example.com", () => {
+    Route.get("flaky", "/flaky-endpoint").withBreaker({ failureThreshold: 3, resetTimeout: 15 });
+});
+
+// Apply a circuit breaker at the API level (shared by all its routes)
+Api.create("api", "https://api.example.com", () => {
+    Route.get("users", "/users");
+    Route.get("posts", "/posts");
+}).withBreaker({ failureThreshold: 5, resetTimeout: 30 }); // Defaults if omitted
+
+// Handling circuit breaker errors
+try {
+    await Klaim.api.flaky();
+} catch (error) {
+    if (error.name === 'CircuitOpenError') {
+        console.log(`Circuit is open, retry in ${error.retryAfterMs}ms`);
     }
 }
 ```

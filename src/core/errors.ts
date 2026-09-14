@@ -94,6 +94,26 @@ export class CancelledError extends KlaimError {
 }
 
 /**
+ * Thrown when a circuit breaker is open and a call fails fast without hitting the network.
+ */
+export class CircuitOpenError extends KlaimError {
+    /** Time in milliseconds until the circuit may move to half-open and retry */
+    public readonly retryAfterMs: number;
+
+    /**
+     * Creates a new CircuitOpenError instance.
+     *
+     * @param message - Error message
+     * @param retryAfterMs - Time in ms until the circuit may move to half-open
+     */
+    public constructor (message: string, retryAfterMs: number) {
+        super(message);
+        this.name = "CircuitOpenError";
+        this.retryAfterMs = retryAfterMs;
+    }
+}
+
+/**
  * Thrown when a required URL argument is missing.
  */
 export class MissingArgumentError extends KlaimError {
