@@ -21,6 +21,7 @@
   - [Retry Mechanism](#retry-mechanism)
   - [Rate Limiting](#rate-limiting)
   - [Circuit Breaker](#circuit-breaker)
+  - [Request Deduplication](#request-deduplication)
   - [Response Validation](#response-validation)
   - [Batch Requests](#batch-requests)
 - [Links](#-links)
@@ -42,6 +43,7 @@
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
 - **Circuit Breaker**: Fail fast and stop hammering a failing API/route after repeated failures, with automatic recovery testing.
+- **Request Deduplication**: Coalesce concurrent identical GET calls into a single network request.
 - **Timeout**: Abort requests that exceed a specified duration with an optional custom error message.
 - **TypeScript Support**: Fully typed for enhanced code quality and developer experience.
 - **Response Validation**: Validate responses using schemas for increased reliability and consistency.
@@ -465,6 +467,26 @@ try {
         console.log(`Circuit is open, retry in ${error.retryAfterMs}ms`);
     }
 }
+```
+
+### Request Deduplication
+
+When several callers trigger the exact same **GET** request while a first call for it is still in flight, Klaim coalesces them: only one network call is made, and every caller receives the same result (success or failure). The dedup key is built from the route and its fully-resolved URL/params, so two GET calls with different parameters are never mixed up.
+
+This only ever applies to `GET` requests. Mutating methods (`POST`, `PUT`, `PATCH`, `DELETE`) always hit the network, since sharing or replaying a write between callers would be incorrect.
+
+⚠️ **Note**: cancelling a call via `.cancel()` (see [Request Cancellation](#request-cancellation)) aborts the shared in-flight request, which also rejects every other caller currently coalesced onto that same GET. Avoid cancelling calls you expect other code to be relying on concurrently.
+
+```typescript
+Api.create("api", "https://api.example.com", () => {
+    Route.get("users", "/users");
+});
+
+// Both calls share a single underlying fetch
+const [a, b] = await Promise.all([
+    Klaim.api.users(),
+    Klaim.api.users()
+]);
 ```
 
 ### Request Timeout

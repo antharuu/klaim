@@ -1,5 +1,6 @@
 import { CancelToken, createCancelToken } from "../tools/cancelToken";
 import { checkCircuitBreaker, reportCircuitBreakerResult } from "../tools/circuitBreaker";
+import { dedupe } from "../tools/dedupe";
 import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { runWithTimeout } from "../tools/timeout";
@@ -327,7 +328,13 @@ async function fetchCancellable (
 }
 
 /**
- * Performs a fetch request with retry capability and rate limiting
+ * Performs a fetch request with retry capability and rate limiting.
+ *
+ * GET requests are additionally coalesced through {@link dedupe}: concurrent
+ * identical GET calls (same route, same resolved URL and params) share a
+ * single in-flight request instead of hitting the network multiple times.
+ * Mutating methods (POST/PUT/PATCH/DELETE) are never deduplicated, since
+ * replaying/sharing a write between callers would be incorrect.
  *
  * @param api - API element containing retry settings
  * @param route - Route element containing retry settings
@@ -341,6 +348,69 @@ async function fetchCancellable (
  * @throws Error after all retry attempts fail or if rate limited
  */
 async function fetchWithRetry (
+    api: IElement,
+    route: IElement,
+    url: string,
+    config: Record<string, unknown>,
+    parent: string,
+    token?: CancelToken,
+    cacheState?: { hit: boolean }
+): Promise<unknown> {
+    const method = typeof config.method === "string" ? config.method.toUpperCase() : "GET";
+    if (method === "GET") {
+        const dedupeKey = buildDedupeKey(parent, route.name, url, config);
+        return dedupe(dedupeKey, () => executeFetchWithRetry(api, route, url, config, parent, token, cacheState));
+    }
+    return executeFetchWithRetry(api, route, url, config, parent, token, cacheState);
+}
+
+/**
+ * Builds the deduplication key for a GET request.
+ *
+ * The key includes the logical route (parent + route name) as well as the
+ * fully-resolved URL and the relevant request configuration (method and
+ * headers), so that two GET calls to the same route with different
+ * parameters/URLs are never incorrectly coalesced together.
+ *
+ * @param parent - Parent path captured by the route handler
+ * @param routeName - Name of the route being called
+ * @param url - Fully-resolved request URL, including query params
+ * @param config - Fetch configuration options (signal is excluded on purpose)
+ * @returns Stable string key identifying this exact GET request
+ */
+function buildDedupeKey (
+    parent: string,
+    routeName: string,
+    url: string,
+    config: Record<string, unknown>
+): string {
+    const configSansSignal: Record<string, unknown> = { ...config };
+    delete configSansSignal.signal;
+    return JSON.stringify([
+        "klaim-dedupe-v1",
+        parent,
+        routeName,
+        url,
+        configSansSignal
+    ]);
+}
+
+/**
+ * Actually performs the fetch request with retry capability and rate limiting,
+ * without any deduplication concerns.
+ *
+ * @param api - API element containing retry settings
+ * @param route - Route element containing retry settings
+ * @param url - The URL to fetch from
+ * @param config - Fetch configuration options
+ * @param parent - Parent path captured by the route handler
+ * @param token - Cancellation token owned by the exposed `.cancel()` API
+ * @param cacheState - Mutable holder flipped to true when a cache hit occurs, for Stats/Hook reporting
+ * @param cacheState.hit - Whether a cache hit has occurred for this call
+ * @returns Promise resolving to the parsed response
+ * @throws Error after all retry attempts fail or if rate limited
+ */
+async function executeFetchWithRetry (
     api: IElement,
     route: IElement,
     url: string,

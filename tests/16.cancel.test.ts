@@ -69,14 +69,14 @@ describe("Cancellation", () => {
     it("only cancels the specific call, leaving concurrent calls to the same route unaffected", async () => {
         const bodies = [deferred<unknown>(), deferred<unknown>()];
         const signals: (AbortSignal | null | undefined)[] = [];
-        Api.create("cancel", "http://localhost", () => Route.get("slow", "/slow"));
+        Api.create("cancel", "http://localhost", () => Route.get("slow", "/slow/[id]"));
         vi.stubGlobal("fetch", vi.fn((_input: unknown, init?: RequestInit) => {
             signals.push(init?.signal);
             const index = signals.length - 1;
             return Promise.resolve({json: () => bodies[index].promise});
         }));
-        const first = Klaim.cancel.slow();
-        const second = Klaim.cancel.slow();
+        const first = Klaim.cancel.slow({id: 1});
+        const second = Klaim.cancel.slow({id: 2});
         first.cancel();
         bodies[1].resolve(42);
         await expect(first).rejects.toBeInstanceOf(CancelledError);
