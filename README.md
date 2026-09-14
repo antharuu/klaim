@@ -307,6 +307,26 @@ Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
 
 Now, when making requests, the caching feature will be applied.
 
+#### Invalidating Cached Routes
+
+Cache entries are namespaced internally as `${parent}.${routeName}` (e.g. `"hello.getTodo"`).
+All parameterized variants of a route (different `args`, query strings, TTLs or response
+policies) share that namespace, so a single call clears every cached variant — without wiping
+unrelated entries the way `Cache.clear()` would.
+
+```typescript
+import {Cache, Klaim} from 'klaim';
+
+// Invalidate only "hello.getTodo", leaving other cached routes untouched
+Cache.i.invalidate("hello.getTodo");
+
+// Or invalidate directly from the route handler
+Klaim.hello.getTodo.invalidate();
+
+// A broader pattern invalidates every route namespaced under it
+Cache.i.invalidate("hello"); // clears hello.getTodo, hello.listTodos, ...
+```
+
 #### Caching the Entire API
 
 You can also enable caching for all routes defined within an API:

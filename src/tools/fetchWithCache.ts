@@ -59,6 +59,6 @@ export default async function (
     const data: unknown = await response.json();
 
     assertActive?.();
-    Cache.i.set(cacheKey, data, ttl);
+    Cache.i.set(cacheKey, data, ttl, options?.namespace);
     return data;
 }

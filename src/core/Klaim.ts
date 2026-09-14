@@ -2,6 +2,7 @@ import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { runWithTimeout } from "../tools/timeout";
 
+import { Cache } from "./Cache";
 import { IElement } from "./Element";
 import { InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
 import { Hook } from "./Hook";
@@ -24,6 +25,13 @@ export type IBody = Record<string, unknown>;
  */
 export type RouteFunction<T = any> = {
     (offset?: number, args?: IArgs, body?: IBody): Promise<T>;
+    /**
+     * Invalidates every cached entry for this route (all parameterized variants included).
+     * No-op if the route was never called with caching enabled.
+     *
+     * @returns The number of cache entries removed
+     */
+    invalidate(): number;
 };
 
 /**
@@ -61,7 +69,13 @@ export function createRouteHandler<T> (
     parent: string,
     element: IElement
 ): RouteFunction<T> {
-    return async (...args: [number?, IArgs?, IBody?] | [IArgs?, IBody?]): Promise<T> => {
+    /**
+     * Invokes the bound route, resolving pagination and default arguments.
+     *
+     * @param args - Pagination offset (if paginated) followed by args/body, or args/body alone
+     * @returns Promise resolving to the route's response
+     */
+    async function handler (...args: [number?, IArgs?, IBody?] | [IArgs?, IBody?]): Promise<T> {
         if (element.pagination) {
             const [
                 page = 0,
@@ -72,7 +86,17 @@ export function createRouteHandler<T> (
         }
         const [ customArgs = {}, body = {} ] = args as [IArgs?, IBody?];
         return callApi<T>(parent, element, undefined, customArgs as IArgs, body as IBody);
+    }
+
+    /**
+     * Invalidates every cached entry belonging to this route's namespace.
+     *
+     * @returns The number of cache entries removed
+     */
+    (handler as RouteFunction<T>).invalidate = function invalidate (): number {
+        return Cache.i.invalidate(`${parent}.${element.name}`);
     };
+    return handler as RouteFunction<T>;
 }
 
 /**
