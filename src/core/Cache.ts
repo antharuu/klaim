@@ -33,7 +33,7 @@ export class Cache {
      *
      * @private
      */
-    private cache: Map<string, { data: unknown; expiry: number }>;
+    private cache: Map<string, { data: unknown; expiry: number; namespace?: string }>;
 
     /**
      * Maximum number of entries allowed in the cache.
@@ -78,6 +78,8 @@ export class Cache {
      * @param key - Unique identifier for the cached item
      * @param value - The data to cache
      * @param ttl - Time to live in milliseconds. If 0 or not provided, the item won't expire
+     * @param namespace - Optional logical namespace (e.g. `${parent}.${route.name}`) used by
+     * {@link invalidate} to target this entry without knowing its hashed key
      * @example
      * ```typescript
      * // Cache a value for 5 minutes
@@ -85,9 +87,12 @@ export class Cache {
      *
      * // Cache without expiration
      * Cache.i.set("appConfig", configData);
+     *
+     * // Cache tagged with a namespace so it can be targeted later
+     * Cache.i.set("hashedKey", todoData, 60000, "hello.getTodo");
      * ```
      */
-    public set (key: string, value: unknown, ttl: number = 0): void {
+    public set (key: string, value: unknown, ttl: number = 0, namespace?: string): void {
         // Delete first so re-insertion moves to end (most recent)
         if (this.cache.has(key)) {
             this.cache.delete(key);
@@ -102,7 +107,7 @@ export class Cache {
         }
 
         const expiry = ttl > 0 ? Date.now() + ttl : Infinity;
-        this.cache.set(key, { data: value, expiry });
+        this.cache.set(key, { data: value, expiry, namespace });
     }
 
     /**
@@ -170,6 +175,47 @@ export class Cache {
      */
     public clear (): void {
         this.cache.clear();
+    }
+
+    /**
+     * Removes cache entries whose namespace exactly matches or is nested under the given
+     * pattern, without clearing the whole cache.
+     *
+     * The namespace is the logical identifier tagged on an entry via {@link set} (in Klaim,
+     * this is built internally as `${parent}.${route.name}`, e.g. `"hello.getTodo"`). All
+     * parameterized variants of a route (different args, query strings, TTLs or policies)
+     * share the same namespace, so a single call invalidates every cached variant of that
+     * route. Entries stored without a namespace (e.g. via legacy, non-namespaced fetch
+     * helper calls) are never affected.
+     *
+     * Matching rules:
+     * - Exact match: `pattern` equal to the entry's namespace (e.g. `"hello.getTodo"`).
+     * - Prefix match: the entry's namespace starts with `${pattern}.`, so a broader pattern
+     *   (e.g. `"hello"`) invalidates every route namespaced under it (e.g. `"hello.getTodo"`,
+     *   `"hello.listTodos"`).
+     *
+     * @param pattern - Exact namespace, or a parent segment, to invalidate
+     * @returns The number of entries removed
+     * @example
+     * ```typescript
+     * // Invalidate a single route's cache (all its parameterized variants included)
+     * Cache.i.invalidate("hello.getTodo");
+     *
+     * // Invalidate every route namespaced under "hello"
+     * Cache.i.invalidate("hello");
+     * ```
+     */
+    public invalidate (pattern: string): number {
+        let removed = 0;
+        const prefix = `${pattern}.`;
+        for (const [ key, entry ] of this.cache) {
+            if (entry.namespace === undefined) continue;
+            if (entry.namespace === pattern || entry.namespace.startsWith(prefix)) {
+                this.cache.delete(key);
+                removed++;
+            }
+        }
+        return removed;
     }
 
     /**
