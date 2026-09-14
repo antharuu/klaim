@@ -10,6 +10,8 @@ export interface FetchCacheOptions {
     policy?: "legacy" | "http";
     /** Throws the runner's memorized terminal error; absent is a no-op. */
     assertActive?: () => void;
+    /** Invoked synchronously when the response is served from cache instead of fetched. */
+    onHit?: () => void;
 }
 
 /**
@@ -50,6 +52,7 @@ export default async function (
 
     if (Cache.i.has(cacheKey)) {
         assertActive?.();
+        options?.onHit?.();
         return Cache.i.get(cacheKey);
     }
 

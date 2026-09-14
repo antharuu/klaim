@@ -16,6 +16,7 @@
     - [Group Configuration](#group-configuration)
   - [Middleware Usage](#middleware-usage)
   - [Hook Subscription](#hook-subscription)
+  - [Stats & Observability](#stats--observability)
   - [Caching Requests](#caching-requests)
   - [Retry Mechanism](#retry-mechanism)
   - [Rate Limiting](#rate-limiting)
@@ -34,6 +35,7 @@
 - **Lightweight**: Minimal footprint for fast load times and minimal performance impact.
 - **Middleware Support**: Easily add middleware to modify requests and responses (`before` and `after`).
 - **Hook System**: Subscribe to hooks to monitor and react to specific events.
+- **Stats & Observability**: Track calls, latency, error rate and cache hit rate per route out of the box.
 - **Caching**: Enable caching on requests to reduce network load and improve performance.
 - **Retry Mechanism**: Automatically retry failed requests to enhance reliability.
 - **Rate Limiting**: Control the frequency of API calls to prevent abuse and respect API provider limits.
@@ -281,6 +283,41 @@ import {Hook} from 'klaim';
 Hook.subscribe("hello.getFirstTodo", ({url}) => {
     console.log(`Requesting ${url}`);
 });
+```
+
+### Stats & Observability
+
+Klaim ships a built-in `Stats` singleton that observes **every** route call automatically, without
+touching or conflicting with your own `Hook.subscribe` callbacks. It's built on `Hook.onAny`, a
+multi-listener observation point separate from the single-callback-per-route `Hook.subscribe` API,
+so Stats and your user hooks can coexist on the same route.
+
+For each route it tracks, non-blocking and with a bounded memory footprint:
+
+- **calls**: total number of calls observed
+- **errors** / **errorRate**: failed calls and their ratio
+- **cacheHits** / **cacheHitRate**: calls served from cache and their ratio
+- **avgLatencyMs**: cumulative running average latency (no per-call array growth)
+- **p95LatencyMs**: approximate 95th percentile from a bounded sliding window (last 100 calls)
+
+```typescript
+import {Stats} from 'klaim';
+// For deno: import { Stats } from "@antharuu/klaim";
+
+// After making some calls...
+await Klaim.hello.listTodos();
+await Klaim.hello.getTodo({id: 1});
+
+// Read metrics for a single route
+const routeStats = Stats.i.get("hello.listTodos");
+console.log(routeStats?.calls, routeStats?.avgLatencyMs, routeStats?.errorRate);
+
+// Read metrics for every observed route
+const allStats = Stats.i.getAll();
+console.table(allStats);
+
+// Reset all collected metrics (e.g. between test runs)
+Stats.i.reset();
 ```
 
 ### Caching Requests
