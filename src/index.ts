@@ -34,11 +34,14 @@ export {
     ValidationError
 } from "./core/errors";
 export { Group } from "./core/Group";
+export type { IHookEventPayload, IHookObserver } from "./core/Hook";
 export { Hook } from "./core/Hook";
 export type { CancellablePromise, IArgs, IBody } from "./core/Klaim";
 export { Klaim } from "./core/Klaim";
 export { Registry } from "./core/Registry";
 export { Route } from "./core/Route";
 export type { CircuitBreakerState, ICircuitBreakerConfig } from "./tools/circuitBreaker";
+export type { IRouteStats } from "./core/Stats";
+export { Stats } from "./core/Stats";
 export type { IRateLimitConfig } from "./tools/rateLimit";
 export type { ITimeoutConfig } from "./tools/timeout";

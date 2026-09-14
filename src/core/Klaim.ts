@@ -179,6 +179,7 @@ export async function callApi<T> (
     body: IBody = {},
     token?: CancelToken
 ): Promise<T> {
+    const startTime = Date.now();
     const parentParts = parent.split(".");
     let api: IElement | undefined;
 
@@ -192,69 +193,87 @@ export async function callApi<T> (
         throw new InvalidPathError(`${parent}.${element.name}`);
     }
 
-    token?.assertActive();
+    const routeKey = `${api.name}.${element.name}`;
+    const cacheState = { hit: false };
 
-    let url = applyArgs(`${api.url}/${element.url}`, element, args);
-
-    if (element.pagination && typeof offset !== "undefined") {
-        const { pageParam = "page", limit = 10, limitParam = "limit" } = element.pagination;
-        const urlParams = new URLSearchParams();
-        urlParams.append(pageParam, String(offset));
-        urlParams.append(limitParam, String(limit));
-        const separator = url.includes("?") ? "&" : "?";
-        url = `${url}${separator}${urlParams.toString()}`;
-    }
-
-    let config: Record<string, unknown> = {};
-
-    if (body && element.method !== "GET") {
-        config.body = JSON.stringify(body);
-    }
-
-    config.headers = {
-        "Content-Type": "application/json",
-        ...api.headers,
-        ...element.headers
-    };
-
-    config.method = element.method;
-
-    const {
-        beforeRoute,
-        beforeApi,
-        beforeUrl,
-        beforeConfig
-    } = applyBefore({ route: element, api, url, config });
-
-    url = beforeUrl;
-    config = beforeConfig;
-
-    Registry.updateElement(beforeApi);
-    Registry.updateElement(beforeRoute);
-
-    token?.assertActive();
-
-    let response = await fetchWithRetry(api, element, url, config, parent, token);
-
-    if (element.schema) {
+    try {
         token?.assertActive();
-        response = await element.schema.validate(response);
+
+        let url = applyArgs(`${api.url}/${element.url}`, element, args);
+
+        if (element.pagination && typeof offset !== "undefined") {
+            const { pageParam = "page", limit = 10, limitParam = "limit" } = element.pagination;
+            const urlParams = new URLSearchParams();
+            urlParams.append(pageParam, String(offset));
+            urlParams.append(limitParam, String(limit));
+            const separator = url.includes("?") ? "&" : "?";
+            url = `${url}${separator}${urlParams.toString()}`;
+        }
+
+        let config: Record<string, unknown> = {};
+
+        if (body && element.method !== "GET") {
+            config.body = JSON.stringify(body);
+        }
+
+        config.headers = {
+            "Content-Type": "application/json",
+            ...api.headers,
+            ...element.headers
+        };
+
+        config.method = element.method;
+
+        const {
+            beforeRoute,
+            beforeApi,
+            beforeUrl,
+            beforeConfig
+        } = applyBefore({ route: element, api, url, config });
+
+        url = beforeUrl;
+        config = beforeConfig;
+
+        Registry.updateElement(beforeApi);
+        Registry.updateElement(beforeRoute);
+
+        token?.assertActive();
+
+        let response = await fetchWithRetry(api, element, url, config, parent, token, cacheState);
+
+        if (element.schema) {
+            token?.assertActive();
+            response = await element.schema.validate(response);
+        }
+
+        token?.assertActive();
+
+        const {
+            afterRoute,
+            afterApi,
+            afterData
+        } = applyAfter({ route: element, api, response, data: response });
+
+        Registry.updateElement(afterApi);
+        Registry.updateElement(afterRoute);
+
+        Hook.run(routeKey);
+        Hook.emit(routeKey, {
+            success: true,
+            durationMs: Date.now() - startTime,
+            cacheHit: cacheState.hit
+        });
+
+        return afterData as T;
+    } catch (error: unknown) {
+        Hook.emit(routeKey, {
+            success: false,
+            durationMs: Date.now() - startTime,
+            cacheHit: cacheState.hit,
+            error
+        });
+        throw error;
     }
-
-    token?.assertActive();
-
-    const {
-        afterRoute,
-        afterApi,
-        afterData
-    } = applyAfter({ route: element, api, response, data: response });
-
-    Registry.updateElement(afterApi);
-    Registry.updateElement(afterRoute);
-
-    Hook.run(`${api.name}.${element.name}`);
-
-    return afterData as T;
 }
 
 /**
@@ -316,6 +335,8 @@ async function fetchCancellable (
  * @param config - Fetch configuration options
  * @param parent - Parent path captured by the route handler
  * @param token - Cancellation token owned by the exposed `.cancel()` API
+ * @param cacheState - Mutable holder flipped to true when a cache hit occurs, for Stats/Hook reporting
+ * @param cacheState.hit - Whether a cache hit has occurred for this call
  * @returns Promise resolving to the parsed response
  * @throws Error after all retry attempts fail or if rate limited
  */
@@ -325,14 +346,21 @@ async function fetchWithRetry (
     url: string,
     config: Record<string, unknown>,
     parent: string,
-    token?: CancelToken
+    token?: CancelToken,
+    cacheState?: { hit: boolean }
 ): Promise<unknown> {
     const cacheDuration = route.cache || api.cache;
     const cacheOptions: FetchCacheOptions | undefined = cacheDuration
         ? {
             ttl: cacheDuration * 1000,
             namespace: `${parent}.${route.name}`,
-            policy: route.responsePolicy ?? api.responsePolicy ?? "legacy"
+            policy: route.responsePolicy ?? api.responsePolicy ?? "legacy",
+            /**
+             * Marks the shared cache-state holder when this cached fetch resolves from cache.
+             */
+            onHit: (): void => {
+                if (cacheState) cacheState.hit = true;
+            }
         }
         : undefined;
     const maxRetries = (route.retry || api.retry) || 0;
