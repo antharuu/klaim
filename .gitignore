@@ -180,3 +180,6 @@ dist
 /yarn.lock
 /bun.lock
 /bun.lockb
+
+# Agent worktrees (not part of repo history)
+.worktrees/
