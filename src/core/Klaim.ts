@@ -6,7 +6,7 @@ import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { runWithTimeout } from "../tools/timeout";
 
 import { Cache } from "./Cache";
-import { IElement } from "./Element";
+import { ICallback, ICallbackAfterArgs, ICallbackBeforeArgs, IElement } from "./Element";
 import { CancelledError, CircuitOpenError, InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
@@ -72,6 +72,20 @@ export type IRouteReference = Record<string, RouteFunction>;
 export type IApiReference = Record<string, IRouteReference>;
 
 /**
+ * Shape of the global middleware registration methods exposed on the {@link Klaim} object.
+ *
+ * These extend the existing before/after pattern (already available per-element via
+ * `Api`/`Route`/`Group`) to a global level: callbacks registered here run for every route of
+ * every API. See {@link registerGlobalBefore} for the full documented execution order.
+ */
+export interface IGlobalMiddlewareApi {
+    /** Registers a global "before" middleware, executed ahead of local before hooks. */
+    before(callback: ICallback<ICallbackBeforeArgs>): void;
+    /** Registers a global "after" middleware, executed after local after hooks. */
+    after(callback: ICallback<ICallbackAfterArgs>): void;
+}
+
+/**
  * Global Klaim object that provides access to all registered APIs and their routes
  *
  * @example
@@ -83,7 +97,119 @@ export type IApiReference = Record<string, IRouteReference>;
  * await Klaim.apiName.routeName(2); // Page 2
  * ```
  */
-export const Klaim: IApiReference = {};
+export const Klaim: IApiReference & IGlobalMiddlewareApi = {} as IApiReference & IGlobalMiddlewareApi;
+
+/**
+ * Collection of global middleware callbacks executed for every route of every API.
+ *
+ * Unlike element-level `before`/`after` (a single callback slot, replaced on each call),
+ * this stores an array so multiple global middlewares can be stacked in registration order.
+ *
+ * @private
+ */
+const globalCallbacks: {
+    before: ICallback<ICallbackBeforeArgs>[];
+    after: ICallback<ICallbackAfterArgs>[];
+} = {
+    before: [],
+    after: []
+};
+
+/**
+ * Registers a global "before" middleware, executed for every route of every API.
+ *
+ * ### Execution order
+ * Global middlewares extend the existing before/after pattern rather than introducing a new
+ * concept. The full, documented order for a single call is:
+ *
+ * 1. **global before** (registered here, in registration order, each fed the previous result)
+ * 2. **api before** *(not currently invoked — see note below)*
+ * 3. **route before** (`route.before(...)`, the existing local hook)
+ * 4. network request execution
+ * 5. **route after** (`route.after(...)`, the existing local hook)
+ * 6. **api after** *(not currently invoked — see note below)*
+ * 7. **global after** (registered here, in registration order, each fed the previous result)
+ *
+ * > **Note (pre-existing, out of scope for this change):** `applyBefore`/`applyAfter` in this
+ * > module only ever invoke `route.callbacks.before` / `route.callbacks.after`. An API-level
+ * > `before`/`after` callback (set via `Api.create(...).before(...)`) is stored on the API
+ * > element but is never actually called during a request. This is a pre-existing gap in the
+ * > local (non-global) middleware chain; it is documented here for visibility but intentionally
+ * > left unfixed by this feature, which only adds the global layer on top of current behavior.
+ *
+ * Each global middleware receives the same shape as a local `before` callback
+ * ({@link ICallbackBeforeArgs}) and may return a partial override; returned fields are merged
+ * into the arguments passed to the next middleware in the chain (global, then local).
+ *
+ * @param {ICallback<ICallbackBeforeArgs>} callback - Function to execute before every request
+ * @returns {void}
+ * @example
+ * ```typescript
+ * import { Klaim } from "klaim";
+ *
+ * Klaim.before(({ url, config }) => {
+ *   console.log(`[global] requesting ${url}`);
+ *   return { config: { ...config, headers: { ...config.headers as object, "X-Trace": "1" } } };
+ * });
+ * ```
+ */
+export function registerGlobalBefore (callback: ICallback<ICallbackBeforeArgs>): void {
+    globalCallbacks.before.push(callback);
+}
+
+/**
+ * Registers a global "after" middleware, executed for every route of every API.
+ *
+ * See {@link registerGlobalBefore} for the full documented execution order.
+ * Global "after" middlewares run last, once route-level (and, in the future, api-level)
+ * "after" callbacks have already run, in registration order, each fed the previous result.
+ *
+ * @param {ICallback<ICallbackAfterArgs>} callback - Function to execute after every response
+ * @returns {void}
+ * @example
+ * ```typescript
+ * import { Klaim } from "klaim";
+ *
+ * Klaim.after(({ data }) => {
+ *   console.log("[global] response received");
+ *   return { data };
+ * });
+ * ```
+ */
+export function registerGlobalAfter (callback: ICallback<ICallbackAfterArgs>): void {
+    globalCallbacks.after.push(callback);
+}
+
+/**
+ * Removes every registered global middleware (before and after).
+ * Primarily useful for tests to isolate global middleware state between cases.
+ *
+ * @returns {void}
+ */
+export function resetGlobalMiddlewares (): void {
+    globalCallbacks.before.length = 0;
+    globalCallbacks.after.length = 0;
+}
+
+Object.assign(Klaim, {
+    /**
+     * Registers a global "before" middleware, executed for every route of every API,
+     * ahead of any element-level (api/route) before hooks. See {@link registerGlobalBefore}.
+     *
+     * @param {ICallback<ICallbackBeforeArgs>} callback - Function to execute before every request
+     * @returns {void}
+     */
+    before: registerGlobalBefore,
+
+    /**
+     * Registers a global "after" middleware, executed for every route of every API,
+     * after any element-level (route/api) after hooks. See {@link registerGlobalAfter}.
+     *
+     * @param {ICallback<ICallbackAfterArgs>} callback - Function to execute after every response
+     * @returns {void}
+     */
+    after: registerGlobalAfter
+});
 
 /**
  * Creates a callable function for a specific route.
@@ -230,7 +356,7 @@ export async function callApi<T> (
             beforeApi,
             beforeUrl,
             beforeConfig
-        } = applyBefore({ route: element, api, url, config });
+        } = applyBefore(applyGlobalBefore({ route: element, api, url, config }));
 
         url = beforeUrl;
         config = beforeConfig;
@@ -253,7 +379,7 @@ export async function callApi<T> (
             afterRoute,
             afterApi,
             afterData
-        } = applyAfter({ route: element, api, response, data: response });
+        } = applyGlobalAfter(applyAfter({ route: element, api, response, data: response }));
 
         Registry.updateElement(afterApi);
         Registry.updateElement(afterRoute);
@@ -546,6 +672,75 @@ function applyArgs (url: string, route: IElement, args: IArgs): string {
         newUrl = newUrl.replace(`[${arg}]`, encodeURIComponent(String(value)));
     });
     return newUrl;
+}
+
+/**
+ * Runs all registered global "before" middlewares in registration order, ahead of the
+ * element-level (route) before hook. Each middleware receives the output of the previous one,
+ * so partial overrides accumulate down the chain — mirroring how a single local `before`
+ * callback would modify `url`/`config`.
+ *
+ * See {@link registerGlobalBefore} for the full documented execution order.
+ *
+ * @param params - Object containing route, API, URL, and config
+ * @param params.route - Route element being called
+ * @param params.api - API element containing the route
+ * @param params.url - URL after arguments replacement
+ * @param params.config - Fetch configuration to send
+ * @returns The (possibly modified) request parameters, ready for {@link applyBefore}
+ */
+function applyGlobalBefore ({ route, api, url, config }: ICallbackBeforeArgs): ICallbackBeforeArgs {
+    return globalCallbacks.before.reduce<ICallbackBeforeArgs>((acc, callback) => {
+        const result = callback(acc);
+        return {
+            route: result?.route || acc.route,
+            api: result?.api || acc.api,
+            url: result?.url || acc.url,
+            config: result?.config || acc.config
+        };
+    }, { route, api, url, config });
+}
+
+/**
+ * Runs all registered global "after" middlewares in registration order, after the
+ * element-level (route) after hook has already run. Each middleware receives the output of the
+ * previous one (starting from the local `applyAfter` result), so partial overrides accumulate
+ * down the chain.
+ *
+ * See {@link registerGlobalBefore} for the full documented execution order.
+ *
+ * @param localResult - Result already produced by {@link applyAfter} (route-level after hook)
+ * @param localResult.afterRoute - Route element, possibly overridden by the route after hook
+ * @param localResult.afterApi - API element, possibly overridden by the route after hook
+ * @param localResult.afterResponse - Raw response, possibly overridden by the route after hook
+ * @param localResult.afterData - Parsed data, possibly overridden by the route after hook
+ * @returns The (possibly modified) response parameters, in the same shape as {@link applyAfter}
+ */
+function applyGlobalAfter (localResult: {
+    afterRoute: IElement;
+    afterApi: IElement;
+    afterResponse: unknown;
+    afterData: unknown;
+}): {
+    afterRoute: IElement;
+    afterApi: IElement;
+    afterResponse: unknown;
+    afterData: unknown;
+} {
+    return globalCallbacks.after.reduce((acc, callback) => {
+        const result = callback({
+            route: acc.afterRoute,
+            api: acc.afterApi,
+            response: acc.afterResponse,
+            data: acc.afterData
+        });
+        return {
+            afterRoute: result?.route || acc.afterRoute,
+            afterApi: result?.api || acc.afterApi,
+            afterResponse: result?.response || acc.afterResponse,
+            afterData: result?.data || acc.afterData
+        };
+    }, localResult);
 }
 
 /**

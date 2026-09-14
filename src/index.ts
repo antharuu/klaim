@@ -36,8 +36,15 @@ export {
 export { Group } from "./core/Group";
 export type { IHookEventPayload, IHookObserver } from "./core/Hook";
 export { Hook } from "./core/Hook";
-export type { CancellablePromise, IArgs, IBody } from "./core/Klaim";
-export { Klaim } from "./core/Klaim";
+export type { IArgs, IBody } from "./core/Klaim";
+export type { IGlobalMiddlewareApi } from "./core/Klaim";
+export type { CancellablePromise } from "./core/Klaim";
+export {
+    Klaim,
+    registerGlobalAfter,
+    registerGlobalBefore,
+    resetGlobalMiddlewares
+} from "./core/Klaim";
 export { Registry } from "./core/Registry";
 export { Route } from "./core/Route";
 export type { IRouteStats } from "./core/Stats";

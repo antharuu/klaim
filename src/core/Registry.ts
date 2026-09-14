@@ -70,7 +70,7 @@ export class Registry {
         this._elements.set(key, element);
 
         if (element.type === "api" || element.type === "group") {
-            let target = Klaim;
+            let target: Record<string, any> = Klaim;
             if (parent) {
                 const parentParts = this.getFullPath(parent).split(".");
 
@@ -145,7 +145,7 @@ export class Registry {
     private addToKlaimRoute (route: IElement): void {
         if (!route.parent) return;
 
-        let target = Klaim;
+        let target: Record<string, any> = Klaim;
         const parentParts = route.parent.split(".");
 
         for (const part of parentParts) {
@@ -277,14 +277,19 @@ export class Registry {
      * Also clears any pending in-flight deduplication entries, so a fresh
      * environment (e.g. a new test) never inherits promises tied to elements
      * that no longer exist. Useful for testing and cleanup.
+     *
+     * API route entries are removed, but the global middleware registration methods
+     * (`Klaim.before` / `Klaim.after`) are preserved since they are not per-registration state.
      */
     public reset (): void {
         this._elements.clear();
         this._currentParent = null;
         clearInFlightRequests();
 
-        // Clear all properties from Klaim object
+        // Clear all API/route properties from the Klaim object, but keep the global
+        // middleware registration methods (before/after) intact.
         for (const key of Object.keys(Klaim)) {
+            if (key === "before" || key === "after") continue;
             delete Klaim[key];
         }
     }
