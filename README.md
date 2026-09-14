@@ -410,6 +410,33 @@ try {
 }
 ```
 
+### Request Cancellation
+
+Every call returned by a route exposes `.cancel(reason?)`, letting you cancel that specific in-flight call without affecting concurrent calls to the same route.
+
+```typescript
+Api.create("api", "https://api.example.com", () => {
+    Route.get("search", "/search");
+});
+
+const call = Klaim.api.search();
+
+// Somewhere else, e.g. a component unmount or a newer request superseding this one
+call.cancel();
+
+try {
+    await call;
+} catch (error) {
+    if (error.name === "CancelledError") {
+        console.log("Call was cancelled");
+    }
+}
+```
+
+Calling `.cancel()` a second time, or after the call has already settled, is a no-op. Pass a custom `reason` to reject with something other than the default `CancelledError`.
+
+When the route has `.withTimeout()` enabled, cancellation reuses the same per-attempt `AbortController` used for the timeout budget, so the underlying transport (e.g. `fetch`) is aborted immediately with no extra allocation and no signal collision between concurrent calls. Without a timeout, cancellation still settles the call immediately and guards any late result (cache write, success callbacks) from completing, but cannot abort synchronous work already in progress. This is independent of, and composes with, a signal supplied through `before` as `config.signal`.
+
 ### Response Validation
 
 You can use [Yup](https://www.npmjs.com/package/yup) to validate the response schema for increased reliability and

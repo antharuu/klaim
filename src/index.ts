@@ -23,6 +23,7 @@ export type {
     ResponsePolicy
 } from "./core/Element";
 export {
+    CancelledError,
     InvalidPathError,
     KlaimError,
     MissingArgumentError,
@@ -33,7 +34,7 @@ export {
 } from "./core/errors";
 export { Group } from "./core/Group";
 export { Hook } from "./core/Hook";
-export type { IArgs, IBody } from "./core/Klaim";
+export type { CancellablePromise, IArgs, IBody } from "./core/Klaim";
 export { Klaim } from "./core/Klaim";
 export { Registry } from "./core/Registry";
 export { Route } from "./core/Route";
