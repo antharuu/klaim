@@ -1,9 +1,10 @@
+import { checkCircuitBreaker, reportCircuitBreakerResult } from "../tools/circuitBreaker";
 import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { runWithTimeout } from "../tools/timeout";
 
 import { IElement } from "./Element";
-import { InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
+import { CircuitOpenError, InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
 
@@ -260,6 +261,24 @@ async function fetchWithRetry (
         }
     }
 
+    // Check circuit breaker state for the whole operation (all retry attempts together),
+    // before any attempt is made. Route-level config takes precedence over API-level config,
+    // mirroring rate limiting above.
+    const breakerConfig = route.breaker || api.breaker;
+    const breakerKey = route.breaker
+        ? `ROUTE:${api.name}:${route.name}`
+        : `API:${api.name}`;
+
+    if (breakerConfig) {
+        const check = checkCircuitBreaker(breakerKey, breakerConfig);
+        if (!check.allowed) {
+            throw new CircuitOpenError(
+                `Circuit breaker open for ${route.breaker ? `${api.name}.${route.name}` : `${api.name} API`}. Try again in ${Math.ceil(check.retryAfterMs / 1000)} seconds.`,
+                check.retryAfterMs
+            );
+        }
+    }
+
     let response;
     let success = false;
     let attempt = 0;
@@ -282,6 +301,7 @@ async function fetchWithRetry (
         } catch (error: unknown) {
             attempt++;
             if (attempt > maxRetries) {
+                if (breakerConfig) reportCircuitBreakerResult(breakerKey, breakerConfig, false);
                 // If no retries were configured, throw the original error
                 if (maxRetries === 0 && error instanceof Error) {
                     throw error;
@@ -300,9 +320,10 @@ async function fetchWithRetry (
         }
     }
 
+    if (breakerConfig && success) reportCircuitBreakerResult(breakerKey, breakerConfig, true);
+
     return response;
 }
-
 /**
  * Replaces URL parameter placeholders with actual values
  *

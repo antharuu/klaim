@@ -1,3 +1,4 @@
+import { DEFAULT_CIRCUIT_BREAKER_CONFIG, ICircuitBreakerConfig } from "../tools/circuitBreaker";
 import cleanUrl from "../tools/cleanUrl";
 import { DEFAULT_RATE_LIMIT_CONFIG, IRateLimitConfig } from "../tools/rateLimit";
 import { DEFAULT_TIMEOUT_CONFIG, ITimeoutConfig } from "../tools/timeout";
@@ -110,6 +111,8 @@ export interface IElement {
     rate: false | IRateLimitConfig;
     /** Request timeout configuration, or false if disabled */
     timeout: false | ITimeoutConfig;
+    /** Circuit breaker configuration, or false if disabled */
+    breaker: false | ICircuitBreakerConfig;
     /** Reference to parent element name */
     parent?: string;
     /** HTTP method for routes */
@@ -150,6 +153,9 @@ export interface IElement {
 
     /** Enables request timeout */
     withTimeout(duration?: number, message?: string): this;
+
+    /** Enables the circuit breaker */
+    withBreaker(config?: Partial<ICircuitBreakerConfig>): this;
 }
 
 /**
@@ -205,6 +211,8 @@ export abstract class Element implements IElement {
     public rate: false | IRateLimitConfig = false;
 
     public timeout: false | ITimeoutConfig = false;
+
+    public breaker: false | ICircuitBreakerConfig = false;
 
     /**
      * Creates a new element with the specified properties
@@ -349,6 +357,28 @@ export abstract class Element implements IElement {
         message: string = DEFAULT_TIMEOUT_CONFIG.message
     ): this {
         this.timeout = { duration, message };
+        return this;
+    }
+
+    /**
+     * Enables a circuit breaker for this element. The breaker guards the whole
+     * retry-attempt budget of a call (not each individual attempt): once it has
+     * observed `failureThreshold` consecutive failed calls it opens and fails fast,
+     * without consuming retries or hitting the network, until `resetTimeout` seconds
+     * have elapsed, at which point a single probe call is allowed through to test recovery.
+     *
+     * @param {Partial<ICircuitBreakerConfig>} [config] - Circuit breaker configuration options
+     * @returns {this} The element instance for chaining
+     * @example
+     * ```typescript
+     * Route.get("flaky", "/flaky-endpoint").withBreaker({ failureThreshold: 3, resetTimeout: 15 });
+     * ```
+     */
+    public withBreaker (config: Partial<ICircuitBreakerConfig> = {}): this {
+        this.breaker = {
+            ...DEFAULT_CIRCUIT_BREAKER_CONFIG,
+            ...config
+        };
         return this;
     }
 }
