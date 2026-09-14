@@ -26,7 +26,8 @@
         "vite": "^8.2.2",
         "vite-plugin-dts": "^4.5.4",
         "vitest": "^4.1.11",
-        "yup": "^1.7.1"
+        "yup": "^1.7.1",
+        "zod": "^4.6.5"
     },
     "bugs": {
         "url": "https://github.com/antharuu/klaim/issues"

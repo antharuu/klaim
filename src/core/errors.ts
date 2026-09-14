@@ -106,3 +106,24 @@ export class InvalidPathError extends KlaimError {
         this.name = "InvalidPathError";
     }
 }
+
+/**
+ * Thrown when a response fails schema validation through a validation adapter
+ * (e.g. {@link https://www.npmjs.com/package/zod | zod}).
+ */
+export class ValidationError extends KlaimError {
+    /** The underlying validation error/issues produced by the wrapped validation library */
+    public readonly cause: unknown;
+
+    /**
+     * Creates a new ValidationError instance.
+     *
+     * @param message - Error message
+     * @param cause - The original error or issues thrown by the wrapped validation library
+     */
+    public constructor (message: string, cause?: unknown) {
+        super(message);
+        this.name = "ValidationError";
+        this.cause = cause;
+    }
+}
