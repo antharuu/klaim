@@ -1,9 +1,10 @@
+import { CancelToken, createCancelToken } from "../tools/cancelToken";
 import fetchWithCache, { FetchCacheOptions } from "../tools/fetchWithCache";
 import { checkRateLimit, getTimeUntilNextRequest } from "../tools/rateLimit";
 import { runWithTimeout } from "../tools/timeout";
 
 import { IElement } from "./Element";
-import { InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
+import { CancelledError, InvalidPathError, MissingArgumentError, RateLimitError, RetryExhaustedError } from "./errors";
 import { Hook } from "./Hook";
 import { Registry } from "./Registry";
 
@@ -18,12 +19,36 @@ export type IArgs = Record<string, unknown>;
 export type IBody = Record<string, unknown>;
 
 /**
+ * A promise returned by a route call that can be cancelled before it settles.
+ *
+ * Cancellation is per call: each invocation of a route function gets its own
+ * cancellation token, so concurrent calls to the same route never share or
+ * collide over a single controller. When the call is running under a
+ * `.withTimeout()` budget, cancelling reuses that attempt's existing
+ * `AbortController` (no extra allocation, no signal collision). Without a
+ * timeout, cancellation is cooperative: it rejects the promise as soon as the
+ * next checkpoint (cache lookup, response decoding, validation, ...) is
+ * reached, but cannot preempt an already-started synchronous step.
+ *
+ * @template T - The type of data returned by the route
+ */
+export interface CancellablePromise<T> extends Promise<T> {
+    /**
+     * Cancels this specific call. Calling it again, or after the call has
+     * already settled, has no additional effect.
+     *
+     * @param reason - Optional custom cancellation reason; defaults to a {@link CancelledError}
+     */
+    cancel(reason?: unknown): void;
+}
+
+/**
  * Generic function type for route handlers with pagination support
  *
  * @template T - The type of data returned by the route
  */
 export type RouteFunction<T = any> = {
-    (offset?: number, args?: IArgs, body?: IBody): Promise<T>;
+    (offset?: number, args?: IArgs, body?: IBody): CancellablePromise<T>;
 };
 
 /**
@@ -53,6 +78,9 @@ export const Klaim: IApiReference = {};
 /**
  * Creates a callable function for a specific route.
  *
+ * Each invocation creates its own cancellation token, so the `.cancel()`
+ * exposed on the returned promise only ever affects that single call.
+ *
  * @param parent - Parent path in dot notation
  * @param element - Route element to bind
  * @returns The generated route function
@@ -61,17 +89,31 @@ export function createRouteHandler<T> (
     parent: string,
     element: IElement
 ): RouteFunction<T> {
-    return async (...args: [number?, IArgs?, IBody?] | [IArgs?, IBody?]): Promise<T> => {
+    return (...args: [number?, IArgs?, IBody?] | [IArgs?, IBody?]): CancellablePromise<T> => {
+        const token = createCancelToken(() => new CancelledError(`Call to ${parent}.${element.name} was cancelled`));
+
+        let promise: Promise<T>;
         if (element.pagination) {
             const [
                 page = 0,
                 customArgs = {},
                 body = {}
             ] = args as [number?, IArgs?, IBody?];
-            return callApi<T>(parent, element, page, customArgs as IArgs, body as IBody);
+            promise = callApi<T>(parent, element, page, customArgs as IArgs, body as IBody, token);
+        } else {
+            const [ customArgs = {}, body = {} ] = args as [IArgs?, IBody?];
+            promise = callApi<T>(parent, element, undefined, customArgs as IArgs, body as IBody, token);
         }
-        const [ customArgs = {}, body = {} ] = args as [IArgs?, IBody?];
-        return callApi<T>(parent, element, undefined, customArgs as IArgs, body as IBody);
+
+        const cancellable = promise as CancellablePromise<T>;
+        /**
+         * Cancels this specific call via the enclosing cancellation token.
+         *
+         * @param reason - Optional custom cancellation reason
+         * @returns Nothing
+         */
+        cancellable.cancel = (reason?: unknown): void => token.cancel(reason);
+        return cancellable;
     };
 }
 
@@ -84,6 +126,7 @@ export function createRouteHandler<T> (
  * @param {number} [offset] - Page number for paginated routes
  * @param {IArgs} [args] - URL parameters for the route
  * @param {IBody} [body] - Request body data
+ * @param {CancelToken} [token] - Cancellation token owned by the exposed `.cancel()` API
  * @returns {Promise<T>} Promise resolving to the API response
  * @throws {Error} If the path is invalid or required arguments are missing
  * @example
@@ -106,7 +149,8 @@ export async function callApi<T> (
     element: IElement,
     offset?: number,
     args: IArgs = {},
-    body: IBody = {}
+    body: IBody = {},
+    token?: CancelToken
 ): Promise<T> {
     const parentParts = parent.split(".");
     let api: IElement | undefined;
@@ -120,6 +164,8 @@ export async function callApi<T> (
     if (!element || !api || element.type !== "route" || api.type !== "api") {
         throw new InvalidPathError(`${parent}.${element.name}`);
     }
+
+    token?.assertActive();
 
     let url = applyArgs(`${api.url}/${element.url}`, element, args);
 
@@ -159,11 +205,16 @@ export async function callApi<T> (
     Registry.updateElement(beforeApi);
     Registry.updateElement(beforeRoute);
 
-    let response = await fetchWithRetry(api, element, url, config, parent);
+    token?.assertActive();
+
+    let response = await fetchWithRetry(api, element, url, config, parent, token);
 
     if (element.schema) {
+        token?.assertActive();
         response = await element.schema.validate(response);
     }
+
+    token?.assertActive();
 
     const {
         afterRoute,
@@ -209,6 +260,27 @@ async function fetchData (
 }
 
 /**
+ * Fetches data without a timeout budget, still honoring an exposed
+ * `.cancel()` by racing the request against the cancellation token.
+ *
+ * @param cacheOptions - Captured cache settings, or undefined to bypass the cache
+ * @param url - The URL to fetch from
+ * @param config - Fetch configuration options
+ * @param token - Cancellation token owned by the exposed `.cancel()` API, if any
+ * @returns Promise resolving to the parsed response
+ */
+async function fetchCancellable (
+    cacheOptions: FetchCacheOptions | undefined,
+    url: string,
+    config: RequestInit,
+    token?: CancelToken
+): Promise<unknown> {
+    if (!token) return fetchData(cacheOptions, url, config);
+    const request = fetchData(cacheOptions, url, config, (): void => token.assertActive());
+    return Promise.race([ request, token.whenCancelled() ]);
+}
+
+/**
  * Performs a fetch request with retry capability and rate limiting
  *
  * @param api - API element containing retry settings
@@ -216,6 +288,7 @@ async function fetchData (
  * @param url - The URL to fetch from
  * @param config - Fetch configuration options
  * @param parent - Parent path captured by the route handler
+ * @param token - Cancellation token owned by the exposed `.cancel()` API
  * @returns Promise resolving to the parsed response
  * @throws Error after all retry attempts fail or if rate limited
  */
@@ -224,7 +297,8 @@ async function fetchWithRetry (
     route: IElement,
     url: string,
     config: Record<string, unknown>,
-    parent: string
+    parent: string,
+    token?: CancelToken
 ): Promise<unknown> {
     const cacheDuration = route.cache || api.cache;
     const cacheOptions: FetchCacheOptions | undefined = cacheDuration
@@ -260,12 +334,15 @@ async function fetchWithRetry (
         }
     }
 
+    token?.assertActive();
+
     let response;
     let success = false;
     let attempt = 0;
 
     while (attempt <= maxRetries && !success) {
         try {
+            token?.assertActive();
             if (route.callbacks?.call) {
                 route.callbacks.call({});
             } else if (api.callbacks?.call) {
@@ -275,9 +352,10 @@ async function fetchWithRetry (
                 ? await runWithTimeout(
                     (signal, assertActive) => fetchData(cacheOptions, url, { ...init, signal }, assertActive),
                     timeoutCfg,
-                    callerSignal
+                    callerSignal,
+                    token && ((abort): void => token.bindAbort(abort))
                 )
-                : await fetchData(cacheOptions, url, init);
+                : await fetchCancellable(cacheOptions, url, init, token);
             success = true;
         } catch (error: unknown) {
             attempt++;
@@ -297,6 +375,7 @@ async function fetchWithRetry (
             const baseDelay = 200;
             const delay = baseDelay * Math.pow(2, attempt - 1) + Math.random() * 100;
             await new Promise(resolve => setTimeout(resolve, delay));
+            token?.assertActive();
         }
     }
 

@@ -74,6 +74,26 @@ export class RetryExhaustedError extends KlaimError {
 }
 
 /**
+ * Thrown when an in-flight call is cancelled via the exposed `.cancel()` API.
+ */
+export class CancelledError extends KlaimError {
+    /** The underlying reason or error that triggered the cancellation, if any */
+    public readonly cause: unknown;
+
+    /**
+     * Creates a new CancelledError instance.
+     *
+     * @param message - Error message
+     * @param cause - Original cancellation reason or underlying error
+     */
+    public constructor (message: string, cause?: unknown) {
+        super(message);
+        this.name = "CancelledError";
+        this.cause = cause;
+    }
+}
+
+/**
  * Thrown when a required URL argument is missing.
  */
 export class MissingArgumentError extends KlaimError {

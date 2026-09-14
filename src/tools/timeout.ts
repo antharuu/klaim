@@ -16,12 +16,17 @@ export const DEFAULT_TIMEOUT_CONFIG: ITimeoutConfig = {
  * @param operation - Deferred operation and terminal guard
  * @param config - Timeout configuration in seconds
  * @param callerSignal - Original request signal, retained across retries
+ * @param registerAbort - Optional sink receiving this attempt's own abort function, so an
+ * external cancellation source (the exposed `.cancel()` API) can reuse the existing
+ * transport controller instead of allocating a new one. Called only when a controller is
+ * actually created, so callers that never use the extra source do not gain overhead.
  * @returns The first observed terminal result
  */
 export async function runWithTimeout<T> (
     operation: (signal: AbortSignal | null | undefined, assertActive: () => void) => Promise<T>,
     config: ITimeoutConfig,
-    callerSignal?: AbortSignal | null
+    callerSignal?: AbortSignal | null,
+    registerAbort?: (abort: (reason?: unknown) => void) => void
 ): Promise<T> {
     const { duration, message } = config;
     let terminal = false;
@@ -50,6 +55,12 @@ export async function runWithTimeout<T> (
             try {
                 if (typeof globalThis.AbortController === "function") {
                     controller = new globalThis.AbortController();
+                    if (registerAbort) {
+                        const transport = controller;
+                        registerAbort((reason?: unknown): void => {
+                            if (!transport.signal.aborted) transport.abort(reason);
+                        });
+                    }
                     if (callerSignal) {
                         const transport = controller;
                         /** Relays caller cancellation without terminating the runner. */
