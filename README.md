@@ -425,6 +425,40 @@ const todoFail = await Klaim.hello.getTodo<Todo>({id: 15});
 const todo = await Klaim.hello.getTodo<Todo>({id: 1});
 ```
 
+#### Using Zod for Validation
+
+You can also validate responses with [zod](https://www.npmjs.com/package/zod) via the built-in `zodAdapter`. `zod`
+schemas expose `parseAsync`/`safeParseAsync` instead of `validate`, so `zodAdapter` wraps a zod schema into the
+`{ validate }` interface expected by `Route#validate`.
+
+⚠️ **Note**: `zod` is not a dependency of Klaim - it stays entirely optional and must be installed by your project to
+use `zodAdapter`.
+
+```typescript
+import { z } from 'zod';
+import { Api, Klaim, Route, zodAdapter } from 'klaim';
+
+// Define the schema using zod
+const todoSchema = z.object({
+    userId: z.number(),
+    id: z.number().min(1).max(10),
+    title: z.string(),
+    completed: z.boolean()
+});
+
+Api.create("hello", "https://jsonplaceholder.typicode.com/", () => {
+    // Get a specific todo by id with validation
+    Route.get<Todo>("getTodo", "todos/[id]").validate(zodAdapter(todoSchema));
+});
+
+// This request will fail because the id is out of range,
+// throwing a ValidationError with the zod issues as `cause`
+const todoFail = await Klaim.hello.getTodo<Todo>({id: 15});
+
+// This request will succeed
+const todo = await Klaim.hello.getTodo<Todo>({id: 1});
+```
+
 ### Pagination
 
 Configure pagination for routes that require it:

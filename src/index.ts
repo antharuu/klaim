@@ -1,3 +1,5 @@
+export type { IValidateAdapter, IZodLikeSchema, IZodSafeParseResult } from "./adapters/zod";
+export { zodAdapter } from "./adapters/zod";
 export { Api } from "./core/Api";
 export type {
     BatchInput,
@@ -26,7 +28,8 @@ export {
     MissingArgumentError,
     RateLimitError,
     RetryExhaustedError,
-    TimeoutError
+    TimeoutError,
+    ValidationError
 } from "./core/errors";
 export { Group } from "./core/Group";
 export { Hook } from "./core/Hook";
